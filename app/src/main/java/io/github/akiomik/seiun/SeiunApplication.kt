@@ -4,12 +4,13 @@ import android.app.Application
 import com.example.catpaw.services.AtpService
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import io.github.akiomik.seiun.model.Timeline
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
 class SeiunApplication: Application() {
     lateinit var userRepository: UserRepository
-    lateinit var atpService: AtpService
+    lateinit var timelineRepository: TimelineRepository
 
     companion object {
         @get:Synchronized var instance: SeiunApplication? = null
@@ -22,14 +23,14 @@ class SeiunApplication: Application() {
         val moshi = Moshi.Builder()
             .add(KotlinJsonAdapterFactory())
             .build()
-
         val retrofit = Retrofit.Builder()
             .baseUrl("https://bsky.social/xrpc/")
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
+        val atpService = retrofit.create(AtpService::class.java)
 
-        atpService = retrofit.create(AtpService::class.java)
-        userRepository = UserRepository(applicationContext)
+        userRepository = UserRepository(applicationContext, atpService)
+        timelineRepository = TimelineRepository(atpService)
         instance = this
     }
 }

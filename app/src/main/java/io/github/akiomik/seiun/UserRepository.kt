@@ -11,7 +11,7 @@ import io.github.akiomik.seiun.model.Session
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
-class UserRepository(context: Context) {
+class UserRepository(private val context: Context, atpService: AtpService) {
     private val key = MasterKey.Builder(context)
         .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
         .build()
@@ -23,17 +23,7 @@ class UserRepository(context: Context) {
         EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
         EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM)
 
-    // TODO: extract atp client instantiation
-    private val moshi = Moshi.Builder()
-        .add(KotlinJsonAdapterFactory())
-        .build()
-
-    private val retrofit = Retrofit.Builder()
-        .baseUrl("https://bsky.social/xrpc/")
-        .addConverterFactory(MoshiConverterFactory.create(moshi))
-        .build()
-
-    private val atpService: AtpService = retrofit.create(AtpService::class.java)
+    private val atpService = atpService;
 
     fun getSession(): Session {
         val accessJwt = sharedPreferences.getString("accessJwt", "") ?: ""

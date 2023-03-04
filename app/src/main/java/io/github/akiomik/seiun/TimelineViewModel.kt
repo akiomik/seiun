@@ -26,16 +26,8 @@ class TimelineViewModel : ViewModel() {
     private var _state = MutableStateFlow<State>(State.Loading)
     val state = _state.asStateFlow()
 
-    private val moshi = Moshi.Builder()
-        .add(KotlinJsonAdapterFactory())
-        .build()
-
-    private val retrofit = Retrofit.Builder()
-        .baseUrl("https://bsky.social/xrpc/")
-        .addConverterFactory(MoshiConverterFactory.create(moshi))
-        .build()
-
     private val userRepository = SeiunApplication.instance!!.userRepository
+    private val timelineRepository = SeiunApplication.instance!!.timelineRepository
 
     init {
         viewModelScope.launch {
@@ -43,19 +35,11 @@ class TimelineViewModel : ViewModel() {
                 // TODO: improve thread handling
                 thread {
                     val session = userRepository.getSession()
-                    val data = getTimeline(session)
+                    val data = timelineRepository.getTimeline(session)
                     _state.value = State.Data(data)
                 }
                 delay(10 * 1000)
             }
         }
-    }
-
-    private fun getTimeline(session: Session): Timeline {
-        Log.d("Seiun", "getTimeliine")
-        // TODO: improve error handling
-        val service: AtpService = retrofit.create(AtpService::class.java)
-        return service.getTimeline("Bearer ${session.accessJwt}").execute().body()
-            ?: throw IllegalStateException("Empty body on getTimeline")
     }
 }
