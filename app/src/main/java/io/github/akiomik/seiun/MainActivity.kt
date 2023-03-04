@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import coil.compose.AsyncImage
@@ -39,7 +40,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun FeedPost(post: FeedPost) {
-    Row(modifier = Modifier.padding(8.dp)) {
+    Row(modifier = Modifier.padding(10.dp)) {
         AsyncImage(
             model = post.author.avatar,
             contentDescription = null,
@@ -48,9 +49,20 @@ fun FeedPost(post: FeedPost) {
                 .height(50.dp)
                 .clip(CircleShape)
         )
-        Column {
-            Text(text = "@${post.author.handle}", modifier = Modifier.padding(4.dp))
-            Text(text = post.record.text, modifier = Modifier.padding(4.dp))
+        Column(modifier = Modifier.padding(start = 8.dp)) {
+            Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "${post.author.displayName}",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "@${post.author.handle}",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = Color.Gray
+                )
+            }
+            Text(text = post.record.text)
         }
     }
 }
@@ -77,10 +89,10 @@ fun MyApp(
                     LoadingText()
                 }
                 is TimelineViewModel.State.Data -> {
-                    LazyColumn(modifier = Modifier.padding(vertical = 4.dp), verticalArrangement = Arrangement.spacedBy(4.dp),) {
+                    LazyColumn {
                         items(state.timeline.feed) { feedViewPost ->
                             FeedPost(post = feedViewPost.post)
-                            Divider(color = Color.Black)
+                            Divider(color = Color.Gray)
                         }
                     }
                 }
