@@ -1,5 +1,6 @@
 package io.github.akiomik.seiun
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -11,16 +12,20 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.security.crypto.MasterKey
+import androidx.security.crypto.EncryptedSharedPreferences
 import io.github.akiomik.seiun.ui.theme.SeiunTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             SeiunTheme {
                 MyApp(modifier = Modifier.fillMaxSize())
@@ -45,10 +50,13 @@ fun LoginTitle() {
 }
 
 @Composable
-fun LoginForm() {
-    var handle by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var valid by remember { mutableStateOf(false) }
+fun LoginForm(sharedPreferences: SharedPreferences) {
+    val savedHandle = sharedPreferences.getString("handle", "") ?: ""
+    val savedPassword = sharedPreferences.getString("password", "") ?: ""
+
+    var handle by remember { mutableStateOf(savedHandle) }
+    var password by remember { mutableStateOf(savedPassword) }
+    var valid by remember { mutableStateOf(handle.isNotEmpty() && password.isNotEmpty()) }
 
     Column {
         TextField(
@@ -64,7 +72,7 @@ fun LoginForm() {
         )
 
         TextField(
-            value = password,
+            value = password ?: "",
             onValueChange = {
                 password = it
                 valid = handle.isNotEmpty() && password.isNotEmpty()
@@ -78,11 +86,17 @@ fun LoginForm() {
 
         ElevatedButton(
             onClick = {
-                // TODO
-                Log.d("hoge", "$handle:$password")
+                Log.d("login", "as $handle")
+
+                with (sharedPreferences.edit()) {
+                    putString("handle", handle)
+                    putString("password", password)
+                    apply()
+                }
             },
             enabled = valid,
             modifier = Modifier.padding(20.dp)
+
         ) {
             Text("Login")
         }
@@ -99,6 +113,18 @@ fun DefaultPreview() {
 
 @Composable
 private fun MyApp(modifier: Modifier = Modifier) {
+    val key = MasterKey.Builder(LocalContext.current)
+        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+        .build()
+
+    val sharedPreferences = EncryptedSharedPreferences.create(
+        LocalContext.current,
+        "seiun",
+        key,
+        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+    )
+
     Surface(
         modifier = modifier,
         color = MaterialTheme.colorScheme.background
@@ -107,7 +133,7 @@ private fun MyApp(modifier: Modifier = Modifier) {
             AppName()
             AppDescription()
             LoginTitle()
-            LoginForm()
+            LoginForm(sharedPreferences)
         }
     }
 }
