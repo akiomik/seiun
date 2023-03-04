@@ -11,10 +11,10 @@ class TimelineRepository(private val atpService: AtpService) {
         Log.d("Seiun", "Get timeline")
 
         val res = atpService.getTimeline("Bearer ${session.accessJwt}").execute()
-        if (res.code() == 401) {
+        if (res.code() == 400 || res.code() == 401) {
             throw UnauthorizedException("Empty body on getTimeline")
         }
 
-        return res.body() ?: throw IllegalStateException("Empty body on getTimeline")
+        return res.body() ?: throw IllegalStateException("Empty body on getTimeline: ${res.raw()}")
     }
 }

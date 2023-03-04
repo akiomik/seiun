@@ -50,14 +50,14 @@ class UserRepository(private val context: Context, atpService: AtpService) {
 
     fun login(handle: String, password: String): Session {
         Log.d("Seiun", "Create session")
-        return atpService.login(LoginParam(handle, password)).execute().body()
-            ?: throw IllegalStateException("Empty body on login")
+        val res = atpService.login(LoginParam(handle, password)).execute()
+        return res.body() ?: throw IllegalStateException("Empty body on login: ${res.raw()}")
     }
 
     fun refresh(): Session {
         Log.d("Seiun", "Refresh session")
         val oldSession = getSession()
-        return atpService.refreshSession("Bearer ${oldSession.refreshJwt}").execute().body()
-            ?: throw IllegalStateException("Empty body on refresh")
+        val res = atpService.refreshSession("Bearer ${oldSession.refreshJwt}").execute()
+        return res.body() ?: throw IllegalStateException("Empty body on refresh: ${res.raw()}")
     }
 }
