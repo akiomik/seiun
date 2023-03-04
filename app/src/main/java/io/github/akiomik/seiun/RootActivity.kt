@@ -1,5 +1,7 @@
 package io.github.akiomik.seiun
 
+import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
@@ -18,6 +20,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.startActivity
 import androidx.security.crypto.MasterKey
 import androidx.security.crypto.EncryptedSharedPreferences
 import com.example.catpaw.models.LoginParam
@@ -35,8 +39,15 @@ class RootActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
+            val moveToMain = {
+                Log.d("Seiun", "Move Root to Main")
+                val intent = Intent(application, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK;
+                applicationContext.startActivity(intent)
+            }
+
             SeiunTheme {
-                MyApp(modifier = Modifier.fillMaxSize())
+                MyApp(modifier = Modifier.fillMaxSize(), onLoginSuccessful =  moveToMain)
             }
         }
     }
@@ -58,7 +69,7 @@ fun LoginTitle() {
 }
 
 @Composable
-fun LoginForm(sharedPreferences: SharedPreferences) {
+fun LoginForm(sharedPreferences: SharedPreferences, onLoginSuccessful: () -> Unit) {
     val savedHandle = sharedPreferences.getString("handle", "") ?: ""
     val savedPassword = sharedPreferences.getString("password", "") ?: ""
 
@@ -112,6 +123,7 @@ fun LoginForm(sharedPreferences: SharedPreferences) {
                             putString("accessJwt", session.accessJwt)
                             apply()
                         }
+                        onLoginSuccessful()
                     } catch (e: java.lang.Exception) {
                         Log.d("Seiun", "Failed to login $e")
                     }
@@ -130,12 +142,12 @@ fun LoginForm(sharedPreferences: SharedPreferences) {
 @Composable
 fun DefaultPreview() {
     SeiunTheme {
-        MyApp()
+        MyApp({})
     }
 }
 
 @Composable
-private fun MyApp(modifier: Modifier = Modifier) {
+private fun MyApp(onLoginSuccessful: () -> Unit, modifier: Modifier = Modifier) {
     val key = MasterKey.Builder(LocalContext.current)
         .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
         .build()
@@ -156,7 +168,7 @@ private fun MyApp(modifier: Modifier = Modifier) {
             AppName()
             AppDescription()
             LoginTitle()
-            LoginForm(sharedPreferences)
+            LoginForm(sharedPreferences, onLoginSuccessful)
         }
     }
 }
