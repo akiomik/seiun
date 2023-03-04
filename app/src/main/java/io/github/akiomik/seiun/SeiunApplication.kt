@@ -1,10 +1,9 @@
 package io.github.akiomik.seiun
 
 import android.app.Application
-import com.example.catpaw.services.AtpService
+import io.github.akiomik.seiun.service.AtpService
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import io.github.akiomik.seiun.model.Timeline
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 

@@ -47,7 +47,7 @@ fun FeedPost(viewPost: FeedViewPost) {
         if (viewPost.reason?.type == "app.bsky.feed.feedViewPost#reasonRepost")  {
             Box(modifier = Modifier.padding(bottom = 8.dp)) {
                 Text(
-                    text = "Reposted by ${viewPost.reason?.by?.displayName}",
+                    text = "Reposted by ${viewPost.reason.by?.displayName}",
                     fontWeight = FontWeight.Bold,
                     color = Color.Gray,
                     style = MaterialTheme.typography.labelMedium

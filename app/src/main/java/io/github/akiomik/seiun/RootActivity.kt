@@ -21,14 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.security.crypto.MasterKey
 import androidx.security.crypto.EncryptedSharedPreferences
-import io.github.akiomik.seiun.model.LoginParam
-import io.github.akiomik.seiun.model.Session
-import com.example.catpaw.services.AtpService
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import io.github.akiomik.seiun.ui.theme.SeiunTheme
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
 import kotlin.concurrent.thread
 
 class RootActivity : ComponentActivity() {

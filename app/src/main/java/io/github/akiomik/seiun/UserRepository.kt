@@ -4,13 +4,9 @@ import android.content.Context
 import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import com.example.catpaw.services.AtpService
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import io.github.akiomik.seiun.service.AtpService
 import io.github.akiomik.seiun.model.LoginParam
 import io.github.akiomik.seiun.model.Session
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
 
 class UserRepository(private val context: Context, atpService: AtpService) {
     private val key = MasterKey.Builder(context)
@@ -24,7 +20,7 @@ class UserRepository(private val context: Context, atpService: AtpService) {
         EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
         EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM)
 
-    private val atpService = atpService;
+    private val atpService = atpService
 
     fun getSession(): Session {
         val accessJwt = sharedPreferences.getString("accessJwt", "") ?: ""

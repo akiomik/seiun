@@ -1,4 +1,4 @@
-package com.example.catpaw.services
+package io.github.akiomik.seiun.service
 
 import io.github.akiomik.seiun.model.ListRecords
 import io.github.akiomik.seiun.model.LoginParam

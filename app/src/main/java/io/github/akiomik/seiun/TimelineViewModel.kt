@@ -3,19 +3,13 @@ package io.github.akiomik.seiun
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.github.akiomik.seiun.model.Session
 import io.github.akiomik.seiun.model.Timeline
-import com.example.catpaw.services.AtpService
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import io.github.akiomik.seiun.service.UnauthorizedException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
 import kotlin.concurrent.thread
 
 class TimelineViewModel : ViewModel() {
