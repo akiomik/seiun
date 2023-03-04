@@ -20,7 +20,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.security.crypto.MasterKey
 import androidx.security.crypto.EncryptedSharedPreferences
+import com.example.catpaw.models.LoginParam
+import com.example.catpaw.models.Session
+import com.example.catpaw.services.AtpService
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import io.github.akiomik.seiun.ui.theme.SeiunTheme
+import retrofit2.Retrofit
+import retrofit2.converter.moshi.MoshiConverterFactory
+import kotlin.concurrent.thread
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,7 +70,7 @@ fun LoginForm(sharedPreferences: SharedPreferences) {
         TextField(
             value = handle,
             onValueChange = {
-                handle = it;
+                handle = it
                 valid = handle.isNotEmpty() && password.isNotEmpty()
             },
             label = { Text("Handle") },
@@ -72,7 +80,7 @@ fun LoginForm(sharedPreferences: SharedPreferences) {
         )
 
         TextField(
-            value = password ?: "",
+            value = password,
             onValueChange = {
                 password = it
                 valid = handle.isNotEmpty() && password.isNotEmpty()
@@ -92,6 +100,21 @@ fun LoginForm(sharedPreferences: SharedPreferences) {
                     putString("handle", handle)
                     putString("password", password)
                     apply()
+                }
+
+                thread {
+                    try {
+                        val session = getSession(handle, password)
+                        Log.d("Seiun", "Login successful")
+
+                        with(sharedPreferences.edit()) {
+                            putString("did", session.did)
+                            putString("accessJwt", session.accessJwt)
+                            apply()
+                        }
+                    } catch (e: java.lang.Exception) {
+                        Log.d("Seiun", "Failed to login $e")
+                    }
                 }
             },
             enabled = valid,
@@ -136,4 +159,25 @@ private fun MyApp(modifier: Modifier = Modifier) {
             LoginForm(sharedPreferences)
         }
     }
+}
+
+private fun getSession(handle: String, password: String): Session {
+    val moshi = Moshi.Builder()
+        .add(KotlinJsonAdapterFactory())
+        .build()
+
+    val retrofit = Retrofit.Builder()
+        .baseUrl("https://bsky.social/xrpc/")
+        .addConverterFactory(MoshiConverterFactory.create(moshi))
+        .build()
+
+    val service: AtpService = retrofit.create(AtpService::class.java)
+    val session = service.login(
+        LoginParam(handle, password)
+    ).execute().body()
+        ?: throw IllegalStateException("Empty body on login")
+    val timeline = service.getTimeline("Bearer ${session.accessJwt}").execute().body()
+        ?: throw IllegalStateException("Empty body on getTimeline")
+
+    return session
 }
