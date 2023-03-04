@@ -3,7 +3,7 @@ package io.github.akiomik.seiun
 import android.content.Context
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import com.example.catpaw.models.Session
+import io.github.akiomik.seiun.model.Session
 
 class UserRepository(context: Context) {
     private val key = MasterKey.Builder(context)

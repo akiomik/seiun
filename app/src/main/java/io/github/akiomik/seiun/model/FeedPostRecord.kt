@@ -1,4 +1,4 @@
-package com.example.catpaw.models
+package io.github.akiomik.seiun.model
 
 import com.squareup.moshi.Json
 

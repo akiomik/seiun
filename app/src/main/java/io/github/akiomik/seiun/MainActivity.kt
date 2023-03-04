@@ -21,7 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import coil.compose.AsyncImage
-import com.example.catpaw.models.FeedPost
+import io.github.akiomik.seiun.model.FeedPost
 import io.github.akiomik.seiun.ui.theme.SeiunTheme
 
 class MainActivity : ComponentActivity() {

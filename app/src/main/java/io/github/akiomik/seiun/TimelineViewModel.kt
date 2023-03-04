@@ -3,8 +3,8 @@ package io.github.akiomik.seiun
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.catpaw.models.Session
-import com.example.catpaw.models.Timeline
+import io.github.akiomik.seiun.model.Session
+import io.github.akiomik.seiun.model.Timeline
 import com.example.catpaw.services.AtpService
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
