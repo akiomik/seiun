@@ -8,6 +8,7 @@ import io.github.akiomik.seiun.model.Timeline
 import com.example.catpaw.services.AtpService
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import io.github.akiomik.seiun.service.UnauthorizedException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -35,8 +36,15 @@ class TimelineViewModel : ViewModel() {
                 // TODO: improve thread handling
                 thread {
                     val session = userRepository.getSession()
-                    val data = timelineRepository.getTimeline(session)
-                    _state.value = State.Data(data)
+                    try {
+                        val data = timelineRepository.getTimeline(session)
+                        _state.value = State.Data(data)
+                    } catch (e: UnauthorizedException) {
+                        Log.d("Seiun", "Retrying to execute getTimeline")
+                        val session = userRepository.refresh()
+                        val data = timelineRepository.getTimeline(session)
+                        _state.value = State.Data(data)
+                    }
                 }
                 delay(10 * 1000)
             }

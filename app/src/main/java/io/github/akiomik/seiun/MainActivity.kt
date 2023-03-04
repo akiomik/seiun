@@ -43,10 +43,6 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun FeedPost(viewPost: FeedViewPost) {
-//    if (viewPost.reason?.reasonRepost != null) {
-        Log.d("Seiun", viewPost.toString())
-//    }
-
     Column(modifier = Modifier.padding(10.dp)) {
         if (viewPost.reason?.type == "app.bsky.feed.feedViewPost#reasonRepost")  {
             Box(modifier = Modifier.padding(bottom = 8.dp)) {

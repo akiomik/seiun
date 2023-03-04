@@ -14,6 +14,11 @@ interface AtpService {
         @Body body: LoginParam,
     ): Call<Session>
 
+    @POST("com.atproto.session.refresh")
+    fun refreshSession(
+        @Header("Authorization") authorization: String,
+    ): Call<Session>
+
     @GET("com.atproto.repo.listRecords")
     fun listRecords(
         @Query("user") user: String,

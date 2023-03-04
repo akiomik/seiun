@@ -1,6 +1,7 @@
 package io.github.akiomik.seiun
 
 import android.content.Context
+import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.example.catpaw.services.AtpService
@@ -52,7 +53,15 @@ class UserRepository(private val context: Context, atpService: AtpService) {
     }
 
     fun login(handle: String, password: String): Session {
+        Log.d("Seiun", "Create session")
         return atpService.login(LoginParam(handle, password)).execute().body()
             ?: throw IllegalStateException("Empty body on login")
+    }
+
+    fun refresh(): Session {
+        Log.d("Seiun", "Refresh session")
+        val oldSession = getSession()
+        return atpService.refreshSession("Bearer ${oldSession.refreshJwt}").execute().body()
+            ?: throw IllegalStateException("Empty body on refresh")
     }
 }
