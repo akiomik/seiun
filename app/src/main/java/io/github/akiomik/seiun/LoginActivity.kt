@@ -24,7 +24,7 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import io.github.akiomik.seiun.ui.theme.SeiunTheme
 import kotlin.concurrent.thread
 
-class RootActivity : ComponentActivity() {
+class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
