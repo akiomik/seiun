@@ -43,12 +43,22 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun FeedPost(viewPost: FeedViewPost) {
-    if (viewPost.reply != null) {
+//    if (viewPost.reason?.reasonRepost != null) {
         Log.d("Seiun", viewPost.toString())
-    }
+//    }
 
     Column(modifier = Modifier.padding(10.dp)) {
-        if (viewPost.reply != null) {
+        if (viewPost.reason?.type == "app.bsky.feed.feedViewPost#reasonRepost")  {
+            Box(modifier = Modifier.padding(bottom = 8.dp)) {
+                Text(
+                    text = "Reposted by ${viewPost.reason?.by?.displayName}",
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Gray,
+                    style = MaterialTheme.typography.labelMedium
+                )
+            }
+        }
+        else if (viewPost.reply != null) {
             Box(modifier = Modifier.padding(bottom = 8.dp)) {
                 Text(
                     text = "Replying to ${viewPost.reply.parent.author.displayName}",
