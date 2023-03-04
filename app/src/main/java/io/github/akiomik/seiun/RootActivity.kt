@@ -104,23 +104,15 @@ fun LoginForm(sharedPreferences: SharedPreferences, onLoginSuccessful: () -> Uni
             onClick = {
                 Log.d("login", "as $handle")
 
-                with (sharedPreferences.edit()) {
-                    putString("handle", handle)
-                    putString("password", password)
-                    apply()
-                }
+                val userRepository = SeiunApplication.instance!!.userRepository
+                userRepository.saveLoginParam(handle, password)
 
                 thread {
                     try {
-                        val session = getSession(handle, password)
+                        val session = userRepository.login(handle, password)
                         Log.d("Seiun", "Login successful")
 
-                        with(sharedPreferences.edit()) {
-                            putString("did", session.did)
-                            putString("accessJwt", session.accessJwt)
-                            putString("refreshJwt", session.refreshJwt)
-                            apply()
-                        }
+                        userRepository.saveSession(session)
                         onLoginSuccessful()
                     } catch (e: java.lang.Exception) {
                         Log.d("Seiun", "Failed to login $e")
@@ -169,25 +161,4 @@ private fun MyApp(onLoginSuccessful: () -> Unit, modifier: Modifier = Modifier) 
             LoginForm(sharedPreferences, onLoginSuccessful)
         }
     }
-}
-
-private fun getSession(handle: String, password: String): Session {
-    val moshi = Moshi.Builder()
-        .add(KotlinJsonAdapterFactory())
-        .build()
-
-    val retrofit = Retrofit.Builder()
-        .baseUrl("https://bsky.social/xrpc/")
-        .addConverterFactory(MoshiConverterFactory.create(moshi))
-        .build()
-
-    val service: AtpService = retrofit.create(AtpService::class.java)
-    val session = service.login(
-        LoginParam(handle, password)
-    ).execute().body()
-        ?: throw IllegalStateException("Empty body on login")
-    val timeline = service.getTimeline("Bearer ${session.accessJwt}").execute().body()
-        ?: throw IllegalStateException("Empty body on getTimeline")
-
-    return session
 }
