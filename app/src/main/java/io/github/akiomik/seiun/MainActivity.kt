@@ -1,6 +1,7 @@
 package io.github.akiomik.seiun
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -17,11 +18,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.model.FeedPost
+import io.github.akiomik.seiun.model.FeedViewPost
 import io.github.akiomik.seiun.ui.theme.SeiunTheme
 
 class MainActivity : ComponentActivity() {
@@ -39,30 +42,49 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun FeedPost(post: FeedPost) {
-    Row(modifier = Modifier.padding(10.dp)) {
-        AsyncImage(
-            model = post.author.avatar,
-            contentDescription = null,
-            modifier = Modifier
-                .width(50.dp)
-                .height(50.dp)
-                .clip(CircleShape)
-        )
-        Column(modifier = Modifier.padding(start = 8.dp)) {
-            Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
+fun FeedPost(viewPost: FeedViewPost) {
+    if (viewPost.reply != null) {
+        Log.d("Seiun", viewPost.toString())
+    }
+
+    Column(modifier = Modifier.padding(10.dp)) {
+        if (viewPost.reply != null) {
+            Box(modifier = Modifier.padding(bottom = 8.dp)) {
                 Text(
-                    text = "${post.author.displayName}",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "@${post.author.handle}",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = Color.Gray
+                    text = "Replying to ${viewPost.reply.parent.author.displayName}",
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Gray,
+                    style = MaterialTheme.typography.labelMedium
                 )
             }
-            Text(text = post.record.text)
+        }
+        Row {
+            AsyncImage(
+                model = viewPost.post.author.avatar,
+                contentDescription = null,
+                modifier = Modifier
+                    .width(50.dp)
+                    .height(50.dp)
+                    .clip(CircleShape)
+            )
+            Column(modifier = Modifier.padding(start = 8.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "${viewPost.post.author.displayName}",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "@${viewPost.post.author.handle}",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = Color.Gray
+                    )
+                }
+                Text(text = viewPost.post.record.text)
+            }
         }
     }
 }
@@ -91,7 +113,7 @@ fun MyApp(
                 is TimelineViewModel.State.Data -> {
                     LazyColumn {
                         items(state.timeline.feed) { feedViewPost ->
-                            FeedPost(post = feedViewPost.post)
+                            FeedPost(viewPost = feedViewPost)
                             Divider(color = Color.Gray)
                         }
                     }

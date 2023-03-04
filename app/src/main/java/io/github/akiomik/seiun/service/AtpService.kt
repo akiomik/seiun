@@ -1,6 +1,5 @@
 package com.example.catpaw.services
 
-import com.example.catpaw.models.*
 import io.github.akiomik.seiun.model.ListRecords
 import io.github.akiomik.seiun.model.LoginParam
 import io.github.akiomik.seiun.model.Session
