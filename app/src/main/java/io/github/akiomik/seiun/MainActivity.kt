@@ -1,7 +1,6 @@
 package io.github.akiomik.seiun
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -18,12 +17,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import coil.compose.AsyncImage
-import io.github.akiomik.seiun.model.FeedPost
 import io.github.akiomik.seiun.model.FeedViewPost
 import io.github.akiomik.seiun.ui.theme.SeiunTheme
 
@@ -116,9 +113,9 @@ fun MyApp(
                 TimelineViewModel.State.Loading -> {
                     LoadingText()
                 }
-                is TimelineViewModel.State.Data -> {
+                is TimelineViewModel.State.Loaded -> {
                     LazyColumn {
-                        items(state.timeline.feed) { feedViewPost ->
+                        items(viewModel.getPosts().value.orEmpty()) { feedViewPost ->
                             FeedPost(viewPost = feedViewPost)
                             Divider(color = Color.Gray)
                         }
