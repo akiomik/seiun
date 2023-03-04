@@ -70,4 +70,9 @@ dependencies {
     def moshi_version = '1.12.0'
     implementation "com.squareup.moshi:moshi:$moshi_version"
     implementation "com.squareup.moshi:moshi-kotlin:$moshi_version"
+
+    def coil_version = '2.2.2'
+    implementation("io.coil-kt:coil:${coil_version}")
+    implementation("io.coil-kt:coil-compose:${coil_version}")
+
 }
