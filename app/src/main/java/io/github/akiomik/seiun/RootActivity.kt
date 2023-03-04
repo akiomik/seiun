@@ -1,6 +1,5 @@
 package io.github.akiomik.seiun
 
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -20,8 +19,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.startActivity
 import androidx.security.crypto.MasterKey
 import androidx.security.crypto.EncryptedSharedPreferences
 import com.example.catpaw.models.LoginParam
@@ -42,7 +39,7 @@ class RootActivity : ComponentActivity() {
             val moveToMain = {
                 Log.d("Seiun", "Move Root to Main")
                 val intent = Intent(application, MainActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK;
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 applicationContext.startActivity(intent)
             }
 
@@ -121,6 +118,7 @@ fun LoginForm(sharedPreferences: SharedPreferences, onLoginSuccessful: () -> Uni
                         with(sharedPreferences.edit()) {
                             putString("did", session.did)
                             putString("accessJwt", session.accessJwt)
+                            putString("refreshJwt", session.refreshJwt)
                             apply()
                         }
                         onLoginSuccessful()
