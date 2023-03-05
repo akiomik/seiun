@@ -1,4 +1,4 @@
-package io.github.akiomik.seiun
+package io.github.akiomik.seiun.repository
 
 import android.content.Context
 import android.util.Log

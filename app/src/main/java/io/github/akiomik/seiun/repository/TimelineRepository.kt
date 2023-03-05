@@ -1,4 +1,4 @@
-package io.github.akiomik.seiun
+package io.github.akiomik.seiun.repository
 
 import android.util.Log
 import com.slack.eithernet.ApiResult

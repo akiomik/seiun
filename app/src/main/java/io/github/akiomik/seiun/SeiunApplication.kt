@@ -6,6 +6,8 @@ import com.slack.eithernet.ApiResultConverterFactory
 import io.github.akiomik.seiun.service.AtpService
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import io.github.akiomik.seiun.repository.TimelineRepository
+import io.github.akiomik.seiun.repository.UserRepository
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.create
