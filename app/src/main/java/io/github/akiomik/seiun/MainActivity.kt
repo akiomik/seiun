@@ -134,13 +134,24 @@ fun ReplyIndicator(viewPost: FeedViewPost) {
 
 @Composable
 fun RepostIndicator(viewPost: FeedViewPost) {
-    val upvoted = viewPost.post.viewer.repost != null
-    val color: Color = if (upvoted) { colorResource(R.color.green_700)  } else { Color.Gray }
+    val viewModel: TimelineViewModel = viewModel()
+    var reposted by remember { mutableStateOf(viewPost.post.viewer.repost != null) }
+    var count by remember { mutableStateOf(viewPost.post.repostCount) }
+    val color: Color = if (reposted) {
+        colorResource(R.color.green_700)
+    } else {
+        Color.Gray
+    }
 
     TextButton(
         modifier = Modifier.width(64.dp),
         onClick = {
-            // TODO
+            if (!reposted) {
+                viewModel.repost(viewPost.post, onComplete = {
+                    reposted = true;
+                    count += 1
+                })
+            }
         }
     ) {
         Row(
@@ -163,7 +174,11 @@ fun UpvoteIndicator(viewPost: FeedViewPost) {
     val viewModel: TimelineViewModel = viewModel()
     var upvoted by remember { mutableStateOf(viewPost.post.viewer.upvote != null) }
     var count by remember { mutableStateOf(viewPost.post.upvoteCount) }
-    val color = if (upvoted) { colorResource(R.color.red_700) } else { Color.Gray }
+    val color = if (upvoted) {
+        colorResource(R.color.red_700)
+    } else {
+        Color.Gray
+    }
 
     TextButton(
         modifier = Modifier.width(64.dp),
@@ -222,10 +237,9 @@ fun FeedPostContent(viewPost: FeedViewPost) {
 @Composable
 fun FeedPost(viewPost: FeedViewPost) {
     Column(modifier = Modifier.padding(10.dp)) {
-        if (viewPost.reason?.type == "app.bsky.feed.feedViewPost#reasonRepost")  {
+        if (viewPost.reason?.type == "app.bsky.feed.feedViewPost#reasonRepost") {
             RetweetText(viewPost = viewPost)
-        }
-        else if (viewPost.reply != null) {
+        } else if (viewPost.reply != null) {
             ReplyText(viewPost = viewPost)
         }
 
@@ -239,19 +253,26 @@ fun FeedPost(viewPost: FeedViewPost) {
 @Composable
 fun LoadingText() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Text("Loading")
             CircularProgressIndicator()
         }
     }
 }
+
 @Composable
 fun LoadingIndicator() {
     val viewModel: TimelineViewModel = viewModel()
 
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .padding(8.dp), contentAlignment = Alignment.Center) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp), contentAlignment = Alignment.Center
+    ) {
         CircularProgressIndicator()
     }
 
@@ -267,9 +288,10 @@ fun Timeline() {
     val listState = rememberLazyListState()
     val feedViewPosts = viewModel.feedViewPosts.observeAsState()
     val isRefreshing = viewModel.isRefreshing.observeAsState()
-    val refreshState = rememberPullRefreshState(refreshing = isRefreshing.value ?: false, onRefresh = {
-        viewModel.refreshPosts()
-    })
+    val refreshState =
+        rememberPullRefreshState(refreshing = isRefreshing.value ?: false, onRefresh = {
+            viewModel.refreshPosts()
+        })
 
     Box(modifier = Modifier.pullRefresh(state = refreshState)) {
         LazyColumn(state = listState) {
@@ -331,10 +353,16 @@ fun NewPostForm(onClose: () -> Unit) {
     var content by remember { mutableStateOf("") }
     var valid by remember { mutableStateOf(false) }
 
-    Dialog(onDismissRequest = onClose, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+    Dialog(
+        onDismissRequest = onClose,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
         Surface(modifier = Modifier.fillMaxSize()) {
             Column(modifier = Modifier.padding(8.dp)) {
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
                     TextButton(onClick = onClose) {
                         Text("Cancel")
                     }

@@ -121,6 +121,15 @@ class TimelineViewModel : ViewModel() {
         }
     }
 
+    fun repost(feedPost: FeedPost, onComplete: () -> Unit) {
+        val session = userRepository.getSession()
+        viewModelScope.launch(Dispatchers.IO) {
+            val ref = StrongRef(cid = feedPost.cid, uri = feedPost.uri)
+            timelineRepository.repost(session, ref)
+            onComplete()
+        }
+    }
+
     fun createPost(content: String) {
         val session = userRepository.getSession()
         viewModelScope.launch(Dispatchers.IO) {

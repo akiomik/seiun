@@ -3,7 +3,6 @@ package io.github.akiomik.seiun.service
 import com.slack.eithernet.ApiResult
 import com.slack.eithernet.DecodeErrorBody
 import io.github.akiomik.seiun.model.*
-import retrofit2.Call
 
 import retrofit2.http.*
 
@@ -45,7 +44,14 @@ interface AtpService {
     suspend fun createPost(
         @Header("Authorization") authorization: String,
         @Body body: CreatePostParam
-    ): ApiResult<CreatePostResponse, AtpError>
+    ): ApiResult<CreateRecordResponse, AtpError>
+
+    @DecodeErrorBody
+    @POST("com.atproto.repo.createRecord")
+    suspend fun retweet(
+        @Header("Authorization") authorization: String,
+        @Body body: RepostParam
+    ): ApiResult<CreateRecordResponse, AtpError>
 
     @DecodeErrorBody
     @POST("app.bsky.feed.setVote")
