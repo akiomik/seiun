@@ -19,14 +19,20 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModelProvider
 import androidx.security.crypto.MasterKey
 import androidx.security.crypto.EncryptedSharedPreferences
 import io.github.akiomik.seiun.ui.theme.SeiunTheme
+import kotlinx.coroutines.Dispatchers.IO
 import kotlin.concurrent.thread
 
 class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val viewModel: LoginViewModel by lazy {
+            ViewModelProvider(this).get(LoginViewModel::class.java)
+        }
 
         setContent {
             val moveToMain = {
@@ -37,7 +43,7 @@ class LoginActivity : ComponentActivity() {
             }
 
             SeiunTheme {
-                MyApp(modifier = Modifier.fillMaxSize(), onLoginSuccessful =  moveToMain)
+                MyApp(viewModel = viewModel, modifier = Modifier.fillMaxSize(), onLoginSuccessful =  moveToMain)
             }
         }
     }
@@ -59,7 +65,7 @@ fun LoginTitle() {
 }
 
 @Composable
-fun LoginForm(sharedPreferences: SharedPreferences, onLoginSuccessful: () -> Unit) {
+fun LoginForm(viewModel: LoginViewModel, sharedPreferences: SharedPreferences, onLoginSuccessful: () -> Unit) {
     val savedHandle = sharedPreferences.getString("handle", "") ?: ""
     val savedPassword = sharedPreferences.getString("password", "") ?: ""
 
@@ -95,21 +101,22 @@ fun LoginForm(sharedPreferences: SharedPreferences, onLoginSuccessful: () -> Uni
 
         ElevatedButton(
             onClick = {
-                Log.d("login", "as $handle")
+                Log.d("Seiun", "Loing as $handle")
 
                 val userRepository = SeiunApplication.instance!!.userRepository
                 userRepository.saveLoginParam(handle, password)
 
-                thread {
-                    try {
-                        val session = userRepository.login(handle, password)
-                        Log.d("Seiun", "Login successful")
-
-                        userRepository.saveSession(session)
-                        onLoginSuccessful()
-                    } catch (e: java.lang.Exception) {
-                        Log.d("Seiun", "Failed to login $e")
-                    }
+                try {
+                    viewModel.login(
+                        handle = handle,
+                        password = password,
+                        onLoginSuccessful = { session ->
+                            Log.d("Seiun", "Login successful")
+                            userRepository.saveSession(session)
+                            onLoginSuccessful()
+                        })
+                } catch (e: java.lang.Exception) {
+                    Log.d("Seiun", "Failed to login $e")
                 }
             },
             enabled = valid,
@@ -121,16 +128,16 @@ fun LoginForm(sharedPreferences: SharedPreferences, onLoginSuccessful: () -> Uni
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    SeiunTheme {
-        MyApp({})
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun DefaultPreview() {
+//    SeiunTheme {
+//        MyApp()
+//    }
+//}
 
 @Composable
-private fun MyApp(onLoginSuccessful: () -> Unit, modifier: Modifier = Modifier) {
+private fun MyApp(viewModel: LoginViewModel, onLoginSuccessful: () -> Unit, modifier: Modifier = Modifier) {
     val key = MasterKey.Builder(LocalContext.current)
         .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
         .build()
@@ -151,7 +158,7 @@ private fun MyApp(onLoginSuccessful: () -> Unit, modifier: Modifier = Modifier) 
             AppName()
             AppDescription()
             LoginTitle()
-            LoginForm(sharedPreferences, onLoginSuccessful)
+            LoginForm(viewModel, sharedPreferences, onLoginSuccessful)
         }
     }
 }

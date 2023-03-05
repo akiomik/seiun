@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.slack.eithernet.ApiResult
 import io.github.akiomik.seiun.service.AtpService
 import io.github.akiomik.seiun.model.LoginParam
 import io.github.akiomik.seiun.model.Session
@@ -48,16 +49,25 @@ class UserRepository(private val context: Context, atpService: AtpService) {
         }
     }
 
-    fun login(handle: String, password: String): Session {
+    suspend fun login(handle: String, password: String): Session {
         Log.d("Seiun", "Create session")
-        val res = atpService.login(LoginParam(handle, password)).execute()
-        return res.body() ?: throw IllegalStateException("Empty body on login: ${res.raw()}")
+        try {
+            return when (val result = atpService.login(LoginParam(handle, password))) {
+                is ApiResult.Success -> result.value
+                is ApiResult.Failure -> throw IllegalStateException("ApiResult.Failure: $result")
+            }
+        } catch (e: java.lang.Exception) {
+            Log.d("Seiun", e.stackTraceToString())
+            throw e
+        }
     }
 
-    fun refresh(): Session {
+    suspend fun refresh(): Session {
         Log.d("Seiun", "Refresh session")
         val oldSession = getSession()
-        val res = atpService.refreshSession("Bearer ${oldSession.refreshJwt}").execute()
-        return res.body() ?: throw IllegalStateException("Empty body on refresh: ${res.raw()}")
+        return when (val result = atpService.refreshSession("Bearer ${oldSession.refreshJwt}")) {
+            is ApiResult.Success -> result.value
+            is ApiResult.Failure -> throw IllegalStateException("ApiResult.Failure: $result")
+        }
     }
 }

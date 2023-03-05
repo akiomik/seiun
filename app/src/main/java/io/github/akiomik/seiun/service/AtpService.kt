@@ -1,39 +1,42 @@
 package io.github.akiomik.seiun.service
 
-import io.github.akiomik.seiun.model.ListRecords
-import io.github.akiomik.seiun.model.LoginParam
-import io.github.akiomik.seiun.model.Session
-import io.github.akiomik.seiun.model.Timeline
+import com.slack.eithernet.ApiResult
+import com.slack.eithernet.DecodeErrorBody
+import io.github.akiomik.seiun.model.*
 import retrofit2.Call
 
 import retrofit2.http.*
 
 interface AtpService {
+    @DecodeErrorBody
     @POST("com.atproto.session.create")
-    fun login(
+    suspend fun login(
         @Body body: LoginParam,
-    ): Call<Session>
+    ): ApiResult<Session, AtpError>
 
+    @DecodeErrorBody
     @POST("com.atproto.session.refresh")
-    fun refreshSession(
+    suspend fun refreshSession(
         @Header("Authorization") authorization: String,
-    ): Call<Session>
+    ): ApiResult<Session, AtpError>
 
+    @DecodeErrorBody
     @GET("com.atproto.repo.listRecords")
-    fun listRecords(
+    suspend fun listRecords(
         @Query("user") user: String,
         @Query("collection") collection: String,
         @Query("limit") limit: Int? = null,
         @Query("before") before: String? = null,
         @Query("after") after: String? = null,
         @Query("reverse") reverse: Boolean? = null
-    ): Call<ListRecords>
+    ): ApiResult<ListRecords, AtpError>
 
+    @DecodeErrorBody
     @GET("app.bsky.feed.getTimeline")
-    fun getTimeline(
+    suspend fun getTimeline(
         @Header("Authorization") authorization: String,
         @Query("algorithm") algorithm: String? = null,
         @Query("limit") limit: Int? = null,
         @Query("before") before: String? = null,
-    ): Call<Timeline>
+    ): ApiResult<Timeline, AtpError>
 }
