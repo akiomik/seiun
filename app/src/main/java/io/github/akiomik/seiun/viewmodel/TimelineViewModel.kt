@@ -1,10 +1,11 @@
-package io.github.akiomik.seiun
+package io.github.akiomik.seiun.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.model.FeedPost
 import io.github.akiomik.seiun.model.FeedViewPost
 import io.github.akiomik.seiun.model.StrongRef

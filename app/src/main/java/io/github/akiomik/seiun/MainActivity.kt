@@ -11,7 +11,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.sharp.*
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -35,6 +34,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.model.FeedViewPost
 import io.github.akiomik.seiun.ui.theme.SeiunTheme
+import io.github.akiomik.seiun.viewmodel.TimelineViewModel
 
 
 class MainActivity : ComponentActivity() {

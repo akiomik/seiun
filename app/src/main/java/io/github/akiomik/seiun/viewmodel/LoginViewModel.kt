@@ -1,21 +1,11 @@
-package io.github.akiomik.seiun
+package io.github.akiomik.seiun.viewmodel
 
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.github.akiomik.seiun.model.FeedViewPost
+import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.model.Session
-import io.github.akiomik.seiun.model.Timeline
-import io.github.akiomik.seiun.service.UnauthorizedException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlin.concurrent.thread
 
 class LoginViewModel : ViewModel() {
     private val userRepository = SeiunApplication.instance!!.userRepository
