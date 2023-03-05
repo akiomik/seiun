@@ -24,20 +24,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.core.graphics.toColor
-import androidx.core.graphics.toColorLong
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.model.FeedViewPost
-import io.github.akiomik.seiun.model.Timeline
 import io.github.akiomik.seiun.ui.theme.SeiunTheme
 
 
@@ -203,7 +198,12 @@ fun FeedPostContent(viewPost: FeedViewPost) {
             RepostIndicator(viewPost = viewPost)
             UpvoteIndicator(viewPost = viewPost)
         }
-        Text(text = viewPost.post.record.createdAt)
+        Text(
+            modifier = Modifier.padding(bottom = 4.dp),
+            text = viewPost.post.record.createdAt,
+            color = Color.Gray,
+            style = MaterialTheme.typography.labelMedium
+        )
     }
 }
 
