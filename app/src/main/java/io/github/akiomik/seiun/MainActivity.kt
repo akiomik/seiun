@@ -14,12 +14,10 @@ import androidx.compose.material.icons.sharp.ChatBubbleOutline
 import androidx.compose.material.icons.sharp.FavoriteBorder
 import androidx.compose.material.icons.sharp.SyncAlt
 import androidx.compose.material3.*
-import androidx.compose.material3.TabRowDefaults.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,9 +29,6 @@ import androidx.lifecycle.ViewModelProvider
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.model.FeedViewPost
 import io.github.akiomik.seiun.ui.theme.SeiunTheme
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

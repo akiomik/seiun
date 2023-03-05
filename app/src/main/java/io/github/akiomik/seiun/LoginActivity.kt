@@ -64,6 +64,7 @@ fun LoginTitle() {
     Text(text = "Login", fontSize = 23.sp, modifier = Modifier.padding(20.dp))
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginForm(viewModel: LoginViewModel, onLoginSuccessful: () -> Unit) {
     val (savedHandle, savedPassword) = viewModel.getLoginParam()
