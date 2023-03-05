@@ -149,7 +149,7 @@ fun RepostIndicator(viewPost: FeedViewPost) {
         onClick = {
             if (!reposted) {
                 viewModel.repost(viewPost.post, onComplete = {
-                    reposted = true;
+                    reposted = true
                     count += 1
                 })
             }
