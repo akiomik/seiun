@@ -46,4 +46,11 @@ interface AtpService {
         @Header("Authorization") authorization: String,
         @Body body: CreatePostParam
     ): ApiResult<CreatePostResponse, AtpError>
+
+    @DecodeErrorBody
+    @POST("com.atproto.repo.createRecord")
+    suspend fun upvote(
+        @Header("Authorization") authorization: String,
+        @Body body: SetVoteParam
+    ): ApiResult<SetVoteResponse, AtpError>
 }
