@@ -112,6 +112,15 @@ class TimelineViewModel : ViewModel() {
         }
     }
 
+    fun cancelVote(feedPost: FeedPost, onComplete: () -> Unit) {
+        val session = userRepository.getSession()
+        viewModelScope.launch(Dispatchers.IO) {
+            val ref = StrongRef(cid = feedPost.cid, uri = feedPost.uri)
+            timelineRepository.cancelVote(session, ref)
+            onComplete()
+        }
+    }
+
     fun createPost(content: String) {
         val session = userRepository.getSession()
         viewModelScope.launch(Dispatchers.IO) {

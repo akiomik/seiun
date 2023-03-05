@@ -46,6 +46,25 @@ class TimelineRepository(private val atpService: AtpService) {
         }
     }
 
+    suspend fun cancelVote(session: Session, subject: StrongRef) {
+        Log.d("Seiun", "Cancel vote post: uri = ${subject.uri}, cid = ${subject.cid}")
+
+        val body = SetVoteParam(subject = subject, direction = VoteDirection.none)
+        when (val result = atpService.upvote(authorization = "Bearer ${session.accessJwt}", body = body)) {
+            is ApiResult.Success -> {}
+            is ApiResult.Failure -> when(result) {
+                is ApiResult.Failure.HttpFailure -> {
+                    if (result.code == 401) {
+                        throw UnauthorizedException("Unauthorized: ${result.code} (${result.error})")
+                    } else {
+                        throw IllegalStateException("HttpError: ${result.code} (${result.error})")
+                    }
+                }
+                else -> throw IllegalStateException("ApiResult.Failure: ${result.response()}")
+            }
+        }
+    }
+
     suspend fun createPost(session: Session, content: String) {
         Log.d("Seiun", "Create a post: content = $content")
 
