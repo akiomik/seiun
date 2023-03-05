@@ -249,6 +249,7 @@ fun Timeline() {
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun NewPostForm(onClose: () -> Unit) {
+    val viewModel: TimelineViewModel = viewModel()
     var content by remember { mutableStateOf("") }
     var valid by remember { mutableStateOf(false) }
 
@@ -259,7 +260,11 @@ fun NewPostForm(onClose: () -> Unit) {
                     TextButton(onClick = onClose) {
                         Text("Cancel")
                     }
-                    Button(onClick = onClose, enabled = valid) {
+                    Button(onClick = {
+                        // TODO: Check post completion
+                        viewModel.createPost(content)
+                        onClose()
+                    }, enabled = valid) {
                         Text("Post")
                     }
                 }
@@ -275,7 +280,10 @@ fun NewPostForm(onClose: () -> Unit) {
                     label = { Text("Content") },
                     placeholder = { Text(text = "What's up?") },
                     maxLines = 8,
-                    modifier = Modifier.padding(20.dp).fillMaxWidth().height(320.dp)
+                    modifier = Modifier
+                        .padding(20.dp)
+                        .fillMaxWidth()
+                        .height(320.dp)
                 )
             }
         }

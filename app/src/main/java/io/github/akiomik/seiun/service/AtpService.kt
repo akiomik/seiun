@@ -39,4 +39,11 @@ interface AtpService {
         @Query("limit") limit: Int? = null,
         @Query("before") before: String? = null,
     ): ApiResult<Timeline, AtpError>
+
+    @DecodeErrorBody
+    @POST("com.atproto.repo.createRecord")
+    suspend fun createPost(
+        @Header("Authorization") authorization: String,
+        @Body body: CreatePostParam
+    ): ApiResult<CreatePostResponse, AtpError>
 }

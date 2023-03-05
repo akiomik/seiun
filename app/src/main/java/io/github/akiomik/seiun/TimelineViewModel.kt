@@ -51,10 +51,10 @@ class TimelineViewModel : ViewModel() {
            return
         }
 
-        Log.d("Seiun", "Refresh timeline")
-        _isRefreshing.value = true
-
         viewModelScope.launch(Dispatchers.IO) {
+            Log.d("Seiun", "Refresh timeline")
+            _isRefreshing.postValue(true)
+
             val session = userRepository.getSession()
             val data = try {
                 timelineRepository.getTimeline(session)
@@ -98,6 +98,14 @@ class TimelineViewModel : ViewModel() {
                 _state.value = State.Loaded
                 Log.d("Seiun", "new feed count: ${newFeedPosts.size}")
             }
+        }
+    }
+
+    fun createPost(content: String) {
+        val session = userRepository.getSession()
+        viewModelScope.launch(Dispatchers.IO) {
+            timelineRepository.createPost(session, content)
+            refreshPosts()
         }
     }
 
