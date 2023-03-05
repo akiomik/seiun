@@ -1,6 +1,5 @@
 package io.github.akiomik.seiun
 
-import android.graphics.Paint.Align
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,6 +10,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.sharp.ChatBubbleOutline
 import androidx.compose.material.icons.sharp.FavoriteBorder
 import androidx.compose.material.icons.sharp.SyncAlt
@@ -28,22 +28,20 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.model.FeedViewPost
 import io.github.akiomik.seiun.ui.theme.SeiunTheme
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val viewModel: TimelineViewModel by lazy {
-            ViewModelProvider(this).get(TimelineViewModel::class.java)
-        }
-
         setContent {
-            MyApp(viewModel)
+            MyApp()
         }
     }
 }
@@ -206,7 +204,9 @@ fun LoadingText() {
     }
 }
 @Composable
-fun LoadingIndicator(viewModel: TimelineViewModel) {
+fun LoadingIndicator() {
+    val viewModel: TimelineViewModel = viewModel()
+
     Box(modifier = Modifier
         .fillMaxSize()
         .padding(8.dp), contentAlignment = Alignment.Center) {
@@ -220,42 +220,45 @@ fun LoadingIndicator(viewModel: TimelineViewModel) {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun MyApp(
-    viewModel: TimelineViewModel
-) {
+fun Timeline() {
+    val viewModel: TimelineViewModel = viewModel()
+    val listState = rememberLazyListState()
+    val feedViewPosts = viewModel.feedViewPosts.observeAsState()
+    val isRefreshing = viewModel.isRefreshing.observeAsState()
+    val refreshState = rememberPullRefreshState(refreshing = isRefreshing.value ?: false, onRefresh = {
+        viewModel.refreshPosts()
+    })
+
+    Box(modifier = Modifier.pullRefresh(state = refreshState)) {
+        LazyColumn(state = listState) {
+            items(feedViewPosts.value.orEmpty()) { feedViewPost ->
+                FeedPost(viewPost = feedViewPost)
+                Divider(color = Color.Gray)
+            }
+            item { LoadingIndicator() }
+        }
+
+        PullRefreshIndicator(
+            refreshing = isRefreshing.value ?: false,
+            state = refreshState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
+    }
+}
+
+@Composable
+fun MyApp() {
+    val viewModel: TimelineViewModel = viewModel()
+
     SeiunTheme {
         // A surface container using the 'background' color from the theme
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            when (val state = viewModel.state.collectAsState().value) {
-                TimelineViewModel.State.Loading -> {
-                    LoadingText()
-                }
-                is TimelineViewModel.State.Loaded -> {
-                    val listState = rememberLazyListState()
-                    val feedViewPosts = viewModel.feedViewPosts.observeAsState()
-                    val isRefreshing = viewModel.isRefreshing.observeAsState()
-                    val refreshState = rememberPullRefreshState(refreshing = isRefreshing.value ?: false, onRefresh = {
-                        viewModel.refreshPosts()
-                    })
-                    Box(modifier = Modifier.pullRefresh(state = refreshState)) {
-                        LazyColumn(state = listState) {
-                            items(feedViewPosts.value.orEmpty()) { feedViewPost ->
-                                FeedPost(viewPost = feedViewPost)
-                                Divider(color = Color.Gray)
-                            }
-                            item { LoadingIndicator(viewModel) }
-                        }
-
-                        PullRefreshIndicator(
-                            refreshing = isRefreshing.value ?: false,
-                            state = refreshState,
-                            modifier = Modifier.align(Alignment.TopCenter)
-                        )
-                    }
-                }
+            when (viewModel.state.collectAsState().value) {
+                is TimelineViewModel.State.Loading -> LoadingText()
+                is TimelineViewModel.State.Loaded -> Timeline()
             }
         }
     }

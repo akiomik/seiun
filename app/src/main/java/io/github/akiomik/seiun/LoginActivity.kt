@@ -1,7 +1,6 @@
 package io.github.akiomik.seiun
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -13,26 +12,16 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModelProvider
-import androidx.security.crypto.MasterKey
-import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.akiomik.seiun.ui.theme.SeiunTheme
-import kotlinx.coroutines.Dispatchers.IO
-import kotlin.concurrent.thread
 
 class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val viewModel: LoginViewModel by lazy {
-            ViewModelProvider(this).get(LoginViewModel::class.java)
-        }
 
         setContent {
             val moveToMain = {
@@ -43,7 +32,7 @@ class LoginActivity : ComponentActivity() {
             }
 
             SeiunTheme {
-                MyApp(viewModel = viewModel, modifier = Modifier.fillMaxSize(), onLoginSuccessful =  moveToMain)
+                MyApp(modifier = Modifier.fillMaxSize(), onLoginSuccessful =  moveToMain)
             }
         }
     }
@@ -66,7 +55,8 @@ fun LoginTitle() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginForm(viewModel: LoginViewModel, onLoginSuccessful: () -> Unit) {
+fun LoginForm(onLoginSuccessful: () -> Unit) {
+    val viewModel: LoginViewModel = viewModel()
     val (savedHandle, savedPassword) = viewModel.getLoginParam()
     var handle by remember { mutableStateOf(savedHandle) }
     var password by remember { mutableStateOf(savedPassword) }
@@ -100,7 +90,7 @@ fun LoginForm(viewModel: LoginViewModel, onLoginSuccessful: () -> Unit) {
 
         ElevatedButton(
             onClick = {
-                Log.d("Seiun", "Loing as $handle")
+                Log.d("Seiun", "Login as $handle")
 
                 val userRepository = SeiunApplication.instance!!.userRepository
                 userRepository.saveLoginParam(handle, password)
@@ -127,16 +117,8 @@ fun LoginForm(viewModel: LoginViewModel, onLoginSuccessful: () -> Unit) {
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun DefaultPreview() {
-//    SeiunTheme {
-//        MyApp()
-//    }
-//}
-
 @Composable
-private fun MyApp(viewModel: LoginViewModel, onLoginSuccessful: () -> Unit, modifier: Modifier = Modifier) {
+private fun MyApp(onLoginSuccessful: () -> Unit, modifier: Modifier = Modifier) {
     Surface(
         modifier = modifier,
         color = MaterialTheme.colorScheme.background
@@ -145,7 +127,7 @@ private fun MyApp(viewModel: LoginViewModel, onLoginSuccessful: () -> Unit, modi
             AppName()
             AppDescription()
             LoginTitle()
-            LoginForm(viewModel, onLoginSuccessful)
+            LoginForm(onLoginSuccessful)
         }
     }
 }
