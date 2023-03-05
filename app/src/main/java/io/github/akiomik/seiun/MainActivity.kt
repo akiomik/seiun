@@ -25,6 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -246,10 +247,45 @@ fun Timeline() {
     }
 }
 
+@Composable
+fun PostButton(content: String, enabled: Boolean, onComplete: () -> Unit) {
+    val viewModel: TimelineViewModel = viewModel()
+
+    Button(onClick = {
+        // TODO: Check post completion
+        viewModel.createPost(content)
+        onComplete()
+    }, enabled = enabled) {
+        Text("Post")
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PostContentField(content: String, onChange: (String) -> Unit) {
+    TextField(
+        value = content,
+        onValueChange = onChange,
+        label = { Text("Content") },
+        placeholder = { Text(text = "What's up?") },
+        maxLines = 8,
+        modifier = Modifier
+            .padding(20.dp)
+            .fillMaxWidth()
+            .height(320.dp),
+        supportingText = {
+            Text(
+                text = "${content.length} / 256",
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.End,
+            )
+        }
+    )
+}
+
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun NewPostForm(onClose: () -> Unit) {
-    val viewModel: TimelineViewModel = viewModel()
     var content by remember { mutableStateOf("") }
     var valid by remember { mutableStateOf(false) }
 
@@ -260,31 +296,15 @@ fun NewPostForm(onClose: () -> Unit) {
                     TextButton(onClick = onClose) {
                         Text("Cancel")
                     }
-                    Button(onClick = {
-                        // TODO: Check post completion
-                        viewModel.createPost(content)
-                        onClose()
-                    }, enabled = valid) {
-                        Text("Post")
-                    }
+                    PostButton(content = content, enabled = valid) { onClose() }
                 }
 
                 Spacer(modifier = Modifier.size(8.dp))
 
-                TextField(
-                    value = content,
-                    onValueChange = {
-                        content = it
-                        valid = content.isNotEmpty()
-                    },
-                    label = { Text("Content") },
-                    placeholder = { Text(text = "What's up?") },
-                    maxLines = 8,
-                    modifier = Modifier
-                        .padding(20.dp)
-                        .fillMaxWidth()
-                        .height(320.dp)
-                )
+                PostContentField(content = content) {
+                    content = it
+                    valid = content.isNotEmpty() && content.length <= 256
+                }
             }
         }
     }
