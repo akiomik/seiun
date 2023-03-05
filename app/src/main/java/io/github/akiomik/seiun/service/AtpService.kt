@@ -48,7 +48,7 @@ interface AtpService {
     ): ApiResult<CreatePostResponse, AtpError>
 
     @DecodeErrorBody
-    @POST("com.atproto.repo.createRecord")
+    @POST("app.bsky.feed.setVote")
     suspend fun upvote(
         @Header("Authorization") authorization: String,
         @Body body: SetVoteParam

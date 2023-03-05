@@ -5,7 +5,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.github.akiomik.seiun.model.FeedPost
 import io.github.akiomik.seiun.model.FeedViewPost
+import io.github.akiomik.seiun.model.StrongRef
 import io.github.akiomik.seiun.service.UnauthorizedException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -98,6 +100,15 @@ class TimelineViewModel : ViewModel() {
                 _state.value = State.Loaded
                 Log.d("Seiun", "new feed count: ${newFeedPosts.size}")
             }
+        }
+    }
+
+    fun upvote(feedPost: FeedPost, onComplete: () -> Unit) {
+        val session = userRepository.getSession()
+        viewModelScope.launch(Dispatchers.IO) {
+            val ref = StrongRef(cid = feedPost.cid, uri = feedPost.uri)
+            timelineRepository.upvote(session, ref)
+            onComplete()
         }
     }
 

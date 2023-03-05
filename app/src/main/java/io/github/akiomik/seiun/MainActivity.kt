@@ -134,7 +134,7 @@ fun ReplyIndicator(viewPost: FeedViewPost) {
 
 @Composable
 fun RepostIndicator(viewPost: FeedViewPost) {
-    val upvoted = viewPost.post.viewer.repost != null;
+    val upvoted = viewPost.post.viewer.repost != null
     val color: Color = if (upvoted) { colorResource(R.color.green_700)  } else { Color.Gray }
 
     TextButton(
@@ -160,13 +160,16 @@ fun RepostIndicator(viewPost: FeedViewPost) {
 
 @Composable
 fun UpvoteIndicator(viewPost: FeedViewPost) {
-    val upvoted = viewPost.post.viewer.upvote != null;
-    val color = if (upvoted) { colorResource(R.color.red_700) } else { Color.Gray }
+    val viewModel: TimelineViewModel = viewModel()
+    var color by remember { mutableStateOf(Color.Gray) }
+    val red700 = colorResource(R.color.red_700)
 
     TextButton(
         modifier = Modifier.width(64.dp),
         onClick = {
-            // TODO
+            viewModel.upvote(feedPost = viewPost.post) {
+                color = red700
+            }
         }
     ) {
         Row(
