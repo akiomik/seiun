@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.sharp.*
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -179,6 +180,11 @@ fun UpvoteIndicator(viewPost: FeedViewPost) {
     } else {
         Color.Gray
     }
+    val icon = if (upvoted) {
+        Icons.Sharp.Favorite
+    } else {
+        Icons.Sharp.FavoriteBorder
+    }
 
     TextButton(
         modifier = Modifier.width(64.dp),
@@ -201,7 +207,7 @@ fun UpvoteIndicator(viewPost: FeedViewPost) {
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Icon(
-                painter = rememberVectorPainter(Icons.Sharp.FavoriteBorder),
+                painter = rememberVectorPainter(icon),
                 contentDescription = null,
                 modifier = Modifier.size(16.dp),
                 tint = color
