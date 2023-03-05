@@ -9,10 +9,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.ChatBubbleOutline
 import androidx.compose.material.icons.sharp.FavoriteBorder
 import androidx.compose.material.icons.sharp.SyncAlt
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -214,6 +218,7 @@ fun LoadingIndicator(viewModel: TimelineViewModel) {
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MyApp(
     viewModel: TimelineViewModel
@@ -231,12 +236,24 @@ fun MyApp(
                 is TimelineViewModel.State.Loaded -> {
                     val listState = rememberLazyListState()
                     val feedViewPosts = viewModel.feedViewPosts.observeAsState()
-                    LazyColumn(state = listState) {
-                        items(feedViewPosts.value.orEmpty()) { feedViewPost ->
-                            FeedPost(viewPost = feedViewPost)
-                            Divider(color = Color.Gray)
+                    val isRefreshing = viewModel.isRefreshing.observeAsState()
+                    val refreshState = rememberPullRefreshState(refreshing = isRefreshing.value ?: false, onRefresh = {
+                        viewModel.refreshPosts()
+                    })
+                    Box(modifier = Modifier.pullRefresh(state = refreshState)) {
+                        LazyColumn(state = listState) {
+                            items(feedViewPosts.value.orEmpty()) { feedViewPost ->
+                                FeedPost(viewPost = feedViewPost)
+                                Divider(color = Color.Gray)
+                            }
+                            item { LoadingIndicator(viewModel) }
                         }
-                        item { LoadingIndicator(viewModel) }
+
+                        PullRefreshIndicator(
+                            refreshing = isRefreshing.value ?: false,
+                            state = refreshState,
+                            modifier = Modifier.align(Alignment.TopCenter)
+                        )
                     }
                 }
             }

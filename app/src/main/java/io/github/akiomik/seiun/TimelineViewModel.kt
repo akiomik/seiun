@@ -6,16 +6,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.akiomik.seiun.model.FeedViewPost
-import io.github.akiomik.seiun.model.Timeline
 import io.github.akiomik.seiun.service.UnauthorizedException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlin.concurrent.thread
 
 class TimelineViewModel : ViewModel() {
     sealed class State {
@@ -24,7 +19,9 @@ class TimelineViewModel : ViewModel() {
     }
 
     private var _cursor = MutableLiveData<String>()
+    private var _isRefreshing =MutableLiveData<Boolean>(false)
     private var _feedViewPosts = MutableLiveData<List<FeedViewPost>>()
+    val isRefreshing = _isRefreshing as LiveData<Boolean>
     val feedViewPosts = _feedViewPosts as LiveData<List<FeedViewPost>>
 
     private var _state = MutableStateFlow<State>(State.Loading)
@@ -35,27 +32,54 @@ class TimelineViewModel : ViewModel() {
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-//            while (isActive) {
-                val session = userRepository.getSession()
-                val data = try {
-                    timelineRepository.getTimeline(session)
-                } catch (e: UnauthorizedException) {
-                    Log.d("Seiun", "Retrying to execute getTimeline")
-                    val session = userRepository.refresh()
-                    timelineRepository.getTimeline(session)
-                }
+            val session = userRepository.getSession()
+            val data = try {
+                timelineRepository.getTimeline(session)
+            } catch (e: UnauthorizedException) {
+                Log.d("Seiun", "Retrying to execute getTimeline")
+                val session = userRepository.refresh()
+                timelineRepository.getTimeline(session)
+            }
 
-                _feedViewPosts.postValue(mergeFeedViewPosts(_feedViewPosts.value.orEmpty(), data.feed))
-                if (_cursor.value == null) {
-                    _cursor.postValue(data.cursor)
-                }
-                _state.value = State.Loaded
-                delay(10 * 1000)
-//            }
+            _feedViewPosts.postValue(mergeFeedViewPosts(_feedViewPosts.value.orEmpty(), data.feed))
+            _state.value = State.Loaded
+        }
+    }
+
+    fun refreshPosts() {
+        if (_isRefreshing.value == true) {
+           return
+        }
+
+        Log.d("Seiun", "Refresh timeline")
+        _isRefreshing.value = true
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val session = userRepository.getSession()
+            val data = try {
+                timelineRepository.getTimeline(session)
+            } catch (e: UnauthorizedException) {
+                Log.d("Seiun", "Retrying to execute getTimeline")
+                val session = userRepository.refresh()
+                timelineRepository.getTimeline(session)
+            } finally {
+                // TODO: update isRefreshing when feedViewPosts is updated
+                _isRefreshing.postValue(false)
+            }
+
+            if (data.cursor != _cursor.value) {
+                val newFeedPosts = mergeFeedViewPosts(_feedViewPosts.value.orEmpty(), data.feed)
+                _feedViewPosts.postValue(newFeedPosts)
+                Log.d("Seiun", "Feed posts are merged")
+            } else {
+                Log.d("Seiun", "Skip merge because cursor is unchanged")
+            }
         }
     }
 
     fun loadMorePosts() {
+        Log.d("Seiun", "Load more posts")
+
         viewModelScope.launch(Dispatchers.IO) {
             val session = userRepository.getSession()
 
@@ -78,18 +102,15 @@ class TimelineViewModel : ViewModel() {
     }
 
     private fun mergeFeedViewPosts(currentPosts: List<FeedViewPost>, newPosts: List<FeedViewPost>): List<FeedViewPost> {
-        val lastPostCid = newPosts.lastOrNull()?.post?.cid
         val top50Posts = currentPosts.take(50)// NOTE: 50 is default limit of getTimeline
 
-        if (!top50Posts.any { lastPostCid == it.post.cid }) {
-            return newPosts + currentPosts
-        }
-
-        return newPosts.reversed().fold(emptyList()) { acc, post ->
+        // TODO: improve merge logic
+        return newPosts.reversed().fold(currentPosts) { acc, post ->
             if (!top50Posts.any { post.post.cid == it.post.cid }) {
-                return listOf(post) + acc
+                listOf(post) + acc
+            } else {
+                acc
             }
-            return acc
         }
     }
 }
