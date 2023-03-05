@@ -10,5 +10,5 @@ data class FeedPost(
     val upvoteCount: Integer,
     val downvoteCount: Integer,
     val indexedAt: String, // TODO: datetime
-//    val viewer: ViewerState
+    val viewer: ViewerState
 )
