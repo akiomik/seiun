@@ -1,23 +1,25 @@
 package io.github.akiomik.seiun
 
+import android.graphics.Paint.Align
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.ChatBubbleOutline
 import androidx.compose.material.icons.sharp.FavoriteBorder
 import androidx.compose.material.icons.sharp.SyncAlt
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.Divider
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,6 +31,9 @@ import androidx.lifecycle.ViewModelProvider
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.model.FeedViewPost
 import io.github.akiomik.seiun.ui.theme.SeiunTheme
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -171,6 +176,7 @@ fun FeedPostContent(viewPost: FeedViewPost) {
             RepostIndicator(viewPost = viewPost)
             UpvoteIndicator(viewPost = viewPost)
         }
+        Text(text = viewPost.post.record.createdAt)
     }
 }
 
@@ -194,7 +200,22 @@ fun FeedPost(viewPost: FeedViewPost) {
 @Composable
 fun LoadingText() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("Loading")
+        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+            Text("Loading")
+            CircularProgressIndicator()
+        }
+    }
+}
+@Composable
+fun LoadingIndicator(viewModel: TimelineViewModel) {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .padding(8.dp), contentAlignment = Alignment.Center) {
+        CircularProgressIndicator()
+    }
+
+    LaunchedEffect(key1 = true) {
+        viewModel.loadMorePosts()
     }
 }
 
@@ -213,11 +234,14 @@ fun MyApp(
                     LoadingText()
                 }
                 is TimelineViewModel.State.Loaded -> {
-                    LazyColumn {
-                        items(viewModel.getPosts().value.orEmpty()) { feedViewPost ->
+                    val listState = rememberLazyListState()
+                    val feedViewPosts = viewModel.feedViewPosts.observeAsState()
+                    LazyColumn(state = listState) {
+                        items(feedViewPosts.value.orEmpty()) { feedViewPost ->
                             FeedPost(viewPost = feedViewPost)
                             Divider(color = Color.Gray)
                         }
+                        item { LoadingIndicator(viewModel) }
                     }
                 }
             }
