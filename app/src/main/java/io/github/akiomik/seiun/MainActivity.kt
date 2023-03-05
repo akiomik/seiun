@@ -11,18 +11,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.sharp.ChatBubbleOutline
-import androidx.compose.material.icons.sharp.FavoriteBorder
-import androidx.compose.material.icons.sharp.SyncAlt
+import androidx.compose.material.icons.sharp.*
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -30,6 +27,8 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.model.FeedViewPost
@@ -243,6 +242,64 @@ fun Timeline() {
             state = refreshState,
             modifier = Modifier.align(Alignment.TopCenter)
         )
+        NewPostButton()
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
+@Composable
+fun NewPostForm(onClose: () -> Unit) {
+    var content by remember { mutableStateOf("") }
+    var valid by remember { mutableStateOf(false) }
+
+    Dialog(onDismissRequest = onClose, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+        Surface(modifier = Modifier.fillMaxSize()) {
+            Column(modifier = Modifier.padding(8.dp)) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    TextButton(onClick = onClose) {
+                        Text("Cancel")
+                    }
+                    Button(onClick = onClose, enabled = valid) {
+                        Text("Post")
+                    }
+                }
+
+                Spacer(modifier = Modifier.size(8.dp))
+
+                TextField(
+                    value = content,
+                    onValueChange = {
+                        content = it
+                        valid = content.isNotEmpty()
+                    },
+                    label = { Text("Content") },
+                    placeholder = { Text(text = "What's up?") },
+                    maxLines = 8,
+                    modifier = Modifier.padding(20.dp).fillMaxWidth().height(320.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun NewPostButton() {
+    var showPostForm by remember { mutableStateOf(false) }
+    if (showPostForm) {
+        NewPostForm { showPostForm = false }
+    } else {
+        Box(modifier = Modifier.fillMaxSize()) {
+            FloatingActionButton(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .align(alignment = Alignment.BottomEnd),
+                onClick = {
+                    showPostForm = true
+                }
+            ) {
+                Icon(Icons.Filled.Add, contentDescription = "Create new post")
+            }
+        }
     }
 }
 
