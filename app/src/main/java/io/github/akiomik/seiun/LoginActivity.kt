@@ -65,10 +65,8 @@ fun LoginTitle() {
 }
 
 @Composable
-fun LoginForm(viewModel: LoginViewModel, sharedPreferences: SharedPreferences, onLoginSuccessful: () -> Unit) {
-    val savedHandle = sharedPreferences.getString("handle", "") ?: ""
-    val savedPassword = sharedPreferences.getString("password", "") ?: ""
-
+fun LoginForm(viewModel: LoginViewModel, onLoginSuccessful: () -> Unit) {
+    val (savedHandle, savedPassword) = viewModel.getLoginParam()
     var handle by remember { mutableStateOf(savedHandle) }
     var password by remember { mutableStateOf(savedPassword) }
     var valid by remember { mutableStateOf(handle.isNotEmpty() && password.isNotEmpty()) }
@@ -138,18 +136,6 @@ fun LoginForm(viewModel: LoginViewModel, sharedPreferences: SharedPreferences, o
 
 @Composable
 private fun MyApp(viewModel: LoginViewModel, onLoginSuccessful: () -> Unit, modifier: Modifier = Modifier) {
-    val key = MasterKey.Builder(LocalContext.current)
-        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-        .build()
-
-    val sharedPreferences = EncryptedSharedPreferences.create(
-        LocalContext.current,
-        "seiun",
-        key,
-        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-    )
-
     Surface(
         modifier = modifier,
         color = MaterialTheme.colorScheme.background
@@ -158,7 +144,7 @@ private fun MyApp(viewModel: LoginViewModel, onLoginSuccessful: () -> Unit, modi
             AppName()
             AppDescription()
             LoginTitle()
-            LoginForm(viewModel, sharedPreferences, onLoginSuccessful)
+            LoginForm(viewModel, onLoginSuccessful)
         }
     }
 }

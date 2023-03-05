@@ -26,4 +26,8 @@ class LoginViewModel : ViewModel() {
             onLoginSuccessful(session)
         }
     }
+
+    fun getLoginParam(): Pair<String, String> {
+        return userRepository.getLoginParam()
+    }
 }

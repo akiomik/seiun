@@ -41,6 +41,12 @@ class UserRepository(private val context: Context, atpService: AtpService) {
         }
     }
 
+    fun getLoginParam(): Pair<String, String> {
+        val handle = sharedPreferences.getString("handle", "") ?: ""
+        val password = sharedPreferences.getString("password", "") ?: ""
+        return Pair(handle, password)
+    }
+
     fun saveLoginParam(handle: String, password: String) {
         with (sharedPreferences.edit()) {
             putString("handle", handle)
