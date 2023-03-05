@@ -106,7 +106,7 @@ class TimelineViewModel : ViewModel() {
 
         // TODO: improve merge logic
         return newPosts.reversed().fold(currentPosts) { acc, post ->
-            if (!top50Posts.any { post.post.cid == it.post.cid }) {
+            if (!top50Posts.any { post.post.cid == it.post.cid && post.reason == it.reason }) {
                 listOf(post) + acc
             } else {
                 acc
