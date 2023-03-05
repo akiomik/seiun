@@ -24,15 +24,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.modifier.modifierLocalConsumer
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.core.graphics.toColor
+import androidx.core.graphics.toColorLong
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.model.FeedViewPost
+import io.github.akiomik.seiun.model.Timeline
 import io.github.akiomik.seiun.ui.theme.SeiunTheme
 
 
@@ -113,49 +118,74 @@ fun NameRow(viewPost: FeedViewPost) {
 
 @Composable
 fun ReplyIndicator(viewPost: FeedViewPost) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    TextButton(
+        modifier = Modifier.width(64.dp),
+        onClick = { /*TODO*/ }
     ) {
-        Icon(
-            painter = rememberVectorPainter(Icons.Sharp.ChatBubbleOutline),
-            contentDescription = null,
-            modifier = Modifier.size(16.dp),
-            tint = Color.Gray
-        )
-        Text(text = viewPost.post.replyCount.toString(), color = Color.Gray)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Icon(
+                painter = rememberVectorPainter(Icons.Sharp.ChatBubbleOutline),
+                contentDescription = null,
+                modifier = Modifier.size(16.dp),
+                tint = Color.Gray
+            )
+            Text(text = viewPost.post.replyCount.toString(), color = Color.Gray)
+        }
     }
 }
 
 @Composable
 fun RepostIndicator(viewPost: FeedViewPost) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    val upvoted = viewPost.post.viewer.repost != null;
+    val color: Color = if (upvoted) { colorResource(R.color.green_700)  } else { Color.Gray }
+
+    TextButton(
+        modifier = Modifier.width(64.dp),
+        onClick = {
+            // TODO
+        }
     ) {
-        Icon(
-            painter = rememberVectorPainter(Icons.Sharp.SyncAlt),
-            contentDescription = null,
-            modifier = Modifier.size(16.dp),
-            tint = Color.Gray
-        )
-        Text(text = viewPost.post.repostCount.toString(), color = Color.Gray)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Icon(
+                painter = rememberVectorPainter(Icons.Sharp.SyncAlt),
+                contentDescription = null,
+                modifier = Modifier.size(16.dp),
+                tint = color
+            )
+            Text(text = viewPost.post.repostCount.toString(), color = color)
+        }
     }
 }
 
 @Composable
 fun UpvoteIndicator(viewPost: FeedViewPost) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    val upvoted = viewPost.post.viewer.upvote != null;
+    val color = if (upvoted) { colorResource(R.color.red_700) } else { Color.Gray }
+
+    TextButton(
+        modifier = Modifier.width(64.dp),
+        onClick = {
+            // TODO
+        }
     ) {
-        Icon(
-            painter = rememberVectorPainter(Icons.Sharp.FavoriteBorder),
-            contentDescription = null,
-            modifier = Modifier.size(16.dp),
-            tint = Color.Gray
-        )
-        Text(text = viewPost.post.upvoteCount.toString(), color = Color.Gray)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Icon(
+                painter = rememberVectorPainter(Icons.Sharp.FavoriteBorder),
+                contentDescription = null,
+                modifier = Modifier.size(16.dp),
+                tint = color
+            )
+            Text(text = viewPost.post.upvoteCount.toString(), color = color)
+        }
     }
 }
 
@@ -165,9 +195,9 @@ fun FeedPostContent(viewPost: FeedViewPost) {
         NameRow(viewPost = viewPost)
         Text(text = viewPost.post.record.text)
         Row(
-            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
+            modifier = Modifier.padding(top = 8.dp, bottom = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(24.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             ReplyIndicator(viewPost = viewPost)
             RepostIndicator(viewPost = viewPost)
