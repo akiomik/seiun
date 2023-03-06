@@ -131,6 +131,18 @@ class TimelineViewModel : ViewModel() {
         }
     }
 
+    fun cancelRepost(feedPost: FeedPost, onComplete: () -> Unit) {
+        if (feedPost.viewer.repost == null) {
+            return
+        }
+
+        val session = userRepository.getSession()
+        viewModelScope.launch(Dispatchers.IO) {
+            timelineRepository.cancelRepost(session, feedPost.viewer.repost)
+            onComplete()
+        }
+    }
+
     fun createPost(content: String) {
         val session = userRepository.getSession()
         viewModelScope.launch(Dispatchers.IO) {

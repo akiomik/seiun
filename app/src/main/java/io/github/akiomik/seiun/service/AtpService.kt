@@ -3,7 +3,6 @@ package io.github.akiomik.seiun.service
 import com.slack.eithernet.ApiResult
 import com.slack.eithernet.DecodeErrorBody
 import io.github.akiomik.seiun.model.*
-
 import retrofit2.http.*
 
 interface AtpService {
@@ -52,6 +51,13 @@ interface AtpService {
         @Header("Authorization") authorization: String,
         @Body body: RepostParam
     ): ApiResult<CreateRecordResponse, AtpError>
+
+    @DecodeErrorBody
+    @POST("com.atproto.repo.deleteRecord")
+    suspend fun deleteRecord(
+        @Header("Authorization") authorization: String,
+        @Body body: DeleteRecordParam
+    ) // TODO: Handle empty response with EitherNet
 
     @DecodeErrorBody
     @POST("app.bsky.feed.setVote")

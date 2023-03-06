@@ -147,7 +147,12 @@ fun RepostIndicator(viewPost: FeedViewPost) {
     TextButton(
         modifier = Modifier.width(64.dp),
         onClick = {
-            if (!reposted) {
+            if (reposted) {
+                viewModel.cancelRepost(viewPost.post, onComplete = {
+                    reposted = false
+                    count -= 1
+                })
+            } else {
                 viewModel.repost(viewPost.post, onComplete = {
                     reposted = true
                     count += 1
@@ -165,7 +170,7 @@ fun RepostIndicator(viewPost: FeedViewPost) {
                 modifier = Modifier.size(16.dp),
                 tint = color
             )
-            Text(text = viewPost.post.repostCount.toString(), color = color)
+            Text(text = count.toString(), color = color)
         }
     }
 }

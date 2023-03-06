@@ -6,6 +6,7 @@ import com.slack.eithernet.response
 import io.github.akiomik.seiun.model.*
 import io.github.akiomik.seiun.service.AtpService
 import io.github.akiomik.seiun.service.UnauthorizedException
+import retrofit2.HttpException
 import java.time.Instant
 
 class TimelineRepository(private val atpService: AtpService) {
@@ -16,7 +17,7 @@ class TimelineRepository(private val atpService: AtpService) {
             is ApiResult.Success -> result.value
             is ApiResult.Failure -> when(result) {
                 is ApiResult.Failure.HttpFailure -> {
-                    if (result.code == 400 || result.code == 401) {
+                    if (result.code == 401) {
                         throw UnauthorizedException("Unauthorized: ${result.code} (${result.error})")
                     } else {
                         throw IllegalStateException("HttpError: ${result.code} (${result.error})")
@@ -66,7 +67,7 @@ class TimelineRepository(private val atpService: AtpService) {
     }
 
     suspend fun repost(session: Session, subject: StrongRef) {
-        Log.d("Seiun", "Create repost: ")
+        Log.d("Seiun", "Cancel repost: uri = ${subject.uri}, cid = ${subject.cid}")
 
         val createdAt = Instant.now().toString()
         val record = RepostRecord(subject = subject, createdAt)
@@ -76,13 +77,30 @@ class TimelineRepository(private val atpService: AtpService) {
             is ApiResult.Success -> {}
             is ApiResult.Failure -> when(result) {
                 is ApiResult.Failure.HttpFailure -> {
-                    if (result.code == 400 || result.code == 401) {
+                    if (result.code == 401) {
                         throw UnauthorizedException("Unauthorized: ${result.code} (${result.error})")
                     } else {
                         throw IllegalStateException("HttpError: ${result.code} (${result.error})")
                     }
                 }
                 else -> throw IllegalStateException("ApiResult.Failure: ${result.response()}")
+            }
+        }
+    }
+
+    suspend fun cancelRepost(session: Session, uri: String) {
+        Log.d("Seiun", "Cancel repost: $uri")
+
+        val rkey = uri.split('/').last()
+        val body = DeleteRecordParam(did = session.did, rkey = rkey, collection = "app.bsky.feed.repost")
+
+        try {
+            val res = atpService.deleteRecord(authorization = "Bearer ${session.accessJwt}", body = body)
+        } catch (e: HttpException) {
+            if (e.code() == 401) {
+                throw UnauthorizedException("Unauthorized: ${e.code()} (${e.message()})")
+            } else {
+                throw IllegalStateException("HttpError: ${e.code()} (${e.message()})")
             }
         }
     }
@@ -98,7 +116,7 @@ class TimelineRepository(private val atpService: AtpService) {
             is ApiResult.Success -> {}
             is ApiResult.Failure -> when(result) {
                 is ApiResult.Failure.HttpFailure -> {
-                    if (result.code == 400 || result.code == 401) {
+                    if (result.code == 401) {
                         throw UnauthorizedException("Unauthorized: ${result.code} (${result.error})")
                     } else {
                         throw IllegalStateException("HttpError: ${result.code} (${result.error})")
