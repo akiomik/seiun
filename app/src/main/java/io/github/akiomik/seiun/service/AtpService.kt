@@ -47,7 +47,7 @@ interface AtpService {
 
     @DecodeErrorBody
     @POST("com.atproto.repo.createRecord")
-    suspend fun retweet(
+    suspend fun repost(
         @Header("Authorization") authorization: String,
         @Body body: RepostParam
     ): ApiResult<CreateRecordResponse, AtpError>

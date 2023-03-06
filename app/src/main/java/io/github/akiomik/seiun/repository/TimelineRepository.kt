@@ -28,12 +28,12 @@ class TimelineRepository(private val atpService: AtpService) {
         }
     }
 
-    suspend fun upvote(session: Session, subject: StrongRef) {
+    suspend fun upvote(session: Session, subject: StrongRef): SetVoteResponse {
         Log.d("Seiun", "Upvote post: uri = ${subject.uri}, cid = ${subject.cid}")
 
         val body = SetVoteParam(subject = subject, direction = VoteDirection.up)
         when (val result = atpService.upvote(authorization = "Bearer ${session.accessJwt}", body = body)) {
-            is ApiResult.Success -> {}
+            is ApiResult.Success -> return result.value
             is ApiResult.Failure -> when(result) {
                 is ApiResult.Failure.HttpFailure -> {
                     if (result.code == 401) {
@@ -66,15 +66,15 @@ class TimelineRepository(private val atpService: AtpService) {
         }
     }
 
-    suspend fun repost(session: Session, subject: StrongRef) {
+    suspend fun repost(session: Session, subject: StrongRef): CreateRecordResponse {
         Log.d("Seiun", "Cancel repost: uri = ${subject.uri}, cid = ${subject.cid}")
 
         val createdAt = Instant.now().toString()
         val record = RepostRecord(subject = subject, createdAt)
         val body = RepostParam(did = session.did, record = record)
 
-        when (val result = atpService.retweet(authorization = "Bearer ${session.accessJwt}", body = body)) {
-            is ApiResult.Success -> {}
+        when (val result = atpService.repost(authorization = "Bearer ${session.accessJwt}", body = body)) {
+            is ApiResult.Success -> return result.value
             is ApiResult.Failure -> when(result) {
                 is ApiResult.Failure.HttpFailure -> {
                     if (result.code == 401) {

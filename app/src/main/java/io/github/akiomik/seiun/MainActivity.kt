@@ -136,8 +136,7 @@ fun ReplyIndicator(viewPost: FeedViewPost) {
 @Composable
 fun RepostIndicator(viewPost: FeedViewPost) {
     val viewModel: TimelineViewModel = viewModel()
-    var reposted by remember { mutableStateOf(viewPost.post.viewer.repost != null) }
-    var count by remember { mutableStateOf(viewPost.post.repostCount) }
+    var reposted = viewPost.post.viewer.repost != null
     val color: Color = if (reposted) {
         colorResource(R.color.green_700)
     } else {
@@ -148,15 +147,9 @@ fun RepostIndicator(viewPost: FeedViewPost) {
         modifier = Modifier.width(64.dp),
         onClick = {
             if (reposted) {
-                viewModel.cancelRepost(viewPost.post, onComplete = {
-                    reposted = false
-                    count -= 1
-                })
+                viewModel.cancelRepost(viewPost.post, onComplete = {})
             } else {
-                viewModel.repost(viewPost.post, onComplete = {
-                    reposted = true
-                    count += 1
-                })
+                viewModel.repost(viewPost.post, onComplete = {})
             }
         }
     ) {
@@ -170,7 +163,7 @@ fun RepostIndicator(viewPost: FeedViewPost) {
                 modifier = Modifier.size(16.dp),
                 tint = color
             )
-            Text(text = count.toString(), color = color)
+            Text(text = viewPost.post.repostCount.toString(), color = color)
         }
     }
 }

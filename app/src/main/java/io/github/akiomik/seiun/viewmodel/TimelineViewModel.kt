@@ -126,7 +126,11 @@ class TimelineViewModel : ViewModel() {
         val session = userRepository.getSession()
         viewModelScope.launch(Dispatchers.IO) {
             val ref = StrongRef(cid = feedPost.cid, uri = feedPost.uri)
-            timelineRepository.repost(session, ref)
+            val response = timelineRepository.repost(session, ref)
+            val updatedViewer = feedPost.viewer.copy(repost = response.uri)
+            val updatedRepostCount = feedPost.repostCount + 1
+            val updatedFeedPost = feedPost.copy(viewer = updatedViewer, repostCount = updatedRepostCount)
+            updateFeedPost(updatedFeedPost)
             onComplete()
         }
     }
@@ -139,6 +143,10 @@ class TimelineViewModel : ViewModel() {
         val session = userRepository.getSession()
         viewModelScope.launch(Dispatchers.IO) {
             timelineRepository.cancelRepost(session, feedPost.viewer.repost)
+            val updatedViewer = feedPost.viewer.copy(repost = null)
+            val updatedRepostCount = feedPost.repostCount - 1
+            val updatedFeedPost = feedPost.copy(viewer = updatedViewer, repostCount = updatedRepostCount)
+            updateFeedPost(feedPost = updatedFeedPost)
             onComplete()
         }
     }
@@ -149,6 +157,17 @@ class TimelineViewModel : ViewModel() {
             timelineRepository.createPost(session, content)
             refreshPosts()
         }
+    }
+
+    private fun updateFeedPost(feedPost: FeedPost) {
+        val updatedFeedViewPosts = feedViewPosts.value?.map {
+            if (it.post.uri === feedPost.uri) {
+                it.copy(post = feedPost)
+            } else {
+                it
+            }
+        }
+        _feedViewPosts.postValue(updatedFeedViewPosts)
     }
 
     private fun mergeFeedViewPosts(currentPosts: List<FeedViewPost>, newPosts: List<FeedViewPost>): List<FeedViewPost> {
