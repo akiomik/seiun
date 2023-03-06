@@ -11,4 +11,32 @@ data class FeedPost(
     val downvoteCount: Int,
     val indexedAt: String, // TODO: datetime
     val viewer: ViewerState
-)
+) {
+    fun reposted(uri: String): FeedPost {
+        return copy(
+            repostCount = repostCount + 1,
+            viewer = viewer.copy(repost = uri),
+        )
+    }
+
+    fun repostCanceled(): FeedPost {
+        return copy(
+            repostCount = repostCount - 1,
+            viewer = viewer.copy(repost = null),
+        )
+    }
+
+    fun upvoted(uri: String): FeedPost {
+        return copy(
+            upvoteCount = upvoteCount + 1,
+            viewer = viewer.copy(upvote = uri),
+        )
+    }
+
+    fun upvoteCanceled(): FeedPost {
+        return copy(
+            upvoteCount = upvoteCount - 1,
+            viewer = viewer.copy(upvote = null),
+        )
+    }
+}

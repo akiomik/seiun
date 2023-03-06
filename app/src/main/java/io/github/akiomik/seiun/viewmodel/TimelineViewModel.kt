@@ -108,7 +108,8 @@ class TimelineViewModel : ViewModel() {
         val session = userRepository.getSession()
         viewModelScope.launch(Dispatchers.IO) {
             val ref = StrongRef(cid = feedPost.cid, uri = feedPost.uri)
-            timelineRepository.upvote(session, ref)
+            val result = timelineRepository.upvote(session, ref)
+            updateFeedPost(feedPost = feedPost.upvoted(result.upvote ?: ""))
             onComplete()
         }
     }
@@ -118,6 +119,7 @@ class TimelineViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val ref = StrongRef(cid = feedPost.cid, uri = feedPost.uri)
             timelineRepository.cancelVote(session, ref)
+            updateFeedPost(feedPost = feedPost.upvoteCanceled())
             onComplete()
         }
     }
@@ -127,10 +129,7 @@ class TimelineViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val ref = StrongRef(cid = feedPost.cid, uri = feedPost.uri)
             val response = timelineRepository.repost(session, ref)
-            val updatedViewer = feedPost.viewer.copy(repost = response.uri)
-            val updatedRepostCount = feedPost.repostCount + 1
-            val updatedFeedPost = feedPost.copy(viewer = updatedViewer, repostCount = updatedRepostCount)
-            updateFeedPost(updatedFeedPost)
+            updateFeedPost(feedPost = feedPost.reposted(response.uri))
             onComplete()
         }
     }
@@ -143,10 +142,7 @@ class TimelineViewModel : ViewModel() {
         val session = userRepository.getSession()
         viewModelScope.launch(Dispatchers.IO) {
             timelineRepository.cancelRepost(session, feedPost.viewer.repost)
-            val updatedViewer = feedPost.viewer.copy(repost = null)
-            val updatedRepostCount = feedPost.repostCount - 1
-            val updatedFeedPost = feedPost.copy(viewer = updatedViewer, repostCount = updatedRepostCount)
-            updateFeedPost(feedPost = updatedFeedPost)
+            updateFeedPost(feedPost = feedPost.repostCanceled())
             onComplete()
         }
     }

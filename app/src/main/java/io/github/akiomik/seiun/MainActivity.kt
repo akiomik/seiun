@@ -136,7 +136,7 @@ fun ReplyIndicator(viewPost: FeedViewPost) {
 @Composable
 fun RepostIndicator(viewPost: FeedViewPost) {
     val viewModel: TimelineViewModel = viewModel()
-    var reposted = viewPost.post.viewer.repost != null
+    val reposted = viewPost.post.viewer.repost != null
     val color: Color = if (reposted) {
         colorResource(R.color.green_700)
     } else {
@@ -171,8 +171,7 @@ fun RepostIndicator(viewPost: FeedViewPost) {
 @Composable
 fun UpvoteIndicator(viewPost: FeedViewPost) {
     val viewModel: TimelineViewModel = viewModel()
-    var upvoted by remember { mutableStateOf(viewPost.post.viewer.upvote != null) }
-    var count by remember { mutableStateOf(viewPost.post.upvoteCount) }
+    val upvoted = viewPost.post.viewer.upvote != null
     val color = if (upvoted) {
         colorResource(R.color.red_700)
     } else {
@@ -188,15 +187,9 @@ fun UpvoteIndicator(viewPost: FeedViewPost) {
         modifier = Modifier.width(64.dp),
         onClick = {
             if (upvoted) {
-                viewModel.cancelVote(feedPost = viewPost.post) {
-                    upvoted = false
-                    count -= 1
-                }
+                viewModel.cancelVote(feedPost = viewPost.post, onComplete = {})
             } else {
-                viewModel.upvote(feedPost = viewPost.post) {
-                    upvoted = true
-                    count += 1
-                }
+                viewModel.upvote(feedPost = viewPost.post, onComplete = {})
             }
         }
     ) {
@@ -210,7 +203,7 @@ fun UpvoteIndicator(viewPost: FeedViewPost) {
                 modifier = Modifier.size(16.dp),
                 tint = color
             )
-            Text(text = count.toString(), color = color)
+            Text(text = viewPost.post.upvoteCount.toString(), color = color)
         }
     }
 }
@@ -351,7 +344,7 @@ fun PostContentField(content: String, onChange: (String) -> Unit) {
     )
 }
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun NewPostForm(onClose: () -> Unit) {
     var content by remember { mutableStateOf("") }
