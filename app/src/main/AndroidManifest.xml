@@ -15,7 +15,7 @@
         android:theme="@style/Theme.Seiun"
         tools:targetApi="31">
         <activity
-            android:name=".LoginActivity"
+            android:name=".SeiunActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.Seiun">

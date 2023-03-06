@@ -12,7 +12,7 @@ import io.github.akiomik.seiun.ui.registration.RegistrationScreen
 import io.github.akiomik.seiun.ui.theme.SeiunTheme
 import io.github.akiomik.seiun.ui.timeline.TimelineScreen
 
-class LoginActivity : ComponentActivity() {
+class SeiunActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -33,6 +33,11 @@ fun App() {
                     navController.navigate("timeline")
                 }, onCreateAccountClick = {
                     navController.navigate("registration")
+                })
+            }
+            composable("registration") {
+                RegistrationScreen(onRegistrationSuccess = {
+                    navController.navigate("timeline")
                 })
             }
         }
