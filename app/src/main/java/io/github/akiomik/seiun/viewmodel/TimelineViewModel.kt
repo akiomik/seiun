@@ -37,6 +37,7 @@ class TimelineViewModel : ApplicationViewModel() {
 
             _feedViewPosts.postValue(mergeFeedViewPosts(_feedViewPosts.value.orEmpty(), data.feed))
             _state.value = State.Loaded
+            _cursor.postValue(data.cursor)
         }
     }
 
