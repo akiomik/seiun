@@ -1,10 +1,13 @@
 package io.github.akiomik.seiun.repository
 
+import android.accounts.Account
 import android.content.Context
 import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.slack.eithernet.ApiResult
+import io.github.akiomik.seiun.model.AccountCreateParam
+import io.github.akiomik.seiun.model.CreateRecordResponse
 import io.github.akiomik.seiun.service.AtpService
 import io.github.akiomik.seiun.model.LoginParam
 import io.github.akiomik.seiun.model.Session
@@ -52,6 +55,18 @@ class UserRepository(private val context: Context, atpService: AtpService) {
             putString("handle", handle)
             putString("password", password)
             apply()
+        }
+    }
+
+    suspend fun createAccount(email: String, handle: String, password: String, inviteCode: String): Session {
+        Log.d("Seiun", "Create account: $handle")
+        val param = AccountCreateParam(email = email, handle = handle, password = password, inviteCode = inviteCode);
+        return when (val result = atpService.createAccount(param)) {
+            is ApiResult.Success -> result.value
+            is ApiResult.Failure -> when (result) {
+                is ApiResult.Failure.HttpFailure -> throw IllegalStateException(result.error?.message ?: "")
+                else -> throw IllegalStateException("Failed to create account")
+            }
         }
     }
 

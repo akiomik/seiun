@@ -7,6 +7,12 @@ import retrofit2.http.*
 
 interface AtpService {
     @DecodeErrorBody
+    @POST("com.atproto.account.create")
+    suspend fun createAccount(
+        @Body body: AccountCreateParam,
+    ): ApiResult<Session, AtpError>
+
+    @DecodeErrorBody
     @POST("com.atproto.session.create")
     suspend fun login(
         @Body body: LoginParam,
