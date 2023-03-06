@@ -12,6 +12,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -62,8 +64,13 @@ fun LoginForm(onLoginSuccessful: () -> Unit) {
     var handle by remember { mutableStateOf(savedHandle) }
     var password by remember { mutableStateOf(savedPassword) }
     var valid by remember { mutableStateOf(handle.isNotEmpty() && password.isNotEmpty()) }
+    var errorMessage by remember { mutableStateOf("") }
 
     Column {
+        if (errorMessage.isNotEmpty()) {
+            Text(errorMessage, color = colorResource(id = R.color.red_700), modifier = Modifier.padding(20.dp))
+        }
+
         TextField(
             value = handle,
             onValueChange = {
@@ -89,6 +96,7 @@ fun LoginForm(onLoginSuccessful: () -> Unit) {
             modifier = Modifier.padding(20.dp)
         )
 
+        val context = LocalContext.current
         ElevatedButton(
             onClick = {
                 Log.d("Seiun", "Login as $handle")
@@ -96,18 +104,21 @@ fun LoginForm(onLoginSuccessful: () -> Unit) {
                 val userRepository = SeiunApplication.instance!!.userRepository
                 userRepository.saveLoginParam(handle, password)
 
-                try {
-                    viewModel.login(
-                        handle = handle,
-                        password = password,
-                        onLoginSuccessful = { session ->
-                            Log.d("Seiun", "Login successful")
+                viewModel.login(
+                    handle = handle,
+                    password = password,
+                    onSuccess = { session ->
+                        Log.d("Seiun", "Login successful")
+                        if (session != null) {
                             userRepository.saveSession(session)
                             onLoginSuccessful()
-                        })
-                } catch (e: java.lang.Exception) {
-                    Log.d("Seiun", "Failed to login $e")
-                }
+                        }
+                    },
+                    onError = { error ->
+                        Log.d("Seiun", "Login failure: ${error.toString()}")
+                        errorMessage = error.message ?: "Failed to login"
+                    }
+                )
             },
             enabled = valid,
             modifier = Modifier.padding(20.dp)

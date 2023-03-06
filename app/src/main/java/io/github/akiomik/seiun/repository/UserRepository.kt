@@ -57,14 +57,12 @@ class UserRepository(private val context: Context, atpService: AtpService) {
 
     suspend fun login(handle: String, password: String): Session {
         Log.d("Seiun", "Create session")
-        try {
-            return when (val result = atpService.login(LoginParam(handle, password))) {
-                is ApiResult.Success -> result.value
-                is ApiResult.Failure -> throw IllegalStateException("ApiResult.Failure: $result")
+        return when (val result = atpService.login(LoginParam(handle, password))) {
+            is ApiResult.Success -> result.value
+            is ApiResult.Failure -> when (result) {
+                is ApiResult.Failure.HttpFailure -> throw IllegalStateException(result.error?.message ?: "")
+                else -> throw IllegalStateException("Failed to login")
             }
-        } catch (e: java.lang.Exception) {
-            Log.d("Seiun", e.stackTraceToString())
-            throw e
         }
     }
 
