@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Seiun</string>
+    <string name="timeline">Home</string>
+    <string name="notification">Notification</string>
 </resources>
