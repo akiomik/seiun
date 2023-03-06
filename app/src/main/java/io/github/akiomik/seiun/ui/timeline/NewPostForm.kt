@@ -28,7 +28,6 @@ private fun PostButton(content: String, enabled: Boolean, onSuccess: () -> Unit)
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PostContentField(content: String, onChange: (String) -> Unit) {
     TextField(

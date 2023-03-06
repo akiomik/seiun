@@ -38,6 +38,7 @@ class UserRepository(private val context: Context, atpService: AtpService) {
 
     fun saveSession(session: Session) {
         with(sharedPreferences.edit()) {
+            putString("handle", session.handle)
             putString("did", session.did)
             putString("accessJwt", session.accessJwt)
             putString("refreshJwt", session.refreshJwt)
