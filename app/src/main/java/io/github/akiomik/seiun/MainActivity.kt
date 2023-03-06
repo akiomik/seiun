@@ -147,9 +147,9 @@ fun RepostIndicator(viewPost: FeedViewPost) {
         modifier = Modifier.width(64.dp),
         onClick = {
             if (reposted) {
-                viewModel.cancelRepost(viewPost.post, onComplete = {})
+                viewModel.cancelRepost(viewPost.post)
             } else {
-                viewModel.repost(viewPost.post, onComplete = {})
+                viewModel.repost(viewPost.post)
             }
         }
     ) {
@@ -187,9 +187,9 @@ fun UpvoteIndicator(viewPost: FeedViewPost) {
         modifier = Modifier.width(64.dp),
         onClick = {
             if (upvoted) {
-                viewModel.cancelVote(feedPost = viewPost.post, onComplete = {})
+                viewModel.cancelVote(feedPost = viewPost.post)
             } else {
-                viewModel.upvote(feedPost = viewPost.post, onComplete = {})
+                viewModel.upvote(feedPost = viewPost.post)
             }
         }
     ) {

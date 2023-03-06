@@ -10,20 +10,13 @@ import io.github.akiomik.seiun.model.Session
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class LoginViewModel : ViewModel() {
+class LoginViewModel : ApplicationViewModel() {
     private val userRepository = SeiunApplication.instance!!.userRepository
 
     fun login(handle: String, password: String, onSuccess: (Session) -> Unit, onError: (Throwable) -> Unit) {
-        var result: Result<Session>? = null
-
-        viewModelScope.launch(Dispatchers.IO) {
-            result = runCatching { userRepository.login(handle, password) }
-        }.invokeOnCompletion {
-            viewModelScope.launch(Dispatchers.Main) {
-                result?.onSuccess { onSuccess(it) }
-                result?.onFailure { onError(it) }
-            }
-        }
+        wrapError(run = {
+            userRepository.login(handle, password)
+        }, onSuccess = onSuccess, onError = onError)
     }
 
     fun getLoginParam(): Pair<String, String> {

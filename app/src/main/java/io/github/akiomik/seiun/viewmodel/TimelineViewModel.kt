@@ -3,13 +3,11 @@ package io.github.akiomik.seiun.viewmodel
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.model.FeedPost
 import io.github.akiomik.seiun.model.FeedViewPost
 import io.github.akiomik.seiun.model.StrongRef
-import io.github.akiomik.seiun.service.UnauthorizedException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -47,30 +45,28 @@ class TimelineViewModel : ApplicationViewModel() {
            return
         }
 
-        viewModelScope.launch(Dispatchers.IO) {
-            Log.d("Seiun", "Refresh timeline")
-            _isRefreshing.postValue(true)
+        Log.d("Seiun", "Refresh timeline")
+        _isRefreshing.postValue(true)
 
-            try {
-                val data = withRetry(userRepository) { timelineRepository.getTimeline(it) }
-                if (data.cursor != _cursor.value) {
-                    val newFeedPosts = mergeFeedViewPosts(_feedViewPosts.value.orEmpty(), data.feed)
-                    _feedViewPosts.postValue(newFeedPosts)
-                    Log.d("Seiun", "Feed posts are merged")
-                } else {
-                    Log.d("Seiun", "Skip merge because cursor is unchanged")
-                }
-            } finally {
-                // TODO: update isRefreshing when feedViewPosts is updated
-                _isRefreshing.postValue(false)
+        wrapError(run = {
+            val data = withRetry(userRepository) { timelineRepository.getTimeline(it) }
+            if (data.cursor != _cursor.value) {
+                val newFeedPosts = mergeFeedViewPosts(_feedViewPosts.value.orEmpty(), data.feed)
+                _feedViewPosts.postValue(newFeedPosts)
+                Log.d("Seiun", "Feed posts are merged")
+            } else {
+                Log.d("Seiun", "Skip merge because cursor is unchanged")
             }
-        }
+        }, onComplete = {
+            // TODO: update isRefreshing when feedViewPosts is updated
+            _isRefreshing.postValue(false)
+        })
     }
 
     fun loadMorePosts() {
         Log.d("Seiun", "Load more posts")
 
-        viewModelScope.launch(Dispatchers.IO) {
+        wrapError(run = {
             val data = withRetry(userRepository) {
                 timelineRepository.getTimeline(it, before = _cursor.value)
             }
@@ -82,54 +78,49 @@ class TimelineViewModel : ApplicationViewModel() {
                 _state.value = State.Loaded
                 Log.d("Seiun", "new feed count: ${newFeedPosts.size}")
             }
-        }
+        })
     }
 
-    fun upvote(feedPost: FeedPost, onComplete: () -> Unit) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val ref = StrongRef(cid = feedPost.cid, uri = feedPost.uri)
+    fun upvote(feedPost: FeedPost, onSuccess: () -> Unit = {}) {
+        val ref = StrongRef(cid = feedPost.cid, uri = feedPost.uri)
+        wrapError(run = {
             val result = withRetry(userRepository) { timelineRepository.upvote(it, ref) }
             updateFeedPost(feedPost = feedPost.upvoted(result.upvote ?: ""))
-            onComplete()
-        }
+        }, onSuccess = { onSuccess() })
     }
 
-    fun cancelVote(feedPost: FeedPost, onComplete: () -> Unit) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val ref = StrongRef(cid = feedPost.cid, uri = feedPost.uri)
+    fun cancelVote(feedPost: FeedPost, onSuccess: () -> Unit = {}) {
+        val ref = StrongRef(cid = feedPost.cid, uri = feedPost.uri)
+        wrapError(run = {
             withRetry(userRepository) { timelineRepository.cancelVote(it, ref) }
             updateFeedPost(feedPost = feedPost.upvoteCanceled())
-            onComplete()
-        }
+        }, onSuccess = { onSuccess() })
     }
 
-    fun repost(feedPost: FeedPost, onComplete: () -> Unit) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val ref = StrongRef(cid = feedPost.cid, uri = feedPost.uri)
+    fun repost(feedPost: FeedPost, onSuccess: () -> Unit = {}) {
+        val ref = StrongRef(cid = feedPost.cid, uri = feedPost.uri)
+        wrapError(run = {
             val response = withRetry(userRepository) { timelineRepository.repost(it, ref) }
             updateFeedPost(feedPost = feedPost.reposted(response.uri))
-            onComplete()
-        }
+        }, onSuccess = { onSuccess() })
     }
 
-    fun cancelRepost(feedPost: FeedPost, onComplete: () -> Unit) {
+    fun cancelRepost(feedPost: FeedPost, onSuccess: () -> Unit = {}) {
         if (feedPost.viewer.repost == null) {
             return
         }
 
-        viewModelScope.launch(Dispatchers.IO) {
+        wrapError(run = {
             withRetry(userRepository) { timelineRepository.cancelRepost(it, feedPost.viewer.repost) }
             updateFeedPost(feedPost = feedPost.repostCanceled())
-            onComplete()
-        }
+        }, onSuccess = { onSuccess() })
     }
 
     fun createPost(content: String) {
-        val session = userRepository.getSession()
-        viewModelScope.launch(Dispatchers.IO) {
+        wrapError(run = {
             withRetry(userRepository) { timelineRepository.createPost(it, content) }
             refreshPosts()
-        }
+        })
     }
 
     private fun updateFeedPost(feedPost: FeedPost) {
