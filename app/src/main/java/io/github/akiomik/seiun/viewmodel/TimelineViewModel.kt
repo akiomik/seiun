@@ -20,7 +20,7 @@ class TimelineViewModel : ApplicationViewModel() {
     }
 
     private var _cursor = MutableLiveData<String>()
-    private var _isRefreshing =MutableLiveData<Boolean>(false)
+    private var _isRefreshing =MutableLiveData(false)
     private var _feedViewPosts = MutableLiveData<List<FeedViewPost>>()
     val isRefreshing = _isRefreshing as LiveData<Boolean>
     val feedViewPosts = _feedViewPosts as LiveData<List<FeedViewPost>>
@@ -40,7 +40,7 @@ class TimelineViewModel : ApplicationViewModel() {
         }
     }
 
-    fun refreshPosts() {
+    fun refreshPosts(onError: (Throwable) -> Unit ={}) {
         if (_isRefreshing.value == true) {
            return
         }
@@ -60,10 +60,10 @@ class TimelineViewModel : ApplicationViewModel() {
         }, onComplete = {
             // TODO: update isRefreshing when feedViewPosts is updated
             _isRefreshing.postValue(false)
-        })
+        }, onError = onError)
     }
 
-    fun loadMorePosts() {
+    fun loadMorePosts(onError: (Throwable) -> Unit ={}) {
         Log.d("Seiun", "Load more posts")
 
         wrapError(run = {
@@ -78,34 +78,34 @@ class TimelineViewModel : ApplicationViewModel() {
                 _state.value = State.Loaded
                 Log.d("Seiun", "new feed count: ${newFeedPosts.size}")
             }
-        })
+        }, onError = onError)
     }
 
-    fun upvote(feedPost: FeedPost, onSuccess: () -> Unit = {}) {
+    fun upvote(feedPost: FeedPost, onSuccess: () -> Unit = {}, onError: (Throwable) -> Unit = {}) {
         val ref = StrongRef(cid = feedPost.cid, uri = feedPost.uri)
         wrapError(run = {
             val result = withRetry(userRepository) { timelineRepository.upvote(it, ref) }
             updateFeedPost(feedPost = feedPost.upvoted(result.upvote ?: ""))
-        }, onSuccess = { onSuccess() })
+        }, onSuccess = { onSuccess() }, onError = onError)
     }
 
-    fun cancelVote(feedPost: FeedPost, onSuccess: () -> Unit = {}) {
+    fun cancelVote(feedPost: FeedPost, onSuccess: () -> Unit = {}, onError: (Throwable) -> Unit = {}) {
         val ref = StrongRef(cid = feedPost.cid, uri = feedPost.uri)
         wrapError(run = {
             withRetry(userRepository) { timelineRepository.cancelVote(it, ref) }
             updateFeedPost(feedPost = feedPost.upvoteCanceled())
-        }, onSuccess = { onSuccess() })
+        }, onSuccess = { onSuccess() }, onError = onError)
     }
 
-    fun repost(feedPost: FeedPost, onSuccess: () -> Unit = {}) {
+    fun repost(feedPost: FeedPost, onSuccess: () -> Unit = {}, onError: (Throwable) -> Unit = {}) {
         val ref = StrongRef(cid = feedPost.cid, uri = feedPost.uri)
         wrapError(run = {
             val response = withRetry(userRepository) { timelineRepository.repost(it, ref) }
             updateFeedPost(feedPost = feedPost.reposted(response.uri))
-        }, onSuccess = { onSuccess() })
+        }, onSuccess = { onSuccess() }, onError = onError)
     }
 
-    fun cancelRepost(feedPost: FeedPost, onSuccess: () -> Unit = {}) {
+    fun cancelRepost(feedPost: FeedPost, onSuccess: () -> Unit = {}, onError: (Throwable) -> Unit = {}) {
         if (feedPost.viewer.repost == null) {
             return
         }
@@ -113,14 +113,14 @@ class TimelineViewModel : ApplicationViewModel() {
         wrapError(run = {
             withRetry(userRepository) { timelineRepository.cancelRepost(it, feedPost.viewer.repost) }
             updateFeedPost(feedPost = feedPost.repostCanceled())
-        }, onSuccess = { onSuccess() })
+        }, onSuccess = { onSuccess() }, onError = onError)
     }
 
-    fun createPost(content: String) {
+    fun createPost(content: String, onSuccess: () -> Unit, onError: (Throwable) -> Unit = {}) {
         wrapError(run = {
             withRetry(userRepository) { timelineRepository.createPost(it, content) }
             refreshPosts()
-        })
+        }, onSuccess = { onSuccess() }, onError = onError)
     }
 
     private fun updateFeedPost(feedPost: FeedPost) {

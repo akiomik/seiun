@@ -1,6 +1,7 @@
 package io.github.akiomik.seiun
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -24,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -142,14 +144,19 @@ fun RepostIndicator(viewPost: FeedViewPost) {
     } else {
         Color.Gray
     }
+    val context = LocalContext.current
 
     TextButton(
         modifier = Modifier.width(64.dp),
         onClick = {
             if (reposted) {
-                viewModel.cancelRepost(viewPost.post)
+                viewModel.cancelRepost(viewPost.post, onError = {
+                    Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
+                })
             } else {
-                viewModel.repost(viewPost.post)
+                viewModel.repost(viewPost.post, onError = {
+                    Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
+                })
             }
         }
     ) {
@@ -182,14 +189,19 @@ fun UpvoteIndicator(viewPost: FeedViewPost) {
     } else {
         Icons.Sharp.FavoriteBorder
     }
+    val context = LocalContext.current
 
     TextButton(
         modifier = Modifier.width(64.dp),
         onClick = {
             if (upvoted) {
-                viewModel.cancelVote(feedPost = viewPost.post)
+                viewModel.cancelVote(feedPost = viewPost.post, onError = {
+                    Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
+                })
             } else {
-                viewModel.upvote(feedPost = viewPost.post)
+                viewModel.upvote(feedPost = viewPost.post, onError = {
+                    Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
+                })
             }
         }
     ) {
@@ -264,6 +276,7 @@ fun LoadingText() {
 @Composable
 fun LoadingIndicator() {
     val viewModel: TimelineViewModel = viewModel()
+    val context = LocalContext.current
 
     Box(
         modifier = Modifier
@@ -274,7 +287,9 @@ fun LoadingIndicator() {
     }
 
     LaunchedEffect(key1 = true) {
-        viewModel.loadMorePosts()
+        viewModel.loadMorePosts(onError = {
+            Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
+        })
     }
 }
 
@@ -285,9 +300,12 @@ fun Timeline() {
     val listState = rememberLazyListState()
     val feedViewPosts = viewModel.feedViewPosts.observeAsState()
     val isRefreshing = viewModel.isRefreshing.observeAsState()
+    val context = LocalContext.current
     val refreshState =
         rememberPullRefreshState(refreshing = isRefreshing.value ?: false, onRefresh = {
-            viewModel.refreshPosts()
+            viewModel.refreshPosts(onError = {
+                Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
+            })
         })
 
     Box(modifier = Modifier.pullRefresh(state = refreshState)) {
@@ -309,13 +327,14 @@ fun Timeline() {
 }
 
 @Composable
-fun PostButton(content: String, enabled: Boolean, onComplete: () -> Unit) {
+fun PostButton(content: String, enabled: Boolean, onSuccess: () -> Unit) {
     val viewModel: TimelineViewModel = viewModel()
+    val context = LocalContext.current
 
     Button(onClick = {
-        // TODO: Check post completion
-        viewModel.createPost(content)
-        onComplete()
+        viewModel.createPost(content, onSuccess = onSuccess, onError = {
+            Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
+        })
     }, enabled = enabled) {
         Text("Post")
     }
