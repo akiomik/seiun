@@ -1,5 +1,6 @@
 package io.github.akiomik.seiun.ui.timeline
 
+import android.text.format.DateFormat
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -27,6 +28,7 @@ import io.github.akiomik.seiun.model.FeedViewPost
 import io.github.akiomik.seiun.ui.theme.Green700
 import io.github.akiomik.seiun.ui.theme.Red700
 import io.github.akiomik.seiun.viewmodel.TimelineViewModel
+import java.time.Instant
 
 @Composable
 private fun RetweetText(viewPost: FeedViewPost) {
@@ -201,6 +203,8 @@ private fun UpvoteIndicator(viewPost: FeedViewPost) {
 
 @Composable
 private fun FeedPostContent(viewPost: FeedViewPost) {
+    val createdAt = Instant.parse(viewPost.post.record.createdAt)
+
     Column(modifier = Modifier.padding(start = 8.dp)) {
         NameRow(viewPost = viewPost)
         Text(text = viewPost.post.record.text)
@@ -215,7 +219,7 @@ private fun FeedPostContent(viewPost: FeedViewPost) {
         }
         Text(
             modifier = Modifier.padding(bottom = 4.dp),
-            text = viewPost.post.record.createdAt,
+            text = DateFormat.format("yyyy/mm/dd hh:mm", createdAt.toEpochMilli()).toString(),
             color = Color.Gray,
             style = MaterialTheme.typography.labelMedium
         )
