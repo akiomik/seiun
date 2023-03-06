@@ -1,10 +1,8 @@
-package io.github.akiomik.seiun
+package io.github.akiomik.seiun.ui.timeline
 
-import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.R
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -12,7 +10,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.sharp.*
+import androidx.compose.material.icons.sharp.ChatBubbleOutline
+import androidx.compose.material.icons.sharp.Favorite
+import androidx.compose.material.icons.sharp.FavoriteBorder
+import androidx.compose.material.icons.sharp.SyncAlt
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -33,24 +34,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.model.FeedViewPost
+import io.github.akiomik.seiun.ui.theme.Green700
+import io.github.akiomik.seiun.ui.theme.Red700
 import io.github.akiomik.seiun.ui.theme.SeiunTheme
 import io.github.akiomik.seiun.viewmodel.TimelineViewModel
 
-
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        setContent {
-            MyApp()
-        }
-    }
-}
-
 @Composable
-fun RetweetText(viewPost: FeedViewPost) {
+private fun RetweetText(viewPost: FeedViewPost) {
     Box(modifier = Modifier.padding(bottom = 8.dp)) {
         Text(
             text = "Reposted by ${viewPost.reason?.by?.displayName}",
@@ -62,7 +57,7 @@ fun RetweetText(viewPost: FeedViewPost) {
 }
 
 @Composable
-fun ReplyText(viewPost: FeedViewPost) {
+private fun ReplyText(viewPost: FeedViewPost) {
     Box(modifier = Modifier.padding(bottom = 8.dp)) {
         Text(
             text = "Replying to ${viewPost.reply?.parent?.author?.displayName}",
@@ -74,7 +69,7 @@ fun ReplyText(viewPost: FeedViewPost) {
 }
 
 @Composable
-fun Avatar(viewPost: FeedViewPost) {
+private fun Avatar(viewPost: FeedViewPost) {
     AsyncImage(
         model = viewPost.post.author.avatar,
         contentDescription = null,
@@ -86,7 +81,7 @@ fun Avatar(viewPost: FeedViewPost) {
 }
 
 @Composable
-fun DisplayName(viewPost: FeedViewPost) {
+private fun DisplayName(viewPost: FeedViewPost) {
     Text(
         text = "${viewPost.post.author.displayName}",
         style = MaterialTheme.typography.titleMedium,
@@ -95,7 +90,7 @@ fun DisplayName(viewPost: FeedViewPost) {
 }
 
 @Composable
-fun Handle(viewPost: FeedViewPost) {
+private fun Handle(viewPost: FeedViewPost) {
     Text(
         text = "@${viewPost.post.author.handle}",
         style = MaterialTheme.typography.labelMedium,
@@ -104,7 +99,7 @@ fun Handle(viewPost: FeedViewPost) {
 }
 
 @Composable
-fun NameRow(viewPost: FeedViewPost) {
+private fun NameRow(viewPost: FeedViewPost) {
     Row(
         modifier = Modifier.fillMaxSize(),
         verticalAlignment = Alignment.CenterVertically
@@ -115,7 +110,7 @@ fun NameRow(viewPost: FeedViewPost) {
 }
 
 @Composable
-fun ReplyIndicator(viewPost: FeedViewPost) {
+private fun ReplyIndicator(viewPost: FeedViewPost) {
     TextButton(
         modifier = Modifier.width(64.dp),
         onClick = { /*TODO*/ }
@@ -136,11 +131,11 @@ fun ReplyIndicator(viewPost: FeedViewPost) {
 }
 
 @Composable
-fun RepostIndicator(viewPost: FeedViewPost) {
+private fun RepostIndicator(viewPost: FeedViewPost) {
     val viewModel: TimelineViewModel = viewModel()
     val reposted = viewPost.post.viewer.repost != null
     val color: Color = if (reposted) {
-        colorResource(R.color.green_700)
+        Green700
     } else {
         Color.Gray
     }
@@ -176,11 +171,11 @@ fun RepostIndicator(viewPost: FeedViewPost) {
 }
 
 @Composable
-fun UpvoteIndicator(viewPost: FeedViewPost) {
+private fun UpvoteIndicator(viewPost: FeedViewPost) {
     val viewModel: TimelineViewModel = viewModel()
     val upvoted = viewPost.post.viewer.upvote != null
     val color = if (upvoted) {
-        colorResource(R.color.red_700)
+        Red700
     } else {
         Color.Gray
     }
@@ -221,7 +216,7 @@ fun UpvoteIndicator(viewPost: FeedViewPost) {
 }
 
 @Composable
-fun FeedPostContent(viewPost: FeedViewPost) {
+private fun FeedPostContent(viewPost: FeedViewPost) {
     Column(modifier = Modifier.padding(start = 8.dp)) {
         NameRow(viewPost = viewPost)
         Text(text = viewPost.post.record.text)
@@ -244,7 +239,7 @@ fun FeedPostContent(viewPost: FeedViewPost) {
 }
 
 @Composable
-fun FeedPost(viewPost: FeedViewPost) {
+private fun FeedPost(viewPost: FeedViewPost) {
     Column(modifier = Modifier.padding(10.dp)) {
         if (viewPost.reason?.type == "app.bsky.feed.feedViewPost#reasonRepost") {
             RetweetText(viewPost = viewPost)
@@ -260,7 +255,7 @@ fun FeedPost(viewPost: FeedViewPost) {
 }
 
 @Composable
-fun LoadingText() {
+private fun LoadingText() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -274,7 +269,7 @@ fun LoadingText() {
 }
 
 @Composable
-fun LoadingIndicator() {
+private fun LoadingIndicator() {
     val viewModel: TimelineViewModel = viewModel()
     val context = LocalContext.current
 
@@ -295,7 +290,7 @@ fun LoadingIndicator() {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun Timeline() {
+private fun Timeline() {
     val viewModel: TimelineViewModel = viewModel()
     val listState = rememberLazyListState()
     val feedViewPosts = viewModel.feedViewPosts.observeAsState()
@@ -327,7 +322,7 @@ fun Timeline() {
 }
 
 @Composable
-fun PostButton(content: String, enabled: Boolean, onSuccess: () -> Unit) {
+private fun PostButton(content: String, enabled: Boolean, onSuccess: () -> Unit) {
     val viewModel: TimelineViewModel = viewModel()
     val context = LocalContext.current
 
@@ -342,7 +337,7 @@ fun PostButton(content: String, enabled: Boolean, onSuccess: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PostContentField(content: String, onChange: (String) -> Unit) {
+private fun PostContentField(content: String, onChange: (String) -> Unit) {
     TextField(
         value = content,
         onValueChange = onChange,
@@ -365,7 +360,7 @@ fun PostContentField(content: String, onChange: (String) -> Unit) {
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun NewPostForm(onClose: () -> Unit) {
+private fun NewPostForm(onClose: () -> Unit) {
     var content by remember { mutableStateOf("") }
     var valid by remember { mutableStateOf(false) }
 
@@ -397,7 +392,7 @@ fun NewPostForm(onClose: () -> Unit) {
 }
 
 @Composable
-fun NewPostButton() {
+private fun NewPostButton() {
     var showPostForm by remember { mutableStateOf(false) }
     if (showPostForm) {
         NewPostForm { showPostForm = false }
@@ -418,19 +413,16 @@ fun NewPostButton() {
 }
 
 @Composable
-fun MyApp() {
+fun TimelineScreen() {
     val viewModel: TimelineViewModel = viewModel()
 
-    SeiunTheme {
-        // A surface container using the 'background' color from the theme
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
-        ) {
-            when (viewModel.state.collectAsState().value) {
-                is TimelineViewModel.State.Loading -> LoadingText()
-                is TimelineViewModel.State.Loaded -> Timeline()
-            }
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
+    ) {
+        when (viewModel.state.collectAsState().value) {
+            is TimelineViewModel.State.Loading -> LoadingText()
+            is TimelineViewModel.State.Loaded -> Timeline()
         }
     }
 }
