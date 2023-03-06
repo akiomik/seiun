@@ -15,12 +15,12 @@ import kotlinx.coroutines.launch
 
 class TimelineViewModel : ApplicationViewModel() {
     sealed class State {
-        object Loading: State()
-        object Loaded: State()
+        object Loading : State()
+        object Loaded : State()
     }
 
     private var _cursor = MutableLiveData<String>()
-    private var _isRefreshing =MutableLiveData(false)
+    private var _isRefreshing = MutableLiveData(false)
     private var _feedViewPosts = MutableLiveData<List<FeedViewPost>>()
     val isRefreshing = _isRefreshing as LiveData<Boolean>
     val feedViewPosts = _feedViewPosts as LiveData<List<FeedViewPost>>
@@ -40,9 +40,9 @@ class TimelineViewModel : ApplicationViewModel() {
         }
     }
 
-    fun refreshPosts(onError: (Throwable) -> Unit ={}) {
+    fun refreshPosts(onError: (Throwable) -> Unit = {}) {
         if (_isRefreshing.value == true) {
-           return
+            return
         }
 
         Log.d("Seiun", "Refresh timeline")
@@ -63,7 +63,7 @@ class TimelineViewModel : ApplicationViewModel() {
         }, onError = onError)
     }
 
-    fun loadMorePosts(onError: (Throwable) -> Unit ={}) {
+    fun loadMorePosts(onError: (Throwable) -> Unit = {}) {
         Log.d("Seiun", "Load more posts")
 
         wrapError(run = {
@@ -89,7 +89,11 @@ class TimelineViewModel : ApplicationViewModel() {
         }, onSuccess = { onSuccess() }, onError = onError)
     }
 
-    fun cancelVote(feedPost: FeedPost, onSuccess: () -> Unit = {}, onError: (Throwable) -> Unit = {}) {
+    fun cancelVote(
+        feedPost: FeedPost,
+        onSuccess: () -> Unit = {},
+        onError: (Throwable) -> Unit = {}
+    ) {
         val ref = StrongRef(cid = feedPost.cid, uri = feedPost.uri)
         wrapError(run = {
             withRetry(userRepository) { timelineRepository.cancelVote(it, ref) }
@@ -105,13 +109,22 @@ class TimelineViewModel : ApplicationViewModel() {
         }, onSuccess = { onSuccess() }, onError = onError)
     }
 
-    fun cancelRepost(feedPost: FeedPost, onSuccess: () -> Unit = {}, onError: (Throwable) -> Unit = {}) {
+    fun cancelRepost(
+        feedPost: FeedPost,
+        onSuccess: () -> Unit = {},
+        onError: (Throwable) -> Unit = {}
+    ) {
         if (feedPost.viewer.repost == null) {
             return
         }
 
         wrapError(run = {
-            withRetry(userRepository) { timelineRepository.cancelRepost(it, feedPost.viewer.repost) }
+            withRetry(userRepository) {
+                timelineRepository.cancelRepost(
+                    it,
+                    feedPost.viewer.repost
+                )
+            }
             updateFeedPost(feedPost = feedPost.repostCanceled())
         }, onSuccess = { onSuccess() }, onError = onError)
     }
@@ -134,7 +147,10 @@ class TimelineViewModel : ApplicationViewModel() {
         _feedViewPosts.postValue(updatedFeedViewPosts)
     }
 
-    private fun mergeFeedViewPosts(currentPosts: List<FeedViewPost>, newPosts: List<FeedViewPost>): List<FeedViewPost> {
+    private fun mergeFeedViewPosts(
+        currentPosts: List<FeedViewPost>,
+        newPosts: List<FeedViewPost>
+    ): List<FeedViewPost> {
         val top50Posts = currentPosts.take(50)// NOTE: 50 is default limit of getTimeline
 
         // TODO: improve merge logic

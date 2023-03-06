@@ -13,7 +13,12 @@ import kotlinx.coroutines.launch
 class LoginViewModel : ApplicationViewModel() {
     private val userRepository = SeiunApplication.instance!!.userRepository
 
-    fun login(handle: String, password: String, onSuccess: (Session) -> Unit, onError: (Throwable) -> Unit) {
+    fun login(
+        handle: String,
+        password: String,
+        onSuccess: (Session) -> Unit,
+        onError: (Throwable) -> Unit
+    ) {
         wrapError(run = {
             userRepository.login(handle, password)
         }, onSuccess = onSuccess, onError = onError)

@@ -22,7 +22,8 @@ class UserRepository(private val context: Context, atpService: AtpService) {
         "seiun",
         key,
         EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM)
+        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+    )
 
     private val atpService = atpService
 
@@ -51,20 +52,32 @@ class UserRepository(private val context: Context, atpService: AtpService) {
     }
 
     fun saveLoginParam(handle: String, password: String) {
-        with (sharedPreferences.edit()) {
+        with(sharedPreferences.edit()) {
             putString("handle", handle)
             putString("password", password)
             apply()
         }
     }
 
-    suspend fun createAccount(email: String, handle: String, password: String, inviteCode: String): Session {
+    suspend fun createAccount(
+        email: String,
+        handle: String,
+        password: String,
+        inviteCode: String
+    ): Session {
         Log.d("Seiun", "Create account: $handle")
-        val param = AccountCreateParam(email = email, handle = handle, password = password, inviteCode = inviteCode);
+        val param = AccountCreateParam(
+            email = email,
+            handle = handle,
+            password = password,
+            inviteCode = inviteCode
+        );
         return when (val result = atpService.createAccount(param)) {
             is ApiResult.Success -> result.value
             is ApiResult.Failure -> when (result) {
-                is ApiResult.Failure.HttpFailure -> throw IllegalStateException(result.error?.message ?: "")
+                is ApiResult.Failure.HttpFailure -> throw IllegalStateException(
+                    result.error?.message ?: ""
+                )
                 else -> throw IllegalStateException("Failed to create account")
             }
         }
@@ -75,7 +88,9 @@ class UserRepository(private val context: Context, atpService: AtpService) {
         return when (val result = atpService.login(LoginParam(handle, password))) {
             is ApiResult.Success -> result.value
             is ApiResult.Failure -> when (result) {
-                is ApiResult.Failure.HttpFailure -> throw IllegalStateException(result.error?.message ?: "")
+                is ApiResult.Failure.HttpFailure -> throw IllegalStateException(
+                    result.error?.message ?: ""
+                )
                 else -> throw IllegalStateException("Failed to login")
             }
         }

@@ -8,7 +8,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -81,7 +80,6 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
             modifier = Modifier.padding(20.dp)
         )
 
-        val context = LocalContext.current
         ElevatedButton(
             onClick = {
                 Log.d("Seiun", "Login as $handle")

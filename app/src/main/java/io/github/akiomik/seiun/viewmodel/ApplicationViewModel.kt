@@ -9,7 +9,7 @@ import io.github.akiomik.seiun.service.UnauthorizedException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-abstract class ApplicationViewModel: ViewModel() {
+abstract class ApplicationViewModel : ViewModel() {
     suspend fun <T> withRetry(userRepository: UserRepository, run: suspend (Session) -> T): T {
         return try {
             val session = userRepository.getSession();
@@ -21,7 +21,12 @@ abstract class ApplicationViewModel: ViewModel() {
         }
     }
 
-    fun <T> wrapError(run: suspend () -> T, onComplete: () -> Unit = {}, onSuccess: (T) -> Unit = {}, onError: (Throwable) -> Unit = {}) {
+    fun <T> wrapError(
+        run: suspend () -> T,
+        onComplete: () -> Unit = {},
+        onSuccess: (T) -> Unit = {},
+        onError: (Throwable) -> Unit = {}
+    ) {
         var result: Result<T>? = null
 
         viewModelScope.launch(Dispatchers.IO) {

@@ -13,9 +13,10 @@ class TimelineRepository(private val atpService: AtpService) {
     suspend fun getTimeline(session: Session, before: String? = null): Timeline {
         Log.d("Seiun", "Get timeline: before = $before")
 
-        return when (val result = atpService.getTimeline("Bearer ${session.accessJwt}", before = before)) {
+        return when (val result =
+            atpService.getTimeline("Bearer ${session.accessJwt}", before = before)) {
             is ApiResult.Success -> result.value
-            is ApiResult.Failure -> when(result) {
+            is ApiResult.Failure -> when (result) {
                 is ApiResult.Failure.HttpFailure -> {
                     if (result.code == 401) {
                         throw UnauthorizedException("Unauthorized: ${result.code} (${result.error})")
@@ -32,9 +33,10 @@ class TimelineRepository(private val atpService: AtpService) {
         Log.d("Seiun", "Upvote post: uri = ${subject.uri}, cid = ${subject.cid}")
 
         val body = SetVoteParam(subject = subject, direction = VoteDirection.up)
-        when (val result = atpService.upvote(authorization = "Bearer ${session.accessJwt}", body = body)) {
+        when (val result =
+            atpService.upvote(authorization = "Bearer ${session.accessJwt}", body = body)) {
             is ApiResult.Success -> return result.value
-            is ApiResult.Failure -> when(result) {
+            is ApiResult.Failure -> when (result) {
                 is ApiResult.Failure.HttpFailure -> {
                     if (result.code == 401) {
                         throw UnauthorizedException("Unauthorized: ${result.code} (${result.error})")
@@ -51,9 +53,10 @@ class TimelineRepository(private val atpService: AtpService) {
         Log.d("Seiun", "Cancel vote post: uri = ${subject.uri}, cid = ${subject.cid}")
 
         val body = SetVoteParam(subject = subject, direction = VoteDirection.none)
-        when (val result = atpService.upvote(authorization = "Bearer ${session.accessJwt}", body = body)) {
+        when (val result =
+            atpService.upvote(authorization = "Bearer ${session.accessJwt}", body = body)) {
             is ApiResult.Success -> {}
-            is ApiResult.Failure -> when(result) {
+            is ApiResult.Failure -> when (result) {
                 is ApiResult.Failure.HttpFailure -> {
                     if (result.code == 401) {
                         throw UnauthorizedException("Unauthorized: ${result.code} (${result.error})")
@@ -73,9 +76,10 @@ class TimelineRepository(private val atpService: AtpService) {
         val record = RepostRecord(subject = subject, createdAt)
         val body = RepostParam(did = session.did, record = record)
 
-        when (val result = atpService.repost(authorization = "Bearer ${session.accessJwt}", body = body)) {
+        when (val result =
+            atpService.repost(authorization = "Bearer ${session.accessJwt}", body = body)) {
             is ApiResult.Success -> return result.value
-            is ApiResult.Failure -> when(result) {
+            is ApiResult.Failure -> when (result) {
                 is ApiResult.Failure.HttpFailure -> {
                     if (result.code == 401) {
                         throw UnauthorizedException("Unauthorized: ${result.code} (${result.error})")
@@ -92,10 +96,12 @@ class TimelineRepository(private val atpService: AtpService) {
         Log.d("Seiun", "Cancel repost: $uri")
 
         val rkey = uri.split('/').last()
-        val body = DeleteRecordParam(did = session.did, rkey = rkey, collection = "app.bsky.feed.repost")
+        val body =
+            DeleteRecordParam(did = session.did, rkey = rkey, collection = "app.bsky.feed.repost")
 
         try {
-            val res = atpService.deleteRecord(authorization = "Bearer ${session.accessJwt}", body = body)
+            val res =
+                atpService.deleteRecord(authorization = "Bearer ${session.accessJwt}", body = body)
         } catch (e: HttpException) {
             if (e.code() == 401) {
                 throw UnauthorizedException("Unauthorized: ${e.code()} (${e.message()})")
@@ -112,9 +118,10 @@ class TimelineRepository(private val atpService: AtpService) {
         val record = FeedPostRecord(text = content, createdAt = createdAt)
         val body = CreatePostParam(did = session.did, record = record)
 
-        when (val result = atpService.createPost(authorization = "Bearer ${session.accessJwt}", body = body)) {
+        when (val result =
+            atpService.createPost(authorization = "Bearer ${session.accessJwt}", body = body)) {
             is ApiResult.Success -> {}
-            is ApiResult.Failure -> when(result) {
+            is ApiResult.Failure -> when (result) {
                 is ApiResult.Failure.HttpFailure -> {
                     if (result.code == 401) {
                         throw UnauthorizedException("Unauthorized: ${result.code} (${result.error})")

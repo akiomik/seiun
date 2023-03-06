@@ -12,12 +12,13 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.create
 
-class SeiunApplication: Application() {
+class SeiunApplication : Application() {
     lateinit var userRepository: UserRepository
     lateinit var timelineRepository: TimelineRepository
 
     companion object {
-        @get:Synchronized var instance: SeiunApplication? = null
+        @get:Synchronized
+        var instance: SeiunApplication? = null
             private set
     }
 
