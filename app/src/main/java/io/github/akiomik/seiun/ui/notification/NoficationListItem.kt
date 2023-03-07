@@ -37,7 +37,7 @@ private fun VoteItem(notification: Notification) {
         Column(modifier = Modifier.padding(start = 8.dp)) {
             Text("${notification.author.displayName} liked your post")
             Text(
-                text = DateFormat.format("yyyy/mm/dd hh:mm", createdAt.toEpochMilli()).toString(),
+                text = DateFormat.format("yyyy/MM/dd hh:mm", createdAt.toEpochMilli()).toString(),
                 color = Color.Gray,
                 style = MaterialTheme.typography.labelMedium
             )
@@ -54,7 +54,7 @@ private fun RepostItem(notification: Notification) {
         Column(modifier = Modifier.padding(start = 8.dp)) {
             Text("${notification.author.displayName} reposted your post")
             Text(
-                text = DateFormat.format("yyyy/mm/dd hh:mm", createdAt.toEpochMilli()).toString(),
+                text = DateFormat.format("yyyy/MM/dd hh:mm", createdAt.toEpochMilli()).toString(),
                 color = Color.Gray,
                 style = MaterialTheme.typography.labelMedium
             )
@@ -71,7 +71,7 @@ private fun FollowItem(notification: Notification) {
         Column(modifier = Modifier.padding(start = 8.dp)) {
             Text("${notification.author.displayName} is followed you")
             Text(
-                text = DateFormat.format("yyyy/mm/dd hh:mm", createdAt.toEpochMilli()).toString(),
+                text = DateFormat.format("yyyy/MM/dd hh:mm", createdAt.toEpochMilli()).toString(),
                 color = Color.Gray,
                 style = MaterialTheme.typography.labelMedium
             )
@@ -88,7 +88,7 @@ private fun InviteItem(notification: Notification) {
         Column(modifier = Modifier.padding(start = 8.dp)) {
             Text("${notification.author.displayName} invited you")
             Text(
-                text = DateFormat.format("yyyy/mm/dd hh:mm", createdAt.toEpochMilli()).toString(),
+                text = DateFormat.format("yyyy/MM/dd hh:mm", createdAt.toEpochMilli()).toString(),
                 color = Color.Gray,
                 style = MaterialTheme.typography.labelMedium
             )
@@ -105,7 +105,7 @@ private fun MentionItem(notification: Notification) {
         Column(modifier = Modifier.padding(start = 8.dp)) {
             Text("${notification.author.displayName} mentioned you")
             Text(
-                text = DateFormat.format("yyyy/mm/dd hh:mm", createdAt.toEpochMilli()).toString(),
+                text = DateFormat.format("yyyy/MM/dd hh:mm", createdAt.toEpochMilli()).toString(),
                 color = Color.Gray,
                 style = MaterialTheme.typography.labelMedium
             )
@@ -122,7 +122,7 @@ private fun ReplyItem(notification: Notification) {
         Column(modifier = Modifier.padding(start = 8.dp)) {
             Text("${notification.author.displayName} replied to you")
             Text(
-                text = DateFormat.format("yyyy/mm/dd hh:mm", createdAt.toEpochMilli()).toString(),
+                text = DateFormat.format("yyyy/MM/dd hh:mm", createdAt.toEpochMilli()).toString(),
                 color = Color.Gray,
                 style = MaterialTheme.typography.labelMedium
             )
