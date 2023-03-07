@@ -8,7 +8,8 @@ data class NotificationRecord(
     val type: String,
     val createdAt: String, // TODO: datetime
     val text: String?,
-    val reply: ReplyRef?,
+    val reply: ReplyRefForNotification?,
+    val direction: VoteDirection?,
     // TODO: Add subject (StrongRef or ? or null)
     //    subject: {
     //        cid: 'bafyreihsqgmuusmcbtxi5feabv6rlrkhxoyxgdfu6sy3truntnzm6ovily',
