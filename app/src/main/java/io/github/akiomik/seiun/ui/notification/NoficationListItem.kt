@@ -10,8 +10,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.model.Notification
 import io.github.akiomik.seiun.model.NotificationReason
 import java.time.Instant
@@ -35,7 +37,12 @@ private fun VoteItem(notification: Notification) {
     Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
         Avatar(notification = notification)
         Column(modifier = Modifier.padding(start = 8.dp)) {
-            Text("${notification.author.displayName} liked your post")
+            Text(
+                stringResource(
+                    R.string.notification_liked,
+                    notification.author.displayName ?: notification.author.handle
+                )
+            )
             Text(
                 text = DateFormat.format("yyyy/MM/dd hh:mm", createdAt.toEpochMilli()).toString(),
                 color = Color.Gray,
@@ -52,7 +59,12 @@ private fun RepostItem(notification: Notification) {
     Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
         Avatar(notification = notification)
         Column(modifier = Modifier.padding(start = 8.dp)) {
-            Text("${notification.author.displayName} reposted your post")
+            Text(
+                stringResource(
+                    R.string.notification_reposted,
+                    notification.author.displayName ?: notification.author.handle
+                )
+            )
             Text(
                 text = DateFormat.format("yyyy/MM/dd hh:mm", createdAt.toEpochMilli()).toString(),
                 color = Color.Gray,
@@ -69,7 +81,12 @@ private fun FollowItem(notification: Notification) {
     Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
         Avatar(notification = notification)
         Column(modifier = Modifier.padding(start = 8.dp)) {
-            Text("${notification.author.displayName} is followed you")
+            Text(
+                stringResource(
+                    R.string.notification_followed,
+                    notification.author.displayName ?: notification.author.handle
+                )
+            )
             Text(
                 text = DateFormat.format("yyyy/MM/dd hh:mm", createdAt.toEpochMilli()).toString(),
                 color = Color.Gray,
@@ -86,7 +103,12 @@ private fun InviteItem(notification: Notification) {
     Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
         Avatar(notification = notification)
         Column(modifier = Modifier.padding(start = 8.dp)) {
-            Text("${notification.author.displayName} invited you")
+            Text(
+                stringResource(
+                    R.string.notification_invited,
+                    notification.author.displayName ?: notification.author.handle
+                )
+            )
             Text(
                 text = DateFormat.format("yyyy/MM/dd hh:mm", createdAt.toEpochMilli()).toString(),
                 color = Color.Gray,
@@ -103,7 +125,12 @@ private fun MentionItem(notification: Notification) {
     Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
         Avatar(notification = notification)
         Column(modifier = Modifier.padding(start = 8.dp)) {
-            Text("${notification.author.displayName} mentioned you")
+            Text(
+                stringResource(
+                    R.string.notification_mentioned,
+                    notification.author.displayName ?: notification.author.handle
+                )
+            )
             Text(
                 text = DateFormat.format("yyyy/MM/dd hh:mm", createdAt.toEpochMilli()).toString(),
                 color = Color.Gray,
@@ -120,7 +147,12 @@ private fun ReplyItem(notification: Notification) {
     Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
         Avatar(notification = notification)
         Column(modifier = Modifier.padding(start = 8.dp)) {
-            Text("${notification.author.displayName} replied to you")
+            Text(
+                stringResource(
+                    R.string.notification_replied,
+                    notification.author.displayName ?: notification.author.handle
+                )
+            )
             Text(
                 text = DateFormat.format("yyyy/MM/dd hh:mm", createdAt.toEpochMilli()).toString(),
                 color = Color.Gray,

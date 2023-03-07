@@ -24,4 +24,10 @@
     <string name="notification_no_notifications_yet">No notifications yet</string>
     <string name="notification_no_more_notifications">No more notifications</string>
     <string name="notification_error">Failed to get notifications. Please try later</string>
+    <string name="notification_liked">%1$s liked your post</string>
+    <string name="notification_reposted">%1$s reposted your post</string>
+    <string name="notification_followed">%1$s is followed you</string>
+    <string name="notification_invited">%1$s invited you</string>
+    <string name="notification_mentioned">%1$s mentioned you</string>
+    <string name="notification_replied">%1$s replied to you</string>
 </resources>
