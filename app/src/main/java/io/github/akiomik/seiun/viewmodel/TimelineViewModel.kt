@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-// タイムラインのViewModel
 class TimelineViewModel : ApplicationViewModel() {
     sealed class State {
         object Loading : State()
@@ -53,7 +52,6 @@ class TimelineViewModel : ApplicationViewModel() {
         }
     }
 
-    // 投稿のリフレッシュ
     fun refreshPosts(onError: (Throwable) -> Unit = {}) {
         if (_isRefreshing.value == true) {
             return
@@ -77,7 +75,6 @@ class TimelineViewModel : ApplicationViewModel() {
         }, onError = onError)
     }
 
-    // 投稿の追加取得
     fun loadMorePosts(onError: (Throwable) -> Unit = {}) {
         Log.d("Seiun", "Load more posts")
 
@@ -101,7 +98,6 @@ class TimelineViewModel : ApplicationViewModel() {
         }, onError = onError)
     }
 
-    // Vote
     fun upvote(feedPost: FeedPost, onSuccess: () -> Unit = {}, onError: (Throwable) -> Unit = {}) {
         val ref = StrongRef(cid = feedPost.cid, uri = feedPost.uri)
         wrapError(run = {
@@ -110,7 +106,6 @@ class TimelineViewModel : ApplicationViewModel() {
         }, onSuccess = { onSuccess() }, onError = onError)
     }
 
-    // Voteのキャンセル
     fun cancelVote(
         feedPost: FeedPost,
         onSuccess: () -> Unit = {},
@@ -123,7 +118,6 @@ class TimelineViewModel : ApplicationViewModel() {
         }, onSuccess = { onSuccess() }, onError = onError)
     }
 
-    // リポスト
     fun repost(feedPost: FeedPost, onSuccess: () -> Unit = {}, onError: (Throwable) -> Unit = {}) {
         val ref = StrongRef(cid = feedPost.cid, uri = feedPost.uri)
         wrapError(run = {
@@ -132,7 +126,6 @@ class TimelineViewModel : ApplicationViewModel() {
         }, onSuccess = { onSuccess() }, onError = onError)
     }
 
-    // リポストのキャンセル
     fun cancelRepost(
         feedPost: FeedPost,
         onSuccess: () -> Unit = {},
@@ -153,7 +146,6 @@ class TimelineViewModel : ApplicationViewModel() {
         }, onSuccess = { onSuccess() }, onError = onError)
     }
 
-    // ポストの新規作成
     fun createPost(content: String, onSuccess: () -> Unit, onError: (Throwable) -> Unit = {}) {
         wrapError(run = {
             withRetry(userRepository) { timelineRepository.createPost(it, content) }
@@ -161,7 +153,6 @@ class TimelineViewModel : ApplicationViewModel() {
         }, onSuccess = { onSuccess() }, onError = onError)
     }
 
-    // 投稿の更新
     private fun updateFeedPost(feedPost: FeedPost) {
         val updatedFeedViewPosts = feedViewPosts.value?.map {
             if (it.post.uri === feedPost.uri) {
@@ -173,7 +164,6 @@ class TimelineViewModel : ApplicationViewModel() {
         _feedViewPosts.postValue(updatedFeedViewPosts)
     }
 
-    // すでに表示されている投稿とのマージ
     private fun mergeFeedViewPosts(
         currentPosts: List<FeedViewPost>,
         newPosts: List<FeedViewPost>
