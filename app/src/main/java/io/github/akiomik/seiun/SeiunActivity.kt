@@ -63,7 +63,7 @@ fun TopBar(scrollBehavior: TopAppBarScrollBehavior, visible: MutableState<Boolea
 
     AnimatedVisibility(visible = visible.value) {
         CenterAlignedTopAppBar(
-            title = { Text("Seiun") },
+            title = { Text(stringResource(id = R.string.app_name)) },
             navigationIcon = { Avatar(viewModel.profile.value) },
             scrollBehavior = scrollBehavior
         )

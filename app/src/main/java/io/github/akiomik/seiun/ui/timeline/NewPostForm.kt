@@ -50,7 +50,6 @@ private fun PostContentField(content: String, onChange: (String) -> Unit) {
     )
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun NewPostForm(onClose: () -> Unit) {
     var content by remember { mutableStateOf("") }

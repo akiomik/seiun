@@ -7,18 +7,24 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.ui.theme.Red700
 import io.github.akiomik.seiun.viewmodel.LoginViewModel
 
 @Composable
 private fun AppName() {
-    Text(text = "Seiun", fontSize = 66.sp, modifier = Modifier.padding(8.dp))
+    Text(
+        text = stringResource(id = R.string.app_name),
+        fontSize = 66.sp,
+        modifier = Modifier.padding(8.dp)
+    )
 }
 
 @Composable
@@ -31,7 +37,6 @@ private fun LoginTitle() {
     Text(text = "Login", fontSize = 23.sp, modifier = Modifier.padding(20.dp))
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LoginForm(onLoginSuccess: () -> Unit) {
     val viewModel: LoginViewModel = viewModel()

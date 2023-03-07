@@ -22,7 +22,6 @@ fun RegistrationTitle() {
     Text(text = "Create Account", fontSize = 23.sp, modifier = Modifier.padding(20.dp))
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
     val viewModel: RegistrationViewModel = viewModel()
