@@ -15,6 +15,7 @@ class NotificationViewModel : ApplicationViewModel() {
     sealed class State {
         object Loading : State()
         object Loaded : State()
+        object Error : State()
     }
 
     private var _cursor = MutableLiveData<String>()
@@ -33,21 +34,21 @@ class NotificationViewModel : ApplicationViewModel() {
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            val data = withRetry(userRepository) { notificationRepository.listNotifications(it) }
+            wrapError (run = {
+                withRetry(userRepository) { notificationRepository.listNotifications(it) }
+            }, onSuccess = {
+                _notifications.postValue(it.notifications)
 
-            _notifications.postValue(
-                mergeNotifications(
-                    _notifications.value.orEmpty(),
-                    data.notifications
-                )
-            )
-            _state.value = State.Loaded
-            _cursor.postValue(data.cursor)
-
-            // NOTE: 50 is default limit of listNotifications
-            if (data.notifications.size < 50) {
-                _seenAllNotifications.postValue(true)
-            }
+                // NOTE: 50 is default limit of listNotifications
+                if (it.notifications.size < 50) {
+                    _seenAllNotifications.postValue(true)
+                }
+                _cursor.postValue(it.cursor)
+                _state.value = State.Loaded
+            }, onError = {
+                _notifications.postValue(emptyList())
+                _state.value = State.Error
+            })
         }
     }
 
@@ -61,6 +62,11 @@ class NotificationViewModel : ApplicationViewModel() {
 
         wrapError(run = {
             val data = withRetry(userRepository) { notificationRepository.listNotifications(it) }
+
+            if (_cursor.value == null) {
+                _cursor.postValue(data.cursor)
+            }
+
             if (data.cursor != _cursor.value) {
                 val newNotifications =
                     mergeNotifications(_notifications.value.orEmpty(), data.notifications)

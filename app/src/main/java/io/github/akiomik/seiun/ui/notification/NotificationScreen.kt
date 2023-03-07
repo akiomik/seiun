@@ -25,6 +25,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.akiomik.seiun.viewmodel.NotificationViewModel
+import kotlin.reflect.jvm.internal.impl.descriptors.Visibilities.Local
+import kotlin.reflect.jvm.internal.impl.resolve.constants.ErrorValue.ErrorValueWithMessage
 
 @Composable
 private fun LoadingText() {
@@ -76,6 +78,13 @@ fun NoMoreNotificationsMessage() {
     }
 }
 
+@Composable
+private fun ErrorMessage() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        androidx.compose.material3.Text("Failed to get notifications. Please try later")
+    }
+}
+
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun NotificationList() {
@@ -90,6 +99,7 @@ private fun NotificationList() {
                 Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
             })
         })
+    val status = viewModel.state.collectAsState().value
 
     Box(modifier = Modifier.pullRefresh(state = refreshState)) {
         LazyColumn(state = listState) {
@@ -98,10 +108,9 @@ private fun NotificationList() {
                 Divider(color = Color.Gray)
             }
 
-            Log.d("Seiun", "${viewModel.notifications.value?.size}")
-            Log.d("Seiun", "${viewModel.seenAllNotifications.value}")
-
-            if (viewModel.notifications.value?.size == 0) {
+            if (status == NotificationViewModel.State.Error) {
+                item { ErrorMessage() }
+            } else if (viewModel.notifications.value?.size == 0) {
                 item { NoNotificationsYetMessage() }
             } else if (viewModel.seenAllNotifications.value == true) {
                 item { NoMoreNotificationsMessage() }
@@ -128,9 +137,8 @@ fun NotificationScreen() {
     ) {
         when (viewModel.state.collectAsState().value) {
             is NotificationViewModel.State.Loading -> LoadingText()
-            is NotificationViewModel.State.Loaded -> {
-                NotificationList()
-            }
+            is NotificationViewModel.State.Loaded -> NotificationList()
+            is NotificationViewModel.State.Error -> NotificationList()
         }
     }
 }
