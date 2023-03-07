@@ -31,7 +31,7 @@ import io.github.akiomik.seiun.viewmodel.TimelineViewModel
 import java.time.Instant
 
 @Composable
-private fun RetweetText(viewPost: FeedViewPost) {
+private fun RepostText(viewPost: FeedViewPost) {
     Box(modifier = Modifier.padding(bottom = 8.dp)) {
         Text(
             text = "Reposted by ${viewPost.reason?.by?.displayName}",
@@ -230,7 +230,7 @@ private fun FeedPostContent(viewPost: FeedViewPost) {
 fun FeedPost(viewPost: FeedViewPost) {
     Column(modifier = Modifier.padding(10.dp)) {
         if (viewPost.reason?.type == "app.bsky.feed.feedViewPost#reasonRepost") {
-            RetweetText(viewPost = viewPost)
+            RepostText(viewPost = viewPost)
         } else if (viewPost.reply != null) {
             ReplyText(viewPost = viewPost)
         }
