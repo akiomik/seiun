@@ -45,7 +45,8 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
             placeholder = { Text(text = "jack@example.com") },
             maxLines = 1,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            modifier = Modifier.padding(20.dp)
+            modifier = Modifier.padding(20.dp),
+            singleLine = true
         )
 
         TextField(
@@ -57,7 +58,8 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
             prefix = { Text(text = "@") },
             suffix = { Text(text = ".bsky.social") },
             maxLines = 1,
-            modifier = Modifier.padding(20.dp)
+            modifier = Modifier.padding(20.dp),
+            singleLine = true
         )
 
         TextField(
@@ -67,7 +69,8 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
             maxLines = 1,
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            modifier = Modifier.padding(20.dp)
+            modifier = Modifier.padding(20.dp),
+            singleLine = true
         )
 
         TextField(
@@ -77,7 +80,8 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
             placeholder = { Text(text = "bsky.social-XXXXXX") },
             maxLines = 1,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
-            modifier = Modifier.padding(20.dp)
+            modifier = Modifier.padding(20.dp),
+            singleLine = true
         )
 
         ElevatedButton(

@@ -55,7 +55,8 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
             label = { Text("Handle") },
             placeholder = { Text(text = "jack.bsky.social") },
             maxLines = 1,
-            modifier = Modifier.padding(20.dp)
+            modifier = Modifier.padding(20.dp),
+            singleLine = true
         )
 
         TextField(
@@ -68,7 +69,8 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
             maxLines = 1,
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            modifier = Modifier.padding(20.dp)
+            modifier = Modifier.padding(20.dp),
+            singleLine = true
         )
 
         ElevatedButton(
