@@ -44,14 +44,17 @@ class UserRepository(context: Context, private val atpService: AtpService) {
     }
 
     fun getLoginParam(): Pair<String, String> {
-        val handle = sharedPreferences.getString("handle", "") ?: ""
+        var handleOrEmail = sharedPreferences.getString("handleOrEmail", "") ?: ""
+        if (handleOrEmail.isEmpty()) {
+            handleOrEmail = sharedPreferences.getString("handle", "") ?: ""
+        }
         val password = sharedPreferences.getString("password", "") ?: ""
-        return Pair(handle, password)
+        return Pair(handleOrEmail, password)
     }
 
-    fun saveLoginParam(handle: String, password: String) {
+    fun saveLoginParam(handleOrEmail: String, password: String) {
         with(sharedPreferences.edit()) {
-            putString("handle", handle)
+            putString("handleOrEmail", handleOrEmail)
             putString("password", password)
             apply()
         }
@@ -81,9 +84,9 @@ class UserRepository(context: Context, private val atpService: AtpService) {
         }
     }
 
-    suspend fun login(handle: String, password: String): Session {
+    suspend fun login(handleOrEmail: String, password: String): Session {
         Log.d("Seiun", "Create session")
-        return when (val result = atpService.login(LoginParam(handle, password))) {
+        return when (val result = atpService.login(LoginParam(handleOrEmail, password))) {
             is ApiResult.Success -> result.value
             is ApiResult.Failure -> when (result) {
                 is ApiResult.Failure.HttpFailure -> throw IllegalStateException(

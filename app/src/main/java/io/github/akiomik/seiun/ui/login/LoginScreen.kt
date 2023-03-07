@@ -35,10 +35,10 @@ private fun LoginTitle() {
 @Composable
 private fun LoginForm(onLoginSuccess: () -> Unit) {
     val viewModel: LoginViewModel = viewModel()
-    val (savedHandle, savedPassword) = viewModel.getLoginParam()
-    var handle by remember { mutableStateOf(savedHandle) }
+    val (savedHandleOrEmail, savedPassword) = viewModel.getLoginParam()
+    var handleOrEmail by remember { mutableStateOf(savedHandleOrEmail) }
     var password by remember { mutableStateOf(savedPassword) }
-    var valid by remember { mutableStateOf(handle.isNotEmpty() && password.isNotEmpty()) }
+    var valid by remember { mutableStateOf(handleOrEmail.isNotEmpty() && password.isNotEmpty()) }
     var errorMessage by remember { mutableStateOf("") }
 
     Column {
@@ -47,14 +47,15 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
         }
 
         TextField(
-            value = handle,
+            value = handleOrEmail,
             onValueChange = {
-                handle = it
-                valid = handle.isNotEmpty() && password.isNotEmpty()
+                handleOrEmail = it
+                valid = handleOrEmail.isNotEmpty() && password.isNotEmpty()
             },
-            label = { Text("Handle") },
-            placeholder = { Text(text = "jack.bsky.social") },
+            label = { Text("Handle or Email") },
+            placeholder = { Text(text = "jack.bsky.social or jack@example.com") },
             maxLines = 1,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
             modifier = Modifier.padding(20.dp),
             singleLine = true
         )
@@ -63,7 +64,7 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
             value = password,
             onValueChange = {
                 password = it
-                valid = handle.isNotEmpty() && password.isNotEmpty()
+                valid = handleOrEmail.isNotEmpty() && password.isNotEmpty()
             },
             label = { Text("Password") },
             maxLines = 1,
@@ -75,13 +76,13 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
 
         ElevatedButton(
             onClick = {
-                Log.d("Seiun", "Login as $handle")
+                Log.d("Seiun", "Login as $handleOrEmail")
 
                 val userRepository = SeiunApplication.instance!!.userRepository
-                userRepository.saveLoginParam(handle, password)
+                userRepository.saveLoginParam(handleOrEmail, password)
 
                 viewModel.login(
-                    handle = handle,
+                    handle = handleOrEmail,
                     password = password,
                     onSuccess = { session ->
                         Log.d("Seiun", "Login successful")
