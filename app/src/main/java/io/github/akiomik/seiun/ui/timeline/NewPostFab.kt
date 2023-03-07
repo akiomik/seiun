@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+// 新規投稿するFloatingActionButtonの設定
 @Composable
 fun NewPostFab() {
     var showPostForm by remember { mutableStateOf(false) }

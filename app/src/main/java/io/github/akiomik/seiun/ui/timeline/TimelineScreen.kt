@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.akiomik.seiun.viewmodel.TimelineViewModel
 
+// ローディング中の表示
 @Composable
 private fun LoadingText() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -69,6 +70,7 @@ fun NoMorePostsMessage() {
     }
 }
 
+// タイムラインの表示
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun Timeline() {
@@ -84,6 +86,7 @@ private fun Timeline() {
             })
         })
 
+    // PullRefresh時の動作
     Box(modifier = Modifier.pullRefresh(state = refreshState)) {
         LazyColumn(state = listState) {
             items(feedViewPosts.value.orEmpty()) { feedViewPost ->
@@ -91,8 +94,10 @@ private fun Timeline() {
                 Divider(color = Color.Gray)
             }
 
+            // 投稿がなかったとき
             if (viewModel.feedViewPosts.value?.size == 0) {
                 item { NoPostsYetMessage() }
+            // 新規表示する投稿がなかったとき
             } else if (viewModel.seenAllFeed.value == true) {
                 item { NoMorePostsMessage() }
             } else {
@@ -108,6 +113,7 @@ private fun Timeline() {
     }
 }
 
+// タイムラインの要素の設定
 @Composable
 fun TimelineScreen() {
     val viewModel: TimelineViewModel = viewModel()
@@ -117,7 +123,9 @@ fun TimelineScreen() {
         color = MaterialTheme.colorScheme.background
     ) {
         when (viewModel.state.collectAsState().value) {
+            // ローディング中には、LoadingText()を表示
             is TimelineViewModel.State.Loading -> LoadingText()
+            // ローディング終了後は、タイムラインを表示
             is TimelineViewModel.State.Loaded -> {
                 Timeline()
             }

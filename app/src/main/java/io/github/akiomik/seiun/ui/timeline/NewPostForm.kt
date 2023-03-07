@@ -14,6 +14,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.akiomik.seiun.viewmodel.TimelineViewModel
 
+// 投稿ボタン
 @Composable
 private fun PostButton(content: String, enabled: Boolean, onSuccess: () -> Unit) {
     val viewModel: TimelineViewModel = viewModel()
@@ -28,6 +29,7 @@ private fun PostButton(content: String, enabled: Boolean, onSuccess: () -> Unit)
     }
 }
 
+// 投稿する内容記入欄
 @Composable
 private fun PostContentField(content: String, onChange: (String) -> Unit) {
     TextField(
@@ -50,6 +52,7 @@ private fun PostContentField(content: String, onChange: (String) -> Unit) {
     )
 }
 
+// 新規投稿フォームの設定
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun NewPostForm(onClose: () -> Unit) {

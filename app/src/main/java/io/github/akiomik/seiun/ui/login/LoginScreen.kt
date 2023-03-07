@@ -31,21 +31,28 @@ private fun LoginTitle() {
     Text(text = "Login", fontSize = 23.sp, modifier = Modifier.padding(20.dp))
 }
 
+// ログインフォーム
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LoginForm(onLoginSuccess: () -> Unit) {
+    // 各種ビューの設定
     val viewModel: LoginViewModel = viewModel()
     val (savedHandle, savedPassword) = viewModel.getLoginParam()
+    // 各種値の設定
     var handle by remember { mutableStateOf(savedHandle) }
     var password by remember { mutableStateOf(savedPassword) }
+    // バリデーション
     var valid by remember { mutableStateOf(handle.isNotEmpty() && password.isNotEmpty()) }
+    // エラーメッセージ
     var errorMessage by remember { mutableStateOf("") }
 
     Column {
+        // エラーメッセージがあれば表示
         if (errorMessage.isNotEmpty()) {
             Text(errorMessage, color = Red700, modifier = Modifier.padding(20.dp))
         }
 
+        // ハンドルの入力欄
         TextField(
             value = handle,
             onValueChange = {
@@ -58,6 +65,7 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
             modifier = Modifier.padding(20.dp)
         )
 
+        // パスワード入力欄
         TextField(
             value = password,
             onValueChange = {
@@ -71,6 +79,7 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
             modifier = Modifier.padding(20.dp)
         )
 
+        // ログインボタン
         ElevatedButton(
             onClick = {
                 Log.d("Seiun", "Login as $handle")
@@ -101,6 +110,7 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
     }
 }
 
+// アカウント作成ボタン
 @Composable
 private fun CreateAccountButton(onClick: () -> Unit) {
     Row(
@@ -114,12 +124,14 @@ private fun CreateAccountButton(onClick: () -> Unit) {
     }
 }
 
+// ログイン画面全体の設定
 @Composable
 fun LoginScreen(onLoginSuccess: () -> Unit, onCreateAccountClick: () -> Unit) {
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
+        // 上記の要素の設定
         Column {
             AppName()
             AppDescription()

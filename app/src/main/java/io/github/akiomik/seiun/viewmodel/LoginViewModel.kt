@@ -10,6 +10,7 @@ import io.github.akiomik.seiun.model.Session
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+// ログイン画面の設定
 class LoginViewModel : ApplicationViewModel() {
     private val userRepository = SeiunApplication.instance!!.userRepository
 

@@ -15,12 +15,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.ViewCompat
 
+// ダークテーマ使用時
 private val DarkColorScheme = darkColorScheme(
     primary = Indigo800,
     secondary = BlueGray800,
     tertiary = Blue800
 )
 
+// ライトテーマ使用時
 private val LightColorScheme = lightColorScheme(
     primary = Indigo400,
     secondary = BlueGray400,
@@ -37,6 +39,7 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
+// 全体のテーマ設定
 @Composable
 fun SeiunTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),

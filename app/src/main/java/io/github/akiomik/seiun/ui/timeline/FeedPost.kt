@@ -30,6 +30,7 @@ import io.github.akiomik.seiun.ui.theme.Red700
 import io.github.akiomik.seiun.viewmodel.TimelineViewModel
 import java.time.Instant
 
+// リポストされている投稿
 @Composable
 private fun RetweetText(viewPost: FeedViewPost) {
     Box(modifier = Modifier.padding(bottom = 8.dp)) {
@@ -42,6 +43,7 @@ private fun RetweetText(viewPost: FeedViewPost) {
     }
 }
 
+// リプライされている投稿
 @Composable
 private fun ReplyText(viewPost: FeedViewPost) {
     Box(modifier = Modifier.padding(bottom = 8.dp)) {
@@ -54,6 +56,7 @@ private fun ReplyText(viewPost: FeedViewPost) {
     }
 }
 
+// アイコン
 @Composable
 private fun Avatar(viewPost: FeedViewPost) {
     AsyncImage(
@@ -66,6 +69,7 @@ private fun Avatar(viewPost: FeedViewPost) {
     )
 }
 
+// 表示名
 @Composable
 private fun DisplayName(viewPost: FeedViewPost) {
     Text(
@@ -75,6 +79,7 @@ private fun DisplayName(viewPost: FeedViewPost) {
     )
 }
 
+// ハンドル
 @Composable
 private fun Handle(viewPost: FeedViewPost) {
     Text(
@@ -84,6 +89,7 @@ private fun Handle(viewPost: FeedViewPost) {
     )
 }
 
+// 名前(ハンドルと表示名)の表示
 @Composable
 private fun NameRow(viewPost: FeedViewPost) {
     Row(
@@ -95,6 +101,7 @@ private fun NameRow(viewPost: FeedViewPost) {
     }
 }
 
+// リプライの表示
 @Composable
 private fun ReplyIndicator(viewPost: FeedViewPost) {
     TextButton(
@@ -116,6 +123,7 @@ private fun ReplyIndicator(viewPost: FeedViewPost) {
     }
 }
 
+// リポストの表示
 @Composable
 private fun RepostIndicator(viewPost: FeedViewPost) {
     val viewModel: TimelineViewModel = viewModel()
@@ -156,6 +164,7 @@ private fun RepostIndicator(viewPost: FeedViewPost) {
     }
 }
 
+// Voteしている投稿の表示
 @Composable
 private fun UpvoteIndicator(viewPost: FeedViewPost) {
     val viewModel: TimelineViewModel = viewModel()
@@ -201,6 +210,7 @@ private fun UpvoteIndicator(viewPost: FeedViewPost) {
     }
 }
 
+// 投稿のリプライ数等の表示
 @Composable
 private fun FeedPostContent(viewPost: FeedViewPost) {
     val createdAt = Instant.parse(viewPost.post.record.createdAt)
@@ -226,6 +236,7 @@ private fun FeedPostContent(viewPost: FeedViewPost) {
     }
 }
 
+// 投稿の表示
 @Composable
 fun FeedPost(viewPost: FeedViewPost) {
     Column(modifier = Modifier.padding(10.dp)) {
