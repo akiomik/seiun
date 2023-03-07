@@ -70,7 +70,6 @@ class TimelineViewModel : ApplicationViewModel() {
                 Log.d("Seiun", "Skip merge because cursor is unchanged")
             }
         }, onComplete = {
-            // TODO: update isRefreshing when feedViewPosts is updated
             _isRefreshing.postValue(false)
         }, onError = onError)
     }

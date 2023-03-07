@@ -5,6 +5,7 @@ import com.slack.eithernet.ApiResultCallAdapterFactory
 import com.slack.eithernet.ApiResultConverterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import io.github.akiomik.seiun.repository.NotificationRepository
 import io.github.akiomik.seiun.repository.TimelineRepository
 import io.github.akiomik.seiun.repository.UserRepository
 import io.github.akiomik.seiun.service.AtpService
@@ -15,6 +16,7 @@ import retrofit2.create
 class SeiunApplication : Application() {
     lateinit var userRepository: UserRepository
     lateinit var timelineRepository: TimelineRepository
+    lateinit var notificationRepository: NotificationRepository
 
     companion object {
         @get:Synchronized
@@ -38,6 +40,7 @@ class SeiunApplication : Application() {
 
         userRepository = UserRepository(applicationContext, atpService)
         timelineRepository = TimelineRepository(atpService)
+        notificationRepository = NotificationRepository(atpService)
         instance = this
     }
 }
