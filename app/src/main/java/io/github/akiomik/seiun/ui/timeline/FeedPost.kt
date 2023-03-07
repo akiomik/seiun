@@ -20,10 +20,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.model.FeedViewPost
 import io.github.akiomik.seiun.ui.theme.Green700
 import io.github.akiomik.seiun.ui.theme.Red700
@@ -34,7 +36,10 @@ import java.time.Instant
 private fun RepostText(viewPost: FeedViewPost) {
     Box(modifier = Modifier.padding(bottom = 8.dp)) {
         Text(
-            text = "Reposted by ${viewPost.reason?.by?.displayName}",
+            text = stringResource(
+                id = R.string.timeline_reposted,
+                viewPost.reason?.by?.displayName ?: viewPost.reason?.by?.handle ?: ""
+            ),
             fontWeight = FontWeight.Bold,
             color = Color.Gray,
             style = MaterialTheme.typography.labelMedium
@@ -46,7 +51,11 @@ private fun RepostText(viewPost: FeedViewPost) {
 private fun ReplyText(viewPost: FeedViewPost) {
     Box(modifier = Modifier.padding(bottom = 8.dp)) {
         Text(
-            text = "Replying to ${viewPost.reply?.parent?.author?.displayName}",
+            text = stringResource(
+                id = R.string.timeline_replying,
+                viewPost.reply?.parent?.author?.displayName
+                    ?: viewPost.reply?.parent?.author?.handle ?: ""
+            ),
             fontWeight = FontWeight.Bold,
             color = Color.Gray,
             style = MaterialTheme.typography.labelMedium

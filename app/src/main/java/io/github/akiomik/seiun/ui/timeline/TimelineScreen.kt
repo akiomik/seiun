@@ -16,8 +16,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.viewmodel.TimelineViewModel
 
 @Composable
@@ -28,7 +30,7 @@ private fun LoadingText() {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Loading")
+            Text(stringResource(id = R.string.loading))
             CircularProgressIndicator()
         }
     }
@@ -57,21 +59,21 @@ private fun LoadingIndicator() {
 @Composable
 fun NoPostsYetMessage() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("No posts yet")
+        Text(stringResource(id = R.string.timeline_no_posts_yet))
     }
 }
 
 @Composable
 fun NoMorePostsMessage() {
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        Text("No more posts")
+        Text(stringResource(id = R.string.timeline_no_more_posts))
     }
 }
 
 @Composable
 fun ErrorMessage() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("Failed to get timeline. Please try later")
+        Text(stringResource(id = R.string.timeline_error))
     }
 }
 

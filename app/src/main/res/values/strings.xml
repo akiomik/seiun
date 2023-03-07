@@ -30,4 +30,13 @@
     <string name="notification_invited">%1$s invited you</string>
     <string name="notification_mentioned">%1$s mentioned you</string>
     <string name="notification_replied">%1$s replied to you</string>
+    <string name="timeline_reposted">Reposted by %1$s</string>
+    <string name="timeline_replying">Replying to %1$s</string>
+    <string name="timeline_new_post_cancel_button">Cancel</string>
+    <string name="timeline_new_post_post_button">Post</string>
+    <string name="timeline_new_post_content">Content</string>
+    <string name="timeline_new_post_content_placeholder">What\'s up?</string>
+    <string name="timeline_no_posts_yet">No posts yet</string>
+    <string name="timeline_no_more_posts">No more posts</string>
+    <string name="timeline_error">Failed to get timeline. Please try later</string>
 </resources>

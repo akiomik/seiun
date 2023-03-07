@@ -4,14 +4,15 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
+import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.viewmodel.TimelineViewModel
 
 @Composable
@@ -24,7 +25,7 @@ private fun PostButton(content: String, enabled: Boolean, onSuccess: () -> Unit)
             Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
         })
     }, enabled = enabled) {
-        Text("Post")
+        Text(stringResource(id = R.string.timeline_new_post_post_button))
     }
 }
 
@@ -33,8 +34,8 @@ private fun PostContentField(content: String, onChange: (String) -> Unit) {
     TextField(
         value = content,
         onValueChange = onChange,
-        label = { Text("Content") },
-        placeholder = { Text(text = "What's up?") },
+        label = { Text(stringResource(id = R.string.timeline_new_post_content)) },
+        placeholder = { Text(text = stringResource(id = R.string.timeline_new_post_content_placeholder)) },
         maxLines = 8,
         modifier = Modifier
             .padding(20.dp)
@@ -66,7 +67,7 @@ fun NewPostForm(onClose: () -> Unit) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     TextButton(onClick = onClose) {
-                        Text("Cancel")
+                        Text(stringResource(id = R.string.timeline_new_post_cancel_button))
                     }
                     PostButton(content = content, enabled = valid) { onClose() }
                 }
