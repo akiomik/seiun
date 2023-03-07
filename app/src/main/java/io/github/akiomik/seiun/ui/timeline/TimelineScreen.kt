@@ -7,8 +7,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -107,28 +105,6 @@ private fun Timeline() {
             state = refreshState,
             modifier = Modifier.align(Alignment.TopCenter)
         )
-        NewPostButton()
-    }
-}
-
-@Composable
-private fun NewPostButton() {
-    var showPostForm by remember { mutableStateOf(false) }
-    if (showPostForm) {
-        NewPostForm { showPostForm = false }
-    } else {
-        Box(modifier = Modifier.fillMaxSize()) {
-            FloatingActionButton(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .align(alignment = Alignment.BottomEnd),
-                onClick = {
-                    showPostForm = true
-                }
-            ) {
-                Icon(Icons.Filled.Add, contentDescription = "Create new post")
-            }
-        }
     }
 }
 
@@ -140,7 +116,6 @@ fun TimelineScreen() {
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        Log.d("Seiun", viewModel.state.collectAsState().value.toString())
         when (viewModel.state.collectAsState().value) {
             is TimelineViewModel.State.Loading -> LoadingText()
             is TimelineViewModel.State.Loaded -> {

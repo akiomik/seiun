@@ -10,10 +10,7 @@ import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Text
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,6 +28,7 @@ import io.github.akiomik.seiun.ui.notification.NotificationScreen
 import io.github.akiomik.seiun.ui.registration.RegistrationScreen
 import io.github.akiomik.seiun.ui.theme.Indigo800
 import io.github.akiomik.seiun.ui.theme.SeiunTheme
+import io.github.akiomik.seiun.ui.timeline.NewPostFab
 import io.github.akiomik.seiun.ui.timeline.TimelineScreen
 
 class SeiunActivity : ComponentActivity() {
@@ -102,15 +100,26 @@ fun App() {
     val navController = rememberNavController()
     val bottomBarState = rememberSaveable { (mutableStateOf(false)) }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val fabState = remember { (mutableStateOf<@Composable () -> Unit>({})) }
     when (navBackStackEntry?.destination?.route) {
-        "timeline" -> bottomBarState.value = true
-        "notification" -> bottomBarState.value = true
-        else -> bottomBarState.value = false
+        "timeline" -> {
+            bottomBarState.value = true
+            fabState.value = { NewPostFab() }
+        }
+        "notification" -> {
+            bottomBarState.value = true
+            fabState.value = {}
+        }
+        else -> {
+            bottomBarState.value = false
+            fabState.value = {}
+        }
     }
 
     SeiunTheme {
         Scaffold(
-            bottomBar = { BottomBar(navController = navController, visible = bottomBarState) }
+            bottomBar = { BottomBar(navController = navController, visible = bottomBarState) },
+            floatingActionButton = fabState.value
         ) {
             Navigation(navController = navController, modifier = Modifier.padding(it))
         }
