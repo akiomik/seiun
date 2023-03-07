@@ -1,13 +1,14 @@
 package io.github.akiomik.seiun
 
+import android.content.res.Resources.Theme
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.Text
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Text
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
@@ -26,7 +27,6 @@ import androidx.navigation.compose.rememberNavController
 import io.github.akiomik.seiun.ui.login.LoginScreen
 import io.github.akiomik.seiun.ui.notification.NotificationScreen
 import io.github.akiomik.seiun.ui.registration.RegistrationScreen
-import io.github.akiomik.seiun.ui.theme.Indigo800
 import io.github.akiomik.seiun.ui.theme.SeiunTheme
 import io.github.akiomik.seiun.ui.timeline.NewPostFab
 import io.github.akiomik.seiun.ui.timeline.TimelineScreen
@@ -46,11 +46,11 @@ fun BottomBar(navController: NavController, visible: MutableState<Boolean>) {
     val items = listOf(Screen.Timeline, Screen.Notification)
 
     AnimatedVisibility(visible = visible.value) {
-        BottomNavigation(backgroundColor = Indigo800, contentColor = Color.White) {
+        NavigationBar {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentDestination = navBackStackEntry?.destination
             items.forEach { screen ->
-                BottomNavigationItem(
+                NavigationBarItem(
                     icon = { Icon(screen.icon, contentDescription = null, tint = Color.White) },
                     label = { Text(stringResource(screen.resourceId)) },
                     selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
