@@ -12,4 +12,12 @@
     <string name="login_button">Login</string>
     <string name="login_or">or</string>
     <string name="login_create_account">Create Account</string>
+    <string name="registration_title">Create Account</string>
+    <string name="registration_email">Email</string>
+    <string name="registration_email_placeholder">jack@example.com</string>
+    <string name="registration_handle">Handle</string>
+    <string name="registration_handle_placeholder">jack</string>
+    <string name="registration_password">Password</string>
+    <string name="registration_invite_code">Invite code</string>
+    <string name="registration_button">Create</string>
 </resources>

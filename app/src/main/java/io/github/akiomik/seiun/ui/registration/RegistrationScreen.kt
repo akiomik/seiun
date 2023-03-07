@@ -8,18 +8,24 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.ui.theme.Red700
 import io.github.akiomik.seiun.viewmodel.RegistrationViewModel
 
 @Composable
 fun RegistrationTitle() {
-    Text(text = "Create Account", fontSize = 23.sp, modifier = Modifier.padding(20.dp))
+    Text(
+        text = stringResource(id = R.string.registration_title),
+        fontSize = 23.sp,
+        modifier = Modifier.padding(20.dp)
+    )
 }
 
 @Composable
@@ -41,8 +47,8 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
         TextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email") },
-            placeholder = { Text(text = "jack@example.com") },
+            label = { Text(stringResource(id = R.string.registration_email)) },
+            placeholder = { Text(text = stringResource(id = R.string.registration_email_placeholder)) },
             maxLines = 1,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier.padding(20.dp),
@@ -52,8 +58,8 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
         TextField(
             value = handle,
             onValueChange = { handle = it },
-            label = { Text("Handle") },
-            placeholder = { Text(text = "jack") },
+            label = { Text(stringResource(id = R.string.registration_handle)) },
+            placeholder = { Text(text = stringResource(id = R.string.registration_handle_placeholder)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
             prefix = { Text(text = "@") },
             suffix = { Text(text = ".bsky.social") },
@@ -65,7 +71,7 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
         TextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
+            label = { Text(stringResource(id = R.string.registration_password)) },
             maxLines = 1,
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -76,7 +82,7 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
         TextField(
             value = inviteCode,
             onValueChange = { inviteCode = it },
-            label = { Text("Invite code") },
+            label = { Text(stringResource(id = R.string.registration_invite_code)) },
             placeholder = { Text(text = "bsky.social-XXXXXX") },
             maxLines = 1,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
@@ -86,7 +92,7 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
 
         ElevatedButton(
             onClick = {
-                Log.d(SeiunApplication.TAG, "Login as $handle")
+                Log.d(SeiunApplication.TAG, "Create account for $handle")
 
                 val userRepository = SeiunApplication.instance!!.userRepository
                 userRepository.saveLoginParam(handle, password)
@@ -97,20 +103,20 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
                     password = password,
                     inviteCode = inviteCode,
                     onSuccess = { session ->
-                        Log.d(SeiunApplication.TAG, "Login successful")
+                        Log.d(SeiunApplication.TAG, "Create account successful")
                         userRepository.saveSession(session)
                         onRegistrationSuccess()
                     },
                     onError = { error ->
                         Log.d(SeiunApplication.TAG, "Login failure: $error")
-                        errorMessage = error.message ?: "Failed to login"
+                        errorMessage = error.message ?: "Failed to create account"
                     }
                 )
             },
             enabled = valid,
             modifier = Modifier.padding(20.dp)
         ) {
-            Text("Create")
+            Text(stringResource(id = R.string.registration_button))
         }
     }
 }
