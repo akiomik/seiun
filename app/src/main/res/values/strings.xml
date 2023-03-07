@@ -3,4 +3,13 @@
     <string name="tag">Seiun</string>
     <string name="timeline">Home</string>
     <string name="notification">Notification</string>
+    <string name="login_title">Login</string>
+    <string name="login_app_description">ATP/Bluesky client</string>
+    <string name="login_handle_or_email">Handle or Email</string>
+    <string name="login_handle_or_email_placeholder">jack.bsky.social or jack@example.com</string>
+    <string name="login_password">Password</string>
+    <string name="login_error">Failed to login</string>
+    <string name="login_button">Login</string>
+    <string name="login_or">or</string>
+    <string name="login_create_account">Create Account</string>
 </resources>

@@ -29,12 +29,20 @@ private fun AppName() {
 
 @Composable
 private fun AppDescription() {
-    Text(text = "ATP/Bluesky client", fontSize = 33.sp, modifier = Modifier.padding(8.dp))
+    Text(
+        text = stringResource(id = R.string.login_app_description),
+        fontSize = 33.sp,
+        modifier = Modifier.padding(8.dp)
+    )
 }
 
 @Composable
 private fun LoginTitle() {
-    Text(text = "Login", fontSize = 23.sp, modifier = Modifier.padding(20.dp))
+    Text(
+        text = stringResource(id = R.string.login_title),
+        fontSize = 23.sp,
+        modifier = Modifier.padding(20.dp)
+    )
 }
 
 @Composable
@@ -45,6 +53,7 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
     var password by remember { mutableStateOf(savedPassword) }
     var valid by remember { mutableStateOf(handleOrEmail.isNotEmpty() && password.isNotEmpty()) }
     var errorMessage by remember { mutableStateOf("") }
+    val loginErrorMessage = stringResource(id = R.string.login_error)
 
     Column {
         if (errorMessage.isNotEmpty()) {
@@ -57,8 +66,8 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
                 handleOrEmail = it
                 valid = handleOrEmail.isNotEmpty() && password.isNotEmpty()
             },
-            label = { Text("Handle or Email") },
-            placeholder = { Text(text = "jack.bsky.social or jack@example.com") },
+            label = { Text(stringResource(id = R.string.login_handle_or_email)) },
+            placeholder = { Text(text = stringResource(id = R.string.login_handle_or_email_placeholder)) },
             maxLines = 1,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
             modifier = Modifier.padding(20.dp),
@@ -71,7 +80,7 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
                 password = it
                 valid = handleOrEmail.isNotEmpty() && password.isNotEmpty()
             },
-            label = { Text("Password") },
+            label = { Text(stringResource(id = R.string.login_password)) },
             maxLines = 1,
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -96,7 +105,7 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
                     },
                     onError = { error ->
                         Log.d(SeiunApplication.TAG, "Login failure: $error")
-                        errorMessage = error.message ?: "Failed to login"
+                        errorMessage = error.message ?: loginErrorMessage
                     }
                 )
             },
@@ -104,7 +113,7 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
             modifier = Modifier.padding(20.dp)
 
         ) {
-            Text("Login")
+            Text(stringResource(id = R.string.login_button))
         }
     }
 }
@@ -115,9 +124,9 @@ private fun CreateAccountButton(onClick: () -> Unit) {
         modifier = Modifier.padding(20.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text("or", modifier = Modifier.padding(bottom = 2.dp))
+        Text(stringResource(id = R.string.login_or), modifier = Modifier.padding(bottom = 2.dp))
         TextButton(onClick = onClick) {
-            Text("Create Account")
+            Text(stringResource(id = R.string.login_create_account))
         }
     }
 }
