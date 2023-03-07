@@ -21,8 +21,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.viewmodel.NotificationViewModel
 
 @Composable
@@ -33,7 +35,7 @@ private fun LoadingText() {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            androidx.compose.material3.Text("Loading")
+            androidx.compose.material3.Text(stringResource(id = R.string.loading))
             CircularProgressIndicator()
         }
     }
@@ -63,21 +65,21 @@ private fun LoadingIndicator() {
 @Composable
 fun NoNotificationsYetMessage() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        androidx.compose.material3.Text("No notifications yet")
+        androidx.compose.material3.Text(stringResource(id = R.string.notification_no_notifications_yet))
     }
 }
 
 @Composable
 fun NoMoreNotificationsMessage() {
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        androidx.compose.material3.Text("No more notifications")
+        androidx.compose.material3.Text(stringResource(id = R.string.notification_no_more_notifications))
     }
 }
 
 @Composable
 private fun ErrorMessage() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        androidx.compose.material3.Text("Failed to get notifications. Please try later")
+        androidx.compose.material3.Text(stringResource(id = R.string.notification_error))
     }
 }
 

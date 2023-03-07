@@ -3,6 +3,7 @@
     <string name="tag">Seiun</string>
     <string name="timeline">Home</string>
     <string name="notification">Notification</string>
+    <string name="loading">Loading…</string>
     <string name="login_title">Login</string>
     <string name="login_app_description">ATP/Bluesky client</string>
     <string name="login_handle_or_email">Handle or Email</string>
@@ -20,4 +21,7 @@
     <string name="registration_password">Password</string>
     <string name="registration_invite_code">Invite code</string>
     <string name="registration_button">Create</string>
+    <string name="notification_no_notifications_yet">No notifications yet</string>
+    <string name="notification_no_more_notifications">No more notifications</string>
+    <string name="notification_error">Failed to get notifications. Please try later</string>
 </resources>
