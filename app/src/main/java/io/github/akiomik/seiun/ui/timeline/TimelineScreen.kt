@@ -1,5 +1,6 @@
 package io.github.akiomik.seiun.ui.timeline
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -56,6 +57,20 @@ private fun LoadingIndicator() {
     }
 }
 
+@Composable
+fun NoPostsYetMessage() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text("No posts yet")
+    }
+}
+
+@Composable
+fun NoMorePostsMessage() {
+    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        Text("No more posts")
+    }
+}
+
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun Timeline() {
@@ -77,7 +92,14 @@ private fun Timeline() {
                 FeedPost(viewPost = feedViewPost)
                 Divider(color = Color.Gray)
             }
-            item { LoadingIndicator() }
+
+            if (viewModel.feedViewPosts.value?.size == 0) {
+                item { NoPostsYetMessage() }
+            } else if (viewModel.seenAllFeed.value == true) {
+                item { NoMorePostsMessage() }
+            } else {
+                item { LoadingIndicator() }
+            }
         }
 
         PullRefreshIndicator(
@@ -118,9 +140,12 @@ fun TimelineScreen() {
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
+        Log.d("Seiun", viewModel.state.collectAsState().value.toString())
         when (viewModel.state.collectAsState().value) {
             is TimelineViewModel.State.Loading -> LoadingText()
-            is TimelineViewModel.State.Loaded -> Timeline()
+            is TimelineViewModel.State.Loaded -> {
+                Timeline()
+            }
         }
     }
 }

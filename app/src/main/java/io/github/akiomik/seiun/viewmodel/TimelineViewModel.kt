@@ -1,6 +1,10 @@
 package io.github.akiomik.seiun.viewmodel
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -22,8 +26,10 @@ class TimelineViewModel : ApplicationViewModel() {
     private var _cursor = MutableLiveData<String>()
     private var _isRefreshing = MutableLiveData(false)
     private var _feedViewPosts = MutableLiveData<List<FeedViewPost>>()
+    private var _seenAllFeed = MutableLiveData(false)
     val isRefreshing = _isRefreshing as LiveData<Boolean>
     val feedViewPosts = _feedViewPosts as LiveData<List<FeedViewPost>>
+    val seenAllFeed = _seenAllFeed as LiveData<Boolean>
 
     private var _state = MutableStateFlow<State>(State.Loading)
     val state = _state.asStateFlow()
@@ -38,6 +44,11 @@ class TimelineViewModel : ApplicationViewModel() {
             _feedViewPosts.postValue(mergeFeedViewPosts(_feedViewPosts.value.orEmpty(), data.feed))
             _state.value = State.Loaded
             _cursor.postValue(data.cursor)
+
+            // NOTE: 50 is default limit of getTimeline
+            if (data.feed.size <= 50) {
+                _seenAllFeed.postValue(true)
+            }
         }
     }
 
@@ -73,11 +84,16 @@ class TimelineViewModel : ApplicationViewModel() {
             }
 
             if (data.cursor != _cursor.value) {
-                val newFeedPosts = feedViewPosts.value.orEmpty() + data.feed
-                _feedViewPosts.postValue(newFeedPosts)
-                _cursor.postValue(data.cursor)
-                _state.value = State.Loaded
-                Log.d("Seiun", "new feed count: ${newFeedPosts.size}")
+                if (data.feed.isNotEmpty()) {
+                    val newFeedPosts = feedViewPosts.value.orEmpty() + data.feed
+                    _feedViewPosts.postValue(newFeedPosts)
+                    _cursor.postValue(data.cursor)
+                    _state.value = State.Loaded
+                    Log.d("Seiun", "New feed count: ${newFeedPosts.size}")
+                } else {
+                    Log.d("Seiun", "No new feed posts")
+                    _seenAllFeed.postValue(true)
+                }
             }
         }, onError = onError)
     }
