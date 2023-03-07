@@ -71,4 +71,12 @@ interface AtpService {
         @Header("Authorization") authorization: String,
         @Body body: SetVoteParam
     ): ApiResult<SetVoteResponse, AtpError>
+
+    @DecodeErrorBody
+    @GET("app.bsky.notification.list")
+    suspend fun listNotifications(
+        @Header("Authorization") authorization: String,
+        @Query("limit") limit: Int? = null,
+        @Query("before") before: String? = null,
+    ): ApiResult<NotificationList, AtpError>
 }
