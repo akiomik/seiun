@@ -12,7 +12,7 @@ import io.github.akiomik.seiun.service.AtpService
 import io.github.akiomik.seiun.model.LoginParam
 import io.github.akiomik.seiun.model.Session
 
-class UserRepository(private val context: Context, atpService: AtpService) {
+class UserRepository(context: Context, private val atpService: AtpService) {
     private val key = MasterKey.Builder(context)
         .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
         .build()
@@ -24,8 +24,6 @@ class UserRepository(private val context: Context, atpService: AtpService) {
         EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
         EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
     )
-
-    private val atpService = atpService
 
     fun getSession(): Session {
         val accessJwt = sharedPreferences.getString("accessJwt", "") ?: ""
