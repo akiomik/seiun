@@ -17,6 +17,7 @@ class TimelineViewModel : ApplicationViewModel() {
     sealed class State {
         object Loading : State()
         object Loaded : State()
+        object Error: State()
     }
 
     private var _cursor = MutableLiveData<String>()
@@ -35,16 +36,21 @@ class TimelineViewModel : ApplicationViewModel() {
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            val data = withRetry(userRepository) { timelineRepository.getTimeline(it) }
+            wrapError(run = {
+                withRetry(userRepository) { timelineRepository.getTimeline(it) }
+            }, onSuccess = {
+                // NOTE: 50 is default limit of getTimeline
+                if (it.feed.size < 50) {
+                    _seenAllFeed.postValue(true)
+                }
 
-            _feedViewPosts.postValue(mergeFeedViewPosts(_feedViewPosts.value.orEmpty(), data.feed))
-            _state.value = State.Loaded
-            _cursor.postValue(data.cursor)
-
-            // NOTE: 50 is default limit of getTimeline
-            if (data.feed.size < 50) {
-                _seenAllFeed.postValue(true)
-            }
+                _feedViewPosts.postValue(it.feed)
+                _cursor.postValue(it.cursor)
+                _state.value = State.Loaded
+            }, onError = {
+                _feedViewPosts.postValue(emptyList())
+                _state.value = State.Error
+            })
         }
     }
 
@@ -58,6 +64,11 @@ class TimelineViewModel : ApplicationViewModel() {
 
         wrapError(run = {
             val data = withRetry(userRepository) { timelineRepository.getTimeline(it) }
+
+            if (_cursor.value == null) {
+                _cursor.postValue(data.cursor)
+            }
+
             if (data.cursor != _cursor.value) {
                 val newFeedPosts = mergeFeedViewPosts(_feedViewPosts.value.orEmpty(), data.feed)
                 _feedViewPosts.postValue(newFeedPosts)

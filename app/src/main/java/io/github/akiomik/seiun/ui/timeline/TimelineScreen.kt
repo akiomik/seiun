@@ -68,6 +68,13 @@ fun NoMorePostsMessage() {
     }
 }
 
+@Composable
+fun ErrorMessage() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text("Failed to get timeline. Please try later")
+    }
+}
+
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun Timeline() {
@@ -76,6 +83,7 @@ private fun Timeline() {
     val feedViewPosts = viewModel.feedViewPosts.observeAsState()
     val isRefreshing = viewModel.isRefreshing.observeAsState()
     val context = LocalContext.current
+    val errored = viewModel.state.collectAsState().value
     val refreshState =
         rememberPullRefreshState(refreshing = isRefreshing.value ?: false, onRefresh = {
             viewModel.refreshPosts(onError = {
@@ -90,7 +98,9 @@ private fun Timeline() {
                 Divider(color = Color.Gray)
             }
 
-            if (viewModel.feedViewPosts.value?.size == 0) {
+            if (errored == TimelineViewModel.State.Error) {
+                item { ErrorMessage() }
+            } else if (viewModel.feedViewPosts.value?.size == 0) {
                 item { NoPostsYetMessage() }
             } else if (viewModel.seenAllFeed.value == true) {
                 item { NoMorePostsMessage() }
@@ -117,9 +127,8 @@ fun TimelineScreen() {
     ) {
         when (viewModel.state.collectAsState().value) {
             is TimelineViewModel.State.Loading -> LoadingText()
-            is TimelineViewModel.State.Loaded -> {
-                Timeline()
-            }
+            is TimelineViewModel.State.Loaded -> Timeline()
+            is TimelineViewModel.State.Error -> Timeline()
         }
     }
 }
