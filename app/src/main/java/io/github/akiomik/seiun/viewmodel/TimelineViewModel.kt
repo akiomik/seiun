@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.model.FeedPost
 import io.github.akiomik.seiun.model.FeedViewPost
+import io.github.akiomik.seiun.model.Profile
 import io.github.akiomik.seiun.model.StrongRef
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,9 +25,11 @@ class TimelineViewModel : ApplicationViewModel() {
     private var _isRefreshing = MutableLiveData(false)
     private var _feedViewPosts = MutableLiveData<List<FeedViewPost>>()
     private var _seenAllFeed = MutableLiveData(false)
+    private var _profile = MutableLiveData<Profile>()
     val isRefreshing = _isRefreshing as LiveData<Boolean>
     val feedViewPosts = _feedViewPosts as LiveData<List<FeedViewPost>>
     val seenAllFeed = _seenAllFeed as LiveData<Boolean>
+    val profile = _profile as LiveData<Profile>
 
     private var _state = MutableStateFlow<State>(State.Loading)
     val state = _state.asStateFlow()
@@ -37,17 +40,21 @@ class TimelineViewModel : ApplicationViewModel() {
     init {
         viewModelScope.launch(Dispatchers.IO) {
             wrapError(run = {
-                withRetry(userRepository) { timelineRepository.getTimeline(it) }
-            }, onSuccess = {
+                val timeline = withRetry(userRepository) { timelineRepository.getTimeline(it) }
+                val profile = withRetry(userRepository) { userRepository.getProfile(it) }
+                Pair(timeline, profile)
+            }, onSuccess = { (timeline, profile) ->
                 // NOTE: 50 is default limit of getTimeline
-                if (it.feed.size < 50) {
+                if (timeline.feed.size < 50) {
                     _seenAllFeed.postValue(true)
                 }
 
-                _feedViewPosts.postValue(it.feed)
-                _cursor.postValue(it.cursor)
+                _profile.postValue(profile)
+                _feedViewPosts.postValue(timeline.feed)
+                _cursor.postValue(timeline.cursor)
                 _state.value = State.Loaded
             }, onError = {
+                Log.d("Seiun", "Error occurred: $it")
                 _feedViewPosts.postValue(emptyList())
                 _state.value = State.Error
             })

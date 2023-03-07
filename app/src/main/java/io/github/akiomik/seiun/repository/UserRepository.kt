@@ -1,16 +1,15 @@
 package io.github.akiomik.seiun.repository
 
-import android.accounts.Account
 import android.content.Context
 import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.slack.eithernet.ApiResult
 import io.github.akiomik.seiun.model.AccountCreateParam
-import io.github.akiomik.seiun.model.CreateRecordResponse
-import io.github.akiomik.seiun.service.AtpService
 import io.github.akiomik.seiun.model.LoginParam
+import io.github.akiomik.seiun.model.Profile
 import io.github.akiomik.seiun.model.Session
+import io.github.akiomik.seiun.service.AtpService
 
 class UserRepository(context: Context, private val atpService: AtpService) {
     private val key = MasterKey.Builder(context)
@@ -99,6 +98,14 @@ class UserRepository(context: Context, private val atpService: AtpService) {
         Log.d("Seiun", "Refresh session")
         val oldSession = getSession()
         return when (val result = atpService.refreshSession("Bearer ${oldSession.refreshJwt}")) {
+            is ApiResult.Success -> result.value
+            is ApiResult.Failure -> throw IllegalStateException("ApiResult.Failure: $result")
+        }
+    }
+
+    suspend fun getProfile(session: Session): Profile {
+        Log.d("Seiun", "Get profile")
+        return when (val result = atpService.getProfile("Bearer ${session.accessJwt}", session.did)) {
             is ApiResult.Success -> result.value
             is ApiResult.Failure -> throw IllegalStateException("ApiResult.Failure: $result")
         }

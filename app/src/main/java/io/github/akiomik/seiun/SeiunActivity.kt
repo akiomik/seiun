@@ -4,9 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -27,7 +25,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
-import io.github.akiomik.seiun.model.Notification
+import io.github.akiomik.seiun.model.Profile
 import io.github.akiomik.seiun.ui.login.LoginScreen
 import io.github.akiomik.seiun.ui.notification.NotificationScreen
 import io.github.akiomik.seiun.ui.registration.RegistrationScreen
@@ -46,12 +44,27 @@ class SeiunActivity : ComponentActivity() {
     }
 }
 
+@Composable
+private fun Avatar(profile: Profile?) {
+    AsyncImage(
+        model = profile?.avatar,
+        contentDescription = null,
+        modifier = Modifier
+            .width(36.dp)
+            .height(36.dp)
+            .clip(CircleShape)
+    )
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(scrollBehavior: TopAppBarScrollBehavior, visible: MutableState<Boolean>) {
+    val viewModel: TimelineViewModel = viewModel()
+
     AnimatedVisibility(visible = visible.value) {
-        TopAppBar(
+        CenterAlignedTopAppBar(
             title = { Text("Seiun") },
+            navigationIcon = { Avatar(viewModel.profile.value) },
             scrollBehavior = scrollBehavior
         )
     }

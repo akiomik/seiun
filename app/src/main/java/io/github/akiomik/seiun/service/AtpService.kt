@@ -25,6 +25,13 @@ interface AtpService {
     ): ApiResult<Session, AtpError>
 
     @DecodeErrorBody
+    @GET("app.bsky.actor.getProfile")
+    suspend fun getProfile(
+        @Header("Authorization") authorization: String,
+        @Query("actor") actor: String,
+    ): ApiResult<Profile, AtpError>
+
+    @DecodeErrorBody
     @GET("com.atproto.repo.listRecords")
     suspend fun listRecords(
         @Query("user") user: String,
