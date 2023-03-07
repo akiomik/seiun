@@ -1,6 +1,5 @@
 package io.github.akiomik.seiun.ui.timeline
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn

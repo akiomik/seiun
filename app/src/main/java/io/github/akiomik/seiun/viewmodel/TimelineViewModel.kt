@@ -1,10 +1,6 @@
 package io.github.akiomik.seiun.viewmodel
 
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -46,7 +42,7 @@ class TimelineViewModel : ApplicationViewModel() {
             _cursor.postValue(data.cursor)
 
             // NOTE: 50 is default limit of getTimeline
-            if (data.feed.size <= 50) {
+            if (data.feed.size < 50) {
                 _seenAllFeed.postValue(true)
             }
         }

@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class NotificationViewModel: ApplicationViewModel() {
+class NotificationViewModel : ApplicationViewModel() {
     sealed class State {
         object Loading : State()
         object Loaded : State()
@@ -35,12 +35,17 @@ class NotificationViewModel: ApplicationViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val data = withRetry(userRepository) { notificationRepository.listNotifications(it) }
 
-            _notifications.postValue(mergeNotifications(_notifications.value.orEmpty(), data.notifications))
+            _notifications.postValue(
+                mergeNotifications(
+                    _notifications.value.orEmpty(),
+                    data.notifications
+                )
+            )
             _state.value = State.Loaded
             _cursor.postValue(data.cursor)
 
             // NOTE: 50 is default limit of listNotifications
-            if (data.notifications.size <= 50) {
+            if (data.notifications.size < 50) {
                 _seenAllNotifications.postValue(true)
             }
         }
@@ -51,13 +56,14 @@ class NotificationViewModel: ApplicationViewModel() {
             return
         }
 
-        Log.d("Seiun", "Refresh notificatinos")
+        Log.d("Seiun", "Refresh notifications")
         _isRefreshing.postValue(true)
 
         wrapError(run = {
             val data = withRetry(userRepository) { notificationRepository.listNotifications(it) }
             if (data.cursor != _cursor.value) {
-                val newNotifications = mergeNotifications(_notifications.value.orEmpty(), data.notifications)
+                val newNotifications =
+                    mergeNotifications(_notifications.value.orEmpty(), data.notifications)
                 _notifications.postValue(newNotifications)
                 Log.d("Seiun", "Notifications are merged")
             } else {
@@ -78,7 +84,7 @@ class NotificationViewModel: ApplicationViewModel() {
 
             if (data.cursor != _cursor.value) {
                 if (data.notifications.isNotEmpty()) {
-                    val newNotifications= notifications.value.orEmpty() + data.notifications
+                    val newNotifications = notifications.value.orEmpty() + data.notifications
                     _notifications.postValue(newNotifications)
                     _cursor.postValue(data.cursor)
                     _state.value = State.Loaded
