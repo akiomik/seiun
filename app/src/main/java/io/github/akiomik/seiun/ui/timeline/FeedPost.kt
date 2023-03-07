@@ -219,7 +219,7 @@ private fun FeedPostContent(viewPost: FeedViewPost) {
         }
         Text(
             modifier = Modifier.padding(bottom = 4.dp),
-            text = DateFormat.format("yyyy/mm/dd hh:mm", createdAt.toEpochMilli()).toString(),
+            text = DateFormat.format("yyyy/MM/dd hh:mm", createdAt.toEpochMilli()).toString(),
             color = Color.Gray,
             style = MaterialTheme.typography.labelMedium
         )
