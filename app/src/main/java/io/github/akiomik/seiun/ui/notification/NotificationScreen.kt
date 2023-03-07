@@ -1,6 +1,5 @@
 package io.github.akiomik.seiun.ui.notification
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,8 +24,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.akiomik.seiun.viewmodel.NotificationViewModel
-import kotlin.reflect.jvm.internal.impl.descriptors.Visibilities.Local
-import kotlin.reflect.jvm.internal.impl.resolve.constants.ErrorValue.ErrorValueWithMessage
 
 @Composable
 private fun LoadingText() {
@@ -57,7 +54,6 @@ private fun LoadingIndicator() {
     }
 
     LaunchedEffect(key1 = true) {
-        Log.d("Seiun", "LoadingIndicator LaunchEffect")
         viewModel.loadMoreNotifications(onError = {
             Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
         })

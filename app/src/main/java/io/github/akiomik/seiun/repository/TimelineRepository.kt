@@ -3,6 +3,8 @@ package io.github.akiomik.seiun.repository
 import android.util.Log
 import com.slack.eithernet.ApiResult
 import com.slack.eithernet.response
+import io.github.akiomik.seiun.R
+import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.model.*
 import io.github.akiomik.seiun.service.AtpService
 import io.github.akiomik.seiun.service.UnauthorizedException
@@ -11,7 +13,7 @@ import java.time.Instant
 
 class TimelineRepository(private val atpService: AtpService) {
     suspend fun getTimeline(session: Session, before: String? = null): Timeline {
-        Log.d("Seiun", "Get timeline: before = $before")
+        Log.d(SeiunApplication.TAG, "Get timeline: before = $before")
 
         return when (val result =
             atpService.getTimeline("Bearer ${session.accessJwt}", before = before)) {
@@ -30,7 +32,7 @@ class TimelineRepository(private val atpService: AtpService) {
     }
 
     suspend fun upvote(session: Session, subject: StrongRef): SetVoteResponse {
-        Log.d("Seiun", "Upvote post: uri = ${subject.uri}, cid = ${subject.cid}")
+        Log.d(SeiunApplication.TAG, "Upvote post: uri = ${subject.uri}, cid = ${subject.cid}")
 
         val body = SetVoteParam(subject = subject, direction = VoteDirection.up)
         when (val result =
@@ -50,7 +52,7 @@ class TimelineRepository(private val atpService: AtpService) {
     }
 
     suspend fun cancelVote(session: Session, subject: StrongRef) {
-        Log.d("Seiun", "Cancel vote post: uri = ${subject.uri}, cid = ${subject.cid}")
+        Log.d(SeiunApplication.TAG, "Cancel vote post: uri = ${subject.uri}, cid = ${subject.cid}")
 
         val body = SetVoteParam(subject = subject, direction = VoteDirection.none)
         when (val result =
@@ -70,7 +72,7 @@ class TimelineRepository(private val atpService: AtpService) {
     }
 
     suspend fun repost(session: Session, subject: StrongRef): CreateRecordResponse {
-        Log.d("Seiun", "Cancel repost: uri = ${subject.uri}, cid = ${subject.cid}")
+        Log.d(SeiunApplication.TAG, "Cancel repost: uri = ${subject.uri}, cid = ${subject.cid}")
 
         val createdAt = Instant.now().toString()
         val record = RepostRecord(subject = subject, createdAt)
@@ -93,7 +95,7 @@ class TimelineRepository(private val atpService: AtpService) {
     }
 
     suspend fun cancelRepost(session: Session, uri: String) {
-        Log.d("Seiun", "Cancel repost: $uri")
+        Log.d(SeiunApplication.TAG, "Cancel repost: $uri")
 
         val rkey = uri.split('/').last()
         val body =
@@ -112,7 +114,7 @@ class TimelineRepository(private val atpService: AtpService) {
     }
 
     suspend fun createPost(session: Session, content: String) {
-        Log.d("Seiun", "Create a post: content = $content")
+        Log.d(SeiunApplication.TAG, "Create a post: content = $content")
 
         val createdAt = Instant.now().toString()
         val record = FeedPostRecord(text = content, createdAt = createdAt)

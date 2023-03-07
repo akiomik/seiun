@@ -22,6 +22,8 @@ class SeiunApplication : Application() {
         @get:Synchronized
         var instance: SeiunApplication? = null
             private set
+
+        const val TAG = "Seiun"
     }
 
     override fun onCreate() {

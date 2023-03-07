@@ -81,7 +81,7 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
 
         ElevatedButton(
             onClick = {
-                Log.d("Seiun", "Login as $handleOrEmail")
+                Log.d(SeiunApplication.TAG, "Login as $handleOrEmail")
 
                 val userRepository = SeiunApplication.instance!!.userRepository
                 userRepository.saveLoginParam(handleOrEmail, password)
@@ -90,12 +90,12 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
                     handle = handleOrEmail,
                     password = password,
                     onSuccess = { session ->
-                        Log.d("Seiun", "Login successful")
+                        Log.d(SeiunApplication.TAG, "Login successful")
                         userRepository.saveSession(session)
                         onLoginSuccess()
                     },
                     onError = { error ->
-                        Log.d("Seiun", "Login failure: $error")
+                        Log.d(SeiunApplication.TAG, "Login failure: $error")
                         errorMessage = error.message ?: "Failed to login"
                     }
                 )

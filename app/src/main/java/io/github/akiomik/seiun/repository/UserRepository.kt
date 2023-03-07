@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.slack.eithernet.ApiResult
+import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.model.AccountCreateParam
 import io.github.akiomik.seiun.model.LoginParam
 import io.github.akiomik.seiun.model.Profile
@@ -66,7 +67,7 @@ class UserRepository(context: Context, private val atpService: AtpService) {
         password: String,
         inviteCode: String
     ): Session {
-        Log.d("Seiun", "Create account: $handle")
+        Log.d(SeiunApplication.TAG, "Create account: $handle")
         val param = AccountCreateParam(
             email = email,
             handle = handle,
@@ -85,7 +86,7 @@ class UserRepository(context: Context, private val atpService: AtpService) {
     }
 
     suspend fun login(handleOrEmail: String, password: String): Session {
-        Log.d("Seiun", "Create session")
+        Log.d(SeiunApplication.TAG, "Create session")
         return when (val result = atpService.login(LoginParam(handleOrEmail, password))) {
             is ApiResult.Success -> result.value
             is ApiResult.Failure -> when (result) {
@@ -98,7 +99,7 @@ class UserRepository(context: Context, private val atpService: AtpService) {
     }
 
     suspend fun refresh(): Session {
-        Log.d("Seiun", "Refresh session")
+        Log.d(SeiunApplication.TAG, "Refresh session")
         val oldSession = getSession()
         return when (val result = atpService.refreshSession("Bearer ${oldSession.refreshJwt}")) {
             is ApiResult.Success -> result.value
@@ -107,7 +108,7 @@ class UserRepository(context: Context, private val atpService: AtpService) {
     }
 
     suspend fun getProfile(session: Session): Profile {
-        Log.d("Seiun", "Get profile")
+        Log.d(SeiunApplication.TAG, "Get profile")
         return when (val result = atpService.getProfile("Bearer ${session.accessJwt}", session.did)) {
             is ApiResult.Success -> result.value
             is ApiResult.Failure -> throw IllegalStateException("ApiResult.Failure: $result")

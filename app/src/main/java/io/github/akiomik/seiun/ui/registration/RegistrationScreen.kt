@@ -29,7 +29,8 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
     var handle by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var inviteCode by remember { mutableStateOf("") }
-    var valid = email.isNotEmpty() && handle.isNotEmpty() && password.isNotEmpty() && inviteCode.isNotEmpty()
+    val valid =
+        email.isNotEmpty() && handle.isNotEmpty() && password.isNotEmpty() && inviteCode.isNotEmpty()
     var errorMessage by remember { mutableStateOf("") }
 
     Column {
@@ -85,7 +86,7 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
 
         ElevatedButton(
             onClick = {
-                Log.d("Seiun", "Login as $handle")
+                Log.d(SeiunApplication.TAG, "Login as $handle")
 
                 val userRepository = SeiunApplication.instance!!.userRepository
                 userRepository.saveLoginParam(handle, password)
@@ -96,12 +97,12 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
                     password = password,
                     inviteCode = inviteCode,
                     onSuccess = { session ->
-                        Log.d("Seiun", "Login successful")
+                        Log.d(SeiunApplication.TAG, "Login successful")
                         userRepository.saveSession(session)
                         onRegistrationSuccess()
                     },
                     onError = { error ->
-                        Log.d("Seiun", "Login failure: ${error.toString()}")
+                        Log.d(SeiunApplication.TAG, "Login failure: $error")
                         errorMessage = error.message ?: "Failed to login"
                     }
                 )

@@ -54,7 +54,7 @@ class TimelineViewModel : ApplicationViewModel() {
                 _cursor.postValue(timeline.cursor)
                 _state.value = State.Loaded
             }, onError = {
-                Log.d("Seiun", "Error occurred: $it")
+                Log.d(SeiunApplication.TAG, "Error occurred: $it")
                 _feedViewPosts.postValue(emptyList())
                 _state.value = State.Error
             })
@@ -66,7 +66,7 @@ class TimelineViewModel : ApplicationViewModel() {
             return
         }
 
-        Log.d("Seiun", "Refresh timeline")
+        Log.d(SeiunApplication.TAG, "Refresh timeline")
         _isRefreshing.postValue(true)
 
         wrapError(run = {
@@ -79,9 +79,9 @@ class TimelineViewModel : ApplicationViewModel() {
             if (data.cursor != _cursor.value) {
                 val newFeedPosts = mergeFeedViewPosts(_feedViewPosts.value.orEmpty(), data.feed)
                 _feedViewPosts.postValue(newFeedPosts)
-                Log.d("Seiun", "Feed posts are merged")
+                Log.d(SeiunApplication.TAG, "Feed posts are merged")
             } else {
-                Log.d("Seiun", "Skip merge because cursor is unchanged")
+                Log.d(SeiunApplication.TAG, "Skip merge because cursor is unchanged")
             }
         }, onComplete = {
             _isRefreshing.postValue(false)
@@ -89,7 +89,7 @@ class TimelineViewModel : ApplicationViewModel() {
     }
 
     fun loadMorePosts(onError: (Throwable) -> Unit = {}) {
-        Log.d("Seiun", "Load more posts")
+        Log.d(SeiunApplication.TAG, "Load more posts")
 
         wrapError(run = {
             val data = withRetry(userRepository) {
@@ -102,9 +102,9 @@ class TimelineViewModel : ApplicationViewModel() {
                     _feedViewPosts.postValue(newFeedPosts)
                     _cursor.postValue(data.cursor)
                     _state.value = State.Loaded
-                    Log.d("Seiun", "New feed count: ${newFeedPosts.size}")
+                    Log.d(SeiunApplication.TAG, "New feed count: ${newFeedPosts.size}")
                 } else {
-                    Log.d("Seiun", "No new feed posts")
+                    Log.d(SeiunApplication.TAG, "No new feed posts")
                     _seenAllFeed.postValue(true)
                 }
             }
@@ -150,10 +150,7 @@ class TimelineViewModel : ApplicationViewModel() {
 
         wrapError(run = {
             withRetry(userRepository) {
-                timelineRepository.cancelRepost(
-                    it,
-                    feedPost.viewer.repost
-                )
+                timelineRepository.cancelRepost(it, feedPost.viewer.repost)
             }
             updateFeedPost(feedPost = feedPost.repostCanceled())
         }, onSuccess = { onSuccess() }, onError = onError)

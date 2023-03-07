@@ -57,7 +57,7 @@ class NotificationViewModel : ApplicationViewModel() {
             return
         }
 
-        Log.d("Seiun", "Refresh notifications")
+        Log.d(SeiunApplication.TAG, "Refresh notifications")
         _isRefreshing.postValue(true)
 
         wrapError(run = {
@@ -71,9 +71,9 @@ class NotificationViewModel : ApplicationViewModel() {
                 val newNotifications =
                     mergeNotifications(_notifications.value.orEmpty(), data.notifications)
                 _notifications.postValue(newNotifications)
-                Log.d("Seiun", "Notifications are merged")
+                Log.d(SeiunApplication.TAG, "Notifications are merged")
             } else {
-                Log.d("Seiun", "Skip merge because cursor is unchanged")
+                Log.d(SeiunApplication.TAG, "Skip merge because cursor is unchanged")
             }
         }, onComplete = {
             _isRefreshing.postValue(false)
@@ -81,7 +81,7 @@ class NotificationViewModel : ApplicationViewModel() {
     }
 
     fun loadMoreNotifications(onError: (Throwable) -> Unit = {}) {
-        Log.d("Seiun", "Load more notifications")
+        Log.d(SeiunApplication.TAG, "Load more notifications")
 
         wrapError(run = {
             val data = withRetry(userRepository) {
@@ -94,9 +94,9 @@ class NotificationViewModel : ApplicationViewModel() {
                     _notifications.postValue(newNotifications)
                     _cursor.postValue(data.cursor)
                     _state.value = State.Loaded
-                    Log.d("Seiun", "New notification count: ${newNotifications.size}")
+                    Log.d(SeiunApplication.TAG, "New notification count: ${newNotifications.size}")
                 } else {
-                    Log.d("Seiun", "No new feed posts")
+                    Log.d(SeiunApplication.TAG, "No new feed posts")
                     _seenAllNotifications.postValue(true)
                 }
             }
