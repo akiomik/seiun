@@ -3,10 +3,12 @@ package io.github.akiomik.seiun.ui.registration
 import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -51,7 +53,9 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
             placeholder = { Text(text = stringResource(id = R.string.registration_email_placeholder)) },
             maxLines = 1,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            modifier = Modifier.padding(20.dp),
+            modifier = Modifier
+                .padding(20.dp)
+                .fillMaxWidth(),
             singleLine = true
         )
 
@@ -64,7 +68,9 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
             prefix = { Text(text = "@") },
             suffix = { Text(text = ".bsky.social") },
             maxLines = 1,
-            modifier = Modifier.padding(20.dp),
+            modifier = Modifier
+                .padding(20.dp)
+                .fillMaxWidth(),
             singleLine = true
         )
 
@@ -75,7 +81,9 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
             maxLines = 1,
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            modifier = Modifier.padding(20.dp),
+            modifier = Modifier
+                .padding(20.dp)
+                .fillMaxWidth(),
             singleLine = true
         )
 
@@ -86,7 +94,9 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
             placeholder = { Text(text = "bsky.social-XXXXXX") },
             maxLines = 1,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
-            modifier = Modifier.padding(20.dp),
+            modifier = Modifier
+                .padding(20.dp)
+                .fillMaxWidth(),
             singleLine = true
         )
 

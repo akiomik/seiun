@@ -70,7 +70,9 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
             placeholder = { Text(text = stringResource(id = R.string.login_handle_or_email_placeholder)) },
             maxLines = 1,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
-            modifier = Modifier.padding(20.dp),
+            modifier = Modifier
+                .padding(20.dp)
+                .fillMaxWidth(),
             singleLine = true
         )
 
@@ -84,7 +86,9 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
             maxLines = 1,
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            modifier = Modifier.padding(20.dp),
+            modifier = Modifier
+                .padding(20.dp)
+                .fillMaxWidth(),
             singleLine = true
         )
 
