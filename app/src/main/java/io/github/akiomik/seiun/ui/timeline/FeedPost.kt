@@ -97,7 +97,8 @@ private fun Handle(viewPost: FeedViewPost) {
 private fun NameRow(viewPost: FeedViewPost) {
     Row(
         modifier = Modifier.fillMaxSize(),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         DisplayName(viewPost = viewPost)
         Handle(viewPost = viewPost)
@@ -214,7 +215,7 @@ private fun UpvoteIndicator(viewPost: FeedViewPost) {
 private fun FeedPostContent(viewPost: FeedViewPost) {
     val createdAt = Instant.parse(viewPost.post.record.createdAt)
 
-    Column(modifier = Modifier.padding(start = 8.dp)) {
+    Column {
         NameRow(viewPost = viewPost)
         Text(text = viewPost.post.record.text)
         Row(
@@ -237,14 +238,14 @@ private fun FeedPostContent(viewPost: FeedViewPost) {
 
 @Composable
 fun FeedPost(viewPost: FeedViewPost) {
-    Column(modifier = Modifier.padding(10.dp)) {
+    Column(modifier = Modifier.padding(14.dp)) {
         if (viewPost.reason?.type == "app.bsky.feed.feedViewPost#reasonRepost") {
             RepostText(viewPost = viewPost)
         } else if (viewPost.reply != null) {
             ReplyText(viewPost = viewPost)
         }
 
-        Row {
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             Avatar(viewPost = viewPost)
             FeedPostContent(viewPost = viewPost)
         }
