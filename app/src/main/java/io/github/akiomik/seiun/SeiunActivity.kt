@@ -5,6 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -33,6 +35,7 @@ import io.github.akiomik.seiun.ui.theme.SeiunTheme
 import io.github.akiomik.seiun.ui.timeline.NewPostFab
 import io.github.akiomik.seiun.ui.timeline.TimelineScreen
 import io.github.akiomik.seiun.viewmodel.TimelineViewModel
+import kotlinx.coroutines.launch
 
 class SeiunActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,8 +74,14 @@ fun TopBar(scrollBehavior: TopAppBarScrollBehavior, visible: MutableState<Boolea
 }
 
 @Composable
-fun BottomBar(navController: NavController, visible: MutableState<Boolean>) {
+fun BottomBar(
+    navController: NavController,
+    visible: MutableState<Boolean>,
+    timelineListState: LazyListState,
+    notificationListState: LazyListState
+) {
     val items = listOf(Screen.Timeline, Screen.Notification)
+    val coroutineScope = rememberCoroutineScope()
 
     AnimatedVisibility(visible = visible.value) {
         NavigationBar {
@@ -85,6 +94,19 @@ fun BottomBar(navController: NavController, visible: MutableState<Boolean>) {
                     selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                     onClick = {
                         navController.navigate(screen.route) {
+
+                            if (screen.route == "timeline" && screen.route == currentDestination?.route) {
+                                coroutineScope.launch {
+                                    timelineListState.animateScrollToItem(0)
+                                }
+                            }
+
+                            if (screen.route == "notification" && screen.route == currentDestination?.route) {
+                                coroutineScope.launch {
+                                    notificationListState.animateScrollToItem(0)
+                                }
+                            }
+
                             // Pop up to the start destination of the graph to
                             // avoid building up a large stack of destinations
                             // on the back stack as users select items
@@ -105,10 +127,15 @@ fun BottomBar(navController: NavController, visible: MutableState<Boolean>) {
 }
 
 @Composable
-fun Navigation(navController: NavHostController, modifier: Modifier) {
+fun Navigation(
+    navController: NavHostController,
+    modifier: Modifier,
+    timelineListState: LazyListState,
+    notificationListState: LazyListState
+) {
     NavHost(navController = navController, startDestination = "login", modifier = modifier) {
-        composable("timeline") { TimelineScreen(/*...*/) }
-        composable("notification") { NotificationScreen(/*...*/) }
+        composable("timeline") { TimelineScreen(timelineListState) }
+        composable("notification") { NotificationScreen(notificationListState) }
         composable("login") {
             LoginScreen(onLoginSuccess = {
                 navController.navigate("timeline")
@@ -134,6 +161,9 @@ fun App() {
     val bottomBarState = rememberSaveable { (mutableStateOf(false)) }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val fabState = remember { (mutableStateOf<@Composable () -> Unit>({})) }
+    val timelineListState = rememberLazyListState()
+    val notificationListState = rememberLazyListState()
+
     when (navBackStackEntry?.destination?.route) {
         "timeline" -> {
             topBarState.value = true
@@ -156,11 +186,23 @@ fun App() {
     SeiunTheme {
         Scaffold(
             topBar = { TopBar(scrollBehavior, visible = topBarState) },
-            bottomBar = { BottomBar(navController = navController, visible = bottomBarState) },
+            bottomBar = {
+                BottomBar(
+                    navController = navController,
+                    visible = bottomBarState,
+                    timelineListState = timelineListState,
+                    notificationListState = notificationListState
+                )
+            },
             floatingActionButton = fabState.value,
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             content = {
-                Navigation(navController = navController, modifier = Modifier.padding(it))
+                Navigation(
+                    navController = navController,
+                    modifier = Modifier.padding(it),
+                    timelineListState = timelineListState,
+                    notificationListState = notificationListState
+                )
             }
         )
     }

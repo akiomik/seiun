@@ -3,8 +3,8 @@ package io.github.akiomik.seiun.ui.notification
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -85,9 +85,8 @@ private fun ErrorMessage() {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun NotificationList() {
+private fun NotificationList(listState: LazyListState) {
     val viewModel: NotificationViewModel = viewModel()
-    val listState = rememberLazyListState()
     val notifications = viewModel.notifications.observeAsState()
     val isRefreshing = viewModel.isRefreshing.observeAsState()
     val context = LocalContext.current
@@ -126,7 +125,7 @@ private fun NotificationList() {
 }
 
 @Composable
-fun NotificationScreen() {
+fun NotificationScreen(listState: LazyListState) {
     val viewModel: NotificationViewModel = viewModel()
 
     Surface(
@@ -135,8 +134,8 @@ fun NotificationScreen() {
     ) {
         when (viewModel.state.collectAsState().value) {
             is NotificationViewModel.State.Loading -> LoadingText()
-            is NotificationViewModel.State.Loaded -> NotificationList()
-            is NotificationViewModel.State.Error -> NotificationList()
+            is NotificationViewModel.State.Loaded -> NotificationList(listState)
+            is NotificationViewModel.State.Error -> NotificationList(listState)
         }
     }
 }

@@ -3,8 +3,8 @@ package io.github.akiomik.seiun.ui.timeline
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -79,9 +79,8 @@ fun ErrorMessage() {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun Timeline() {
+private fun Timeline(listState: LazyListState) {
     val viewModel: TimelineViewModel = viewModel()
-    val listState = rememberLazyListState()
     val feedViewPosts = viewModel.feedViewPosts.observeAsState()
     val isRefreshing = viewModel.isRefreshing.observeAsState()
     val context = LocalContext.current
@@ -120,7 +119,7 @@ private fun Timeline() {
 }
 
 @Composable
-fun TimelineScreen() {
+fun TimelineScreen(listState: LazyListState) {
     val viewModel: TimelineViewModel = viewModel()
 
     Surface(
@@ -129,8 +128,8 @@ fun TimelineScreen() {
     ) {
         when (viewModel.state.collectAsState().value) {
             is TimelineViewModel.State.Loading -> LoadingText()
-            is TimelineViewModel.State.Loaded -> Timeline()
-            is TimelineViewModel.State.Error -> Timeline()
+            is TimelineViewModel.State.Loaded -> Timeline(listState)
+            is TimelineViewModel.State.Error -> Timeline(listState)
         }
     }
 }
