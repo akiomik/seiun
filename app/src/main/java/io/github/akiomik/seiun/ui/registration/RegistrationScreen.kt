@@ -124,7 +124,9 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
                 )
             },
             enabled = valid,
-            modifier = Modifier.padding(20.dp)
+            modifier = Modifier
+                .padding(20.dp)
+                .align(alignment = Alignment.End)
         ) {
             Text(stringResource(id = R.string.registration_button))
         }
