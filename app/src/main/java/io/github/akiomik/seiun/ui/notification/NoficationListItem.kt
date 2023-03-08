@@ -16,7 +16,8 @@ import coil.compose.AsyncImage
 import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.model.Notification
 import io.github.akiomik.seiun.model.NotificationReason
-import java.time.Instant
+
+const val DATETIME_FORMAT = "yyyy/MM/dd HH:mm"
 
 @Composable
 private fun Avatar(notification: Notification) {
@@ -32,7 +33,10 @@ private fun Avatar(notification: Notification) {
 
 @Composable
 private fun VoteItem(notification: Notification) {
-    val createdAt = Instant.parse(notification.record.createdAt)
+    val createdAt = DateFormat.format(
+        DATETIME_FORMAT,
+        notification.record.createdAtAsInstant().toEpochMilli()
+    )
 
     Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
         Avatar(notification = notification)
@@ -44,7 +48,7 @@ private fun VoteItem(notification: Notification) {
                 )
             )
             Text(
-                text = DateFormat.format("yyyy/MM/dd hh:mm", createdAt.toEpochMilli()).toString(),
+                text = createdAt.toString(),
                 color = Color.Gray,
                 style = MaterialTheme.typography.labelMedium
             )
@@ -54,7 +58,10 @@ private fun VoteItem(notification: Notification) {
 
 @Composable
 private fun RepostItem(notification: Notification) {
-    val createdAt = Instant.parse(notification.record.createdAt)
+    val createdAt = DateFormat.format(
+        DATETIME_FORMAT,
+        notification.record.createdAtAsInstant().toEpochMilli()
+    )
 
     Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
         Avatar(notification = notification)
@@ -66,7 +73,7 @@ private fun RepostItem(notification: Notification) {
                 )
             )
             Text(
-                text = DateFormat.format("yyyy/MM/dd hh:mm", createdAt.toEpochMilli()).toString(),
+                text = createdAt.toString(),
                 color = Color.Gray,
                 style = MaterialTheme.typography.labelMedium
             )
@@ -76,7 +83,10 @@ private fun RepostItem(notification: Notification) {
 
 @Composable
 private fun FollowItem(notification: Notification) {
-    val createdAt = Instant.parse(notification.record.createdAt)
+    val createdAt = DateFormat.format(
+        DATETIME_FORMAT,
+        notification.record.createdAtAsInstant().toEpochMilli()
+    )
 
     Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
         Avatar(notification = notification)
@@ -88,7 +98,7 @@ private fun FollowItem(notification: Notification) {
                 )
             )
             Text(
-                text = DateFormat.format("yyyy/MM/dd hh:mm", createdAt.toEpochMilli()).toString(),
+                text = createdAt.toString(),
                 color = Color.Gray,
                 style = MaterialTheme.typography.labelMedium
             )
@@ -98,7 +108,10 @@ private fun FollowItem(notification: Notification) {
 
 @Composable
 private fun InviteItem(notification: Notification) {
-    val createdAt = Instant.parse(notification.record.createdAt)
+    val createdAt = DateFormat.format(
+        DATETIME_FORMAT,
+        notification.record.createdAtAsInstant().toEpochMilli()
+    )
 
     Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
         Avatar(notification = notification)
@@ -110,7 +123,7 @@ private fun InviteItem(notification: Notification) {
                 )
             )
             Text(
-                text = DateFormat.format("yyyy/MM/dd hh:mm", createdAt.toEpochMilli()).toString(),
+                text = createdAt.toString(),
                 color = Color.Gray,
                 style = MaterialTheme.typography.labelMedium
             )
@@ -120,7 +133,10 @@ private fun InviteItem(notification: Notification) {
 
 @Composable
 private fun MentionItem(notification: Notification) {
-    val createdAt = Instant.parse(notification.record.createdAt)
+    val createdAt = DateFormat.format(
+        DATETIME_FORMAT,
+        notification.record.createdAtAsInstant().toEpochMilli()
+    )
 
     Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
         Avatar(notification = notification)
@@ -132,7 +148,7 @@ private fun MentionItem(notification: Notification) {
                 )
             )
             Text(
-                text = DateFormat.format("yyyy/MM/dd hh:mm", createdAt.toEpochMilli()).toString(),
+                text = createdAt.toString(),
                 color = Color.Gray,
                 style = MaterialTheme.typography.labelMedium
             )
@@ -142,7 +158,10 @@ private fun MentionItem(notification: Notification) {
 
 @Composable
 private fun ReplyItem(notification: Notification) {
-    val createdAt = Instant.parse(notification.record.createdAt)
+    val createdAt = DateFormat.format(
+        DATETIME_FORMAT,
+        notification.record.createdAtAsInstant().toEpochMilli()
+    )
 
     Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
         Avatar(notification = notification)
@@ -154,7 +173,7 @@ private fun ReplyItem(notification: Notification) {
                 )
             )
             Text(
-                text = DateFormat.format("yyyy/MM/dd hh:mm", createdAt.toEpochMilli()).toString(),
+                text = createdAt.toString(),
                 color = Color.Gray,
                 style = MaterialTheme.typography.labelMedium
             )

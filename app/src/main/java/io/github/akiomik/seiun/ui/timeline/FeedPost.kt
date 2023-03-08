@@ -28,6 +28,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.model.FeedViewPost
+import io.github.akiomik.seiun.ui.notification.DATETIME_FORMAT
 import io.github.akiomik.seiun.ui.theme.Green700
 import io.github.akiomik.seiun.ui.theme.Red700
 import io.github.akiomik.seiun.viewmodel.TimelineViewModel
@@ -214,7 +215,10 @@ private fun UpvoteIndicator(viewPost: FeedViewPost) {
 
 @Composable
 private fun FeedPostContent(viewPost: FeedViewPost) {
-    val createdAt = Instant.parse(viewPost.post.record.createdAt)
+    val createdAt = DateFormat.format(
+        "yyyy/MM/dd HH:mm",
+        viewPost.post.record.createdAtAsInstant().toEpochMilli()
+    )
 
     Column {
         NameRow(viewPost = viewPost)
@@ -232,7 +236,7 @@ private fun FeedPostContent(viewPost: FeedViewPost) {
         }
         Text(
             modifier = Modifier.padding(bottom = 4.dp),
-            text = DateFormat.format("yyyy/MM/dd hh:mm", createdAt.toEpochMilli()).toString(),
+            text = createdAt.toString(),
             color = Color.Gray,
             style = MaterialTheme.typography.labelMedium
         )
