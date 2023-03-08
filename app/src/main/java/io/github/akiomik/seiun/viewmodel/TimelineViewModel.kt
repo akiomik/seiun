@@ -115,7 +115,7 @@ class TimelineViewModel : ApplicationViewModel() {
         val ref = StrongRef(cid = feedPost.cid, uri = feedPost.uri)
         wrapError(run = {
             val result = withRetry(userRepository) { timelineRepository.upvote(it, ref) }
-            updateFeedPost(feedPost = feedPost.upvoted(result.upvote ?: ""))
+            updateFeedPost(feedPost.cid) { it.upvoted(result.upvote ?: "") }
         }, onSuccess = { onSuccess() }, onError = onError)
     }
 
@@ -127,7 +127,7 @@ class TimelineViewModel : ApplicationViewModel() {
         val ref = StrongRef(cid = feedPost.cid, uri = feedPost.uri)
         wrapError(run = {
             withRetry(userRepository) { timelineRepository.cancelVote(it, ref) }
-            updateFeedPost(feedPost = feedPost.upvoteCanceled())
+            updateFeedPost(feedPost.cid) { it.upvoteCanceled() }
         }, onSuccess = { onSuccess() }, onError = onError)
     }
 
@@ -135,7 +135,7 @@ class TimelineViewModel : ApplicationViewModel() {
         val ref = StrongRef(cid = feedPost.cid, uri = feedPost.uri)
         wrapError(run = {
             val response = withRetry(userRepository) { timelineRepository.repost(it, ref) }
-            updateFeedPost(feedPost = feedPost.reposted(response.uri))
+            updateFeedPost(feedPost.cid) { it.reposted(response.uri) }
         }, onSuccess = { onSuccess() }, onError = onError)
     }
 
@@ -152,7 +152,7 @@ class TimelineViewModel : ApplicationViewModel() {
             withRetry(userRepository) {
                 timelineRepository.cancelRepost(it, feedPost.viewer.repost)
             }
-            updateFeedPost(feedPost = feedPost.repostCanceled())
+            updateFeedPost(feedPost.cid) { it.repostCanceled() }
         }, onSuccess = { onSuccess() }, onError = onError)
     }
 
@@ -163,29 +163,43 @@ class TimelineViewModel : ApplicationViewModel() {
         }, onSuccess = { onSuccess() }, onError = onError)
     }
 
-    private fun updateFeedPost(feedPost: FeedPost) {
-        val updatedFeedViewPosts = feedViewPosts.value?.map {
+    // To avoid race conditions, we must use current feedPost instead of arguments (#7)
+    private fun updateFeedPost(cid: String, run: (FeedPost) -> FeedPost) {
+        val index = feedViewPosts.value?.indexOfFirst { it.post.cid == cid } ?: -1
+        val target = feedViewPosts.value?.get(index)?.post
+        if (index >= 0 && target != null) {
+            _feedViewPosts.postValue(updateFeedPostOf(feedViewPosts.value.orEmpty(), run(target)))
+        }
+    }
+
+    private fun updateFeedPostOf(feedViewPosts: List<FeedViewPost>, feedPost: FeedPost): List<FeedViewPost> {
+        return feedViewPosts.map {
             if (it.post.uri === feedPost.uri) {
                 it.copy(post = feedPost)
             } else {
                 it
             }
         }
-        _feedViewPosts.postValue(updatedFeedViewPosts)
+    }
+
+    private fun updateFeedPostAt(feedViewPosts: List<FeedViewPost>, index: Int, feedPost: FeedPost): List<FeedViewPost> {
+        val posts = feedViewPosts.toMutableList()
+        val feedViewPost = feedViewPosts[index]
+        posts[index] = feedViewPost.copy(post = feedPost)
+        return posts
     }
 
     private fun mergeFeedViewPosts(
         currentPosts: List<FeedViewPost>,
         newPosts: List<FeedViewPost>
     ): List<FeedViewPost> {
-        val top50Posts = currentPosts.take(50)// NOTE: 50 is default limit of getTimeline
-
         // TODO: improve merge logic
         return newPosts.reversed().fold(currentPosts) { acc, post ->
-            if (!top50Posts.any { post.post.cid == it.post.cid && post.reason == it.reason }) {
-                listOf(post) + acc
+            val index =  acc.indexOfFirst { post.post.cid == it.post.cid && post.reason == it.reason }
+            if (index >= 0) {
+                updateFeedPostAt(acc, index, post.post)
             } else {
-                acc
+                listOf(post) + acc
             }
         }
     }
