@@ -23,7 +23,7 @@ private fun AppName() {
     Text(
         text = stringResource(id = R.string.app_name),
         fontSize = 66.sp,
-        modifier = Modifier.padding(8.dp)
+        modifier = Modifier.padding(top = 20.dp, end = 20.dp, bottom = 8.dp, start = 20.dp)
     )
 }
 
@@ -32,7 +32,7 @@ private fun AppDescription() {
     Text(
         text = stringResource(id = R.string.login_app_description),
         fontSize = 33.sp,
-        modifier = Modifier.padding(8.dp)
+        modifier = Modifier.padding(top = 8.dp, end = 20.dp, bottom = 8.dp, start = 20.dp)
     )
 }
 
