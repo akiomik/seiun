@@ -4,6 +4,7 @@ import android.text.format.DateFormat
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.ChatBubbleOutline
 import androidx.compose.material.icons.sharp.Favorite
@@ -217,7 +218,9 @@ private fun FeedPostContent(viewPost: FeedViewPost) {
 
     Column {
         NameRow(viewPost = viewPost)
-        Text(text = viewPost.post.record.text)
+        SelectionContainer() {
+            Text(text = viewPost.post.record.text)
+        }
         Row(
             modifier = Modifier.padding(top = 8.dp, bottom = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
