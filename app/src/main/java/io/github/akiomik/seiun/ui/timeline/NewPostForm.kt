@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -31,6 +33,8 @@ private fun PostButton(content: String, enabled: Boolean, onSuccess: () -> Unit)
 
 @Composable
 private fun PostContentField(content: String, onChange: (String) -> Unit) {
+    val focusRequester = remember { FocusRequester() }
+
     TextField(
         value = content,
         onValueChange = onChange,
@@ -40,7 +44,8 @@ private fun PostContentField(content: String, onChange: (String) -> Unit) {
         modifier = Modifier
             .padding(20.dp)
             .fillMaxWidth()
-            .height(320.dp),
+            .height(320.dp)
+            .focusRequester(focusRequester),
         supportingText = {
             Text(
                 text = "${content.length} / 256",
@@ -49,6 +54,10 @@ private fun PostContentField(content: String, onChange: (String) -> Unit) {
             )
         }
     )
+
+    LaunchedEffect(Unit){
+        focusRequester.requestFocus()
+    }
 }
 
 @Composable
