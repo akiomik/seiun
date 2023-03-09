@@ -10,6 +10,7 @@ An experimental ATP/Bluesky client app for Android
 - Home feed (Timeline)
 - Notifications feed
 - Upvote / Repost
+- Send Post / Reply
 
 ## Install
 
