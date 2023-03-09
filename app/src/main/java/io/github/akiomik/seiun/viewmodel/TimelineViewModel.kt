@@ -207,9 +207,9 @@ class TimelineViewModel : ApplicationViewModel() {
     }
 
     private fun resizeImage(original: Bitmap): Bitmap {
-        // NOTE: app.bsky.embed.images supports images up to 1000x1000px
-        val maxWidth = 1000
-        val maxHeight = 1000
+        // NOTE: app.bsky.embed.images supports images up to 2000x2000px and 1MB
+        val maxWidth = 2000
+        val maxHeight = 2000
 
         if (original.width <= maxWidth && original.height <= maxHeight) {
             return original
