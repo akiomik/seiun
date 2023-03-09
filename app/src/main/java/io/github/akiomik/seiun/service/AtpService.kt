@@ -3,6 +3,7 @@ package io.github.akiomik.seiun.service
 import com.slack.eithernet.ApiResult
 import com.slack.eithernet.DecodeErrorBody
 import io.github.akiomik.seiun.model.*
+import okhttp3.*
 import retrofit2.http.*
 
 interface AtpService {
@@ -86,4 +87,12 @@ interface AtpService {
         @Query("limit") limit: Int? = null,
         @Query("before") before: String? = null,
     ): ApiResult<NotificationList, AtpError>
+
+    @DecodeErrorBody
+    @POST("com.atproto.blob.upload")
+    suspend fun uploadBlob(
+        @Header("Authorization") authorization: String,
+        @Header("Content-Type") contentType: String,
+        @Body body: RequestBody,
+    ): ApiResult<UploadBlobOutput, AtpError>
 }

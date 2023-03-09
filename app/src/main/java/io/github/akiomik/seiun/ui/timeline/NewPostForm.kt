@@ -1,12 +1,21 @@
 package io.github.akiomik.seiun.ui.timeline
 
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -15,37 +24,77 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.akiomik.seiun.R
-import io.github.akiomik.seiun.model.FeedPost
 import io.github.akiomik.seiun.model.FeedViewPost
 import io.github.akiomik.seiun.ui.embed.EmbedPost
 import io.github.akiomik.seiun.viewmodel.TimelineViewModel
+import io.github.akiomik.seiun.SeiunApplication
 
 @Composable
 private fun PostButton(
     content: String,
     enabled: Boolean,
     feedViewPost: FeedViewPost?,
+    imageUri: Uri?,
     onSuccess: () -> Unit
 ) {
+    val isUploading = remember { mutableStateOf(false) }
     val viewModel: TimelineViewModel = viewModel()
     val context = LocalContext.current
 
     Button(onClick = {
+        isUploading.value = true
+
+        val image = imageUri?.let { uri ->
+            val source = ImageDecoder.createSource(context.contentResolver, uri)
+            val bytes = viewModel.convertToUploadableImage(source)
+            Pair(bytes, "image/jpeg")
+        }
+
+        val handleSuccess = {
+            isUploading.value = false
+            onSuccess()
+        }
+
+        val handleError = { error: Throwable ->
+            isUploading.value = false
+            Log.d(SeiunApplication.TAG, error.toString())
+            Toast.makeText(context, error.toString(), Toast.LENGTH_LONG).show()
+        }
+
         if (feedViewPost == null) {
-            viewModel.createPost(content, onSuccess = onSuccess, onError = {
-                Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
-            })
+            viewModel.createPost(
+                content,
+                image?.first,
+                image?.second,
+                onSuccess = handleSuccess,
+                onError = handleError
+            )
         } else {
             viewModel.createReply(
-                content = content,
-                feedViewPost = feedViewPost,
-                onSuccess = onSuccess,
-                onError = {
-                    Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
-                })
+                content,
+                feedViewPost,
+                image?.first,
+                image?.second,
+                onSuccess = handleSuccess,
+                onError = handleError
+            )
         }
-    }, enabled = enabled) {
+    }, enabled = enabled && !isUploading.value) {
         Text(stringResource(id = R.string.timeline_new_post_post_button))
+    }
+}
+
+@Composable
+fun ImageSelectButton(onSelect: (Uri?) -> Unit) {
+    val launcher = rememberLauncherForActivityResult(
+        contract =
+        ActivityResultContracts.GetContent()
+    ) { onSelect(it) }
+
+    Button(onClick = {
+        launcher.launch("image/*")
+    }) {
+        Text(stringResource(id = R.string.timeline_new_post_image_upload_button))
     }
 }
 
@@ -73,8 +122,31 @@ private fun PostContentField(content: String, onChange: (String) -> Unit) {
         }
     )
 
-    LaunchedEffect(Unit){
+    LaunchedEffect(Unit) {
         focusRequester.requestFocus()
+    }
+}
+
+@Composable
+private fun ImagePreview(uri: Uri, onDelete: () -> Unit) {
+    val bitmap = remember { mutableStateOf<Bitmap?>(null) }
+    val source = ImageDecoder.createSource(LocalContext.current.contentResolver, uri)
+
+    if (bitmap.value == null) {
+        bitmap.value = ImageDecoder.decodeBitmap(source)
+    }
+
+    bitmap.value?.let {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Button(onClick = onDelete) {
+                Text(stringResource(id = R.string.timeline_new_post_delete_image))
+            }
+            Image(
+                bitmap = it.asImageBitmap(),
+                contentDescription = null,
+                modifier = Modifier.size(400.dp)
+            )
+        }
     }
 }
 
@@ -82,6 +154,7 @@ private fun PostContentField(content: String, onChange: (String) -> Unit) {
 fun NewPostForm(feedViewPost: FeedViewPost?, onClose: () -> Unit) {
     var content by remember { mutableStateOf("") }
     var valid by remember { mutableStateOf(false) }
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
 
     Column(modifier = Modifier.padding(8.dp)) {
         Row(
@@ -91,15 +164,23 @@ fun NewPostForm(feedViewPost: FeedViewPost?, onClose: () -> Unit) {
             TextButton(onClick = onClose) {
                 Text(stringResource(id = R.string.timeline_new_post_cancel_button))
             }
-            PostButton(content = content, enabled = valid, feedViewPost = feedViewPost) { onClose() }
+            ImageSelectButton { imageUri = it }
+            PostButton(
+                content = content,
+                enabled = valid,
+                feedViewPost = feedViewPost,
+                imageUri = imageUri
+            ) { onClose() }
         }
 
         Spacer(modifier = Modifier.size(8.dp))
 
         if (feedViewPost != null) {
-            Box(modifier = Modifier
-                .padding(20.dp)
-                .fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .padding(20.dp)
+                    .fillMaxWidth()
+            ) {
                 EmbedPost(viewPost = feedViewPost)
             }
         }
@@ -107,6 +188,12 @@ fun NewPostForm(feedViewPost: FeedViewPost?, onClose: () -> Unit) {
         PostContentField(content = content) {
             content = it
             valid = content.isNotEmpty() && content.length <= 256
+        }
+
+        imageUri?.let {
+            ImagePreview(uri = it) {
+                imageUri = null
+            }
         }
     }
 }
@@ -122,4 +209,3 @@ fun NewPostFormModal(feedViewPost: FeedViewPost? = null, onClose: () -> Unit = {
         }
     }
 }
-

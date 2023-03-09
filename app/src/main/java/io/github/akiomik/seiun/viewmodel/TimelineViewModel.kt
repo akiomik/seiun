@@ -1,5 +1,7 @@
 package io.github.akiomik.seiun.viewmodel
 
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -10,12 +12,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
 
 class TimelineViewModel : ApplicationViewModel() {
     sealed class State {
         object Loading : State()
         object Loaded : State()
-        object Error: State()
+        object Error : State()
     }
 
     private var _cursor = MutableLiveData<String>()
@@ -153,14 +156,34 @@ class TimelineViewModel : ApplicationViewModel() {
         }, onSuccess = { onSuccess() }, onError = onError)
     }
 
-    fun createPost(content: String, onSuccess: () -> Unit, onError: (Throwable) -> Unit = {}) {
+    fun createPost(
+        content: String,
+        image: ByteArray? = null,
+        mimeType: String? = null,
+        onSuccess: () -> Unit,
+        onError: (Throwable) -> Unit = {}
+    ) {
         wrapError(run = {
-            withRetry(userRepository) { timelineRepository.createPost(it, content) }
+            withRetry(userRepository) { session: Session ->
+                val output = if (image != null && mimeType != null) {
+                    timelineRepository.uploadImage(session, image, mimeType)
+                } else {
+                    null
+                }
+                timelineRepository.createPost(session, content, output?.cid, mimeType)
+            }
             refreshPosts()
         }, onSuccess = { onSuccess() }, onError = onError)
     }
 
-    fun createReply(content: String, feedViewPost: FeedViewPost, onSuccess: () -> Unit, onError: (Throwable) -> Unit = {}) {
+    fun createReply(
+        content: String,
+        feedViewPost: FeedViewPost,
+        image: ByteArray? = null,
+        mimeType: String? = null,
+        onSuccess: () -> Unit,
+        onError: (Throwable) -> Unit = {}
+    ) {
         wrapError(run = {
             val to = if (feedViewPost.reply == null) {
                 val ref = feedViewPost.post.toStrongRef()
@@ -170,9 +193,42 @@ class TimelineViewModel : ApplicationViewModel() {
                 val parent = feedViewPost.post.toStrongRef()
                 CreateReplyRef(root = root, parent = parent)
             }
-            withRetry(userRepository) { timelineRepository.createReply(it, content, to) }
+
+            withRetry(userRepository) {session: Session ->
+                val output = if (image != null && mimeType != null) {
+                    timelineRepository.uploadImage(session, image, mimeType)
+                } else {
+                    null
+                }
+                timelineRepository.createReply(session, content, to, output?.cid, mimeType)
+            }
             refreshPosts()
         }, onSuccess = { onSuccess() }, onError = onError)
+    }
+
+    private fun resizeImage(original: Bitmap): Bitmap {
+        // NOTE: app.bsky.embed.images supports images up to 1000x1000px
+        val maxWidth = 1000
+        val maxHeight = 1000
+
+        if (original.width <= maxWidth && original.height <= maxHeight) {
+            return original
+        }
+
+        val (width, height) = if (original.width >= original.height) {
+            Pair(maxWidth, original.height * maxWidth / original.width)
+        } else {
+            Pair(original.width * maxHeight / original.height, maxHeight)
+        }
+
+        return Bitmap.createScaledBitmap(original, width, height, true)
+    }
+
+    fun convertToUploadableImage(source: ImageDecoder.Source): ByteArray {
+        val bitmap = resizeImage(ImageDecoder.decodeBitmap(source))
+        val stream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+        return stream.toByteArray()
     }
 
     // To avoid race conditions, we must use current feedPost instead of arguments (#7)
@@ -184,7 +240,10 @@ class TimelineViewModel : ApplicationViewModel() {
         }
     }
 
-    private fun updateFeedPostOf(feedViewPosts: List<FeedViewPost>, feedPost: FeedPost): List<FeedViewPost> {
+    private fun updateFeedPostOf(
+        feedViewPosts: List<FeedViewPost>,
+        feedPost: FeedPost
+    ): List<FeedViewPost> {
         return feedViewPosts.map {
             if (it.post.uri === feedPost.uri) {
                 it.copy(post = feedPost)
@@ -194,7 +253,11 @@ class TimelineViewModel : ApplicationViewModel() {
         }
     }
 
-    private fun updateFeedPostAt(feedViewPosts: List<FeedViewPost>, index: Int, feedPost: FeedPost): List<FeedViewPost> {
+    private fun updateFeedPostAt(
+        feedViewPosts: List<FeedViewPost>,
+        index: Int,
+        feedPost: FeedPost
+    ): List<FeedViewPost> {
         val posts = feedViewPosts.toMutableList()
         val feedViewPost = feedViewPosts[index]
         posts[index] = feedViewPost.copy(post = feedPost)
@@ -207,7 +270,8 @@ class TimelineViewModel : ApplicationViewModel() {
     ): List<FeedViewPost> {
         // TODO: improve merge logic
         return newPosts.reversed().fold(currentPosts) { acc, post ->
-            val index =  acc.indexOfFirst { post.post.cid == it.post.cid && post.reason == it.reason }
+            val index =
+                acc.indexOfFirst { post.post.cid == it.post.cid && post.reason == it.reason }
             if (index >= 0) {
                 updateFeedPostAt(acc, index, post.post)
             } else {

@@ -34,9 +34,11 @@
     <string name="timeline_reposted">%1$s がリポスト</string>
     <string name="timeline_replying">%1$s への返信</string>
     <string name="timeline_new_post_cancel_button">キャンセル</string>
+    <string name="timeline_new_post_image_upload_button">画像をアップロード</string>
     <string name="timeline_new_post_post_button">送信</string>
     <string name="timeline_new_post_content">内容</string>
     <string name="timeline_new_post_content_placeholder">今なにしてる？</string>
+    <string name="timeline_new_post_delete_image">画像を削除</string>
     <string name="timeline_no_posts_yet">まだ投稿がありません</string>
     <string name="timeline_no_more_posts">これ以上投稿はありません</string>
     <string name="timeline_error">タイムラインの取得に失敗しました。後ほどお試しください</string>

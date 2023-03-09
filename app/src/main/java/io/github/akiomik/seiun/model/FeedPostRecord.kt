@@ -9,8 +9,10 @@ data class FeedPostRecord(
     @Json(name = "\$type")
     val type: String = "app.bsky.feed.post",
     val createdAt: String,
-    val reply: CreateReplyRef? = null)
-{
+    val reply: CreateReplyRef? = null,
+    val embed: EmbedImagesOrEmbedExternal? = null,
+//    val entities: List<Entity>?
+) {
     fun createdAtAsInstant(): Instant {
         return Instant.from(DateTimeFormatter.ISO_DATE_TIME.parse(createdAt))
     }
