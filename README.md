@@ -1,6 +1,6 @@
 # seiun
 
-An experimental ATP/Bluesky client app for Android
+Seiun (青雲: means blue cloud in Japanese) is an experimental ATP/Bluesky client app for Android
 
 ![cover](https://github.com/akiomik/seiun/raw/main/assets/covers/cover-github.png)
 
