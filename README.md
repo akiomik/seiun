@@ -11,6 +11,7 @@ An experimental ATP/Bluesky client app for Android
 - Notifications feed
 - Upvote / Repost
 - Send Post / Reply
+- i18n support (en-US / ja-JP)
 
 ## Install
 
