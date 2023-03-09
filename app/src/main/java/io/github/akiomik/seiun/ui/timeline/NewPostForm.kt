@@ -164,7 +164,10 @@ fun NewPostForm(feedViewPost: FeedViewPost?, onClose: () -> Unit) {
             TextButton(onClick = onClose) {
                 Text(stringResource(id = R.string.timeline_new_post_cancel_button))
             }
-            ImageSelectButton { imageUri = it }
+            ImageSelectButton {
+                imageUri = it
+                valid = true
+            }
             PostButton(
                 content = content,
                 enabled = valid,
@@ -187,12 +190,13 @@ fun NewPostForm(feedViewPost: FeedViewPost?, onClose: () -> Unit) {
 
         PostContentField(content = content) {
             content = it
-            valid = content.isNotEmpty() && content.length <= 256
+            valid = content.isNotEmpty() && content.length <= 256 || imageUri != null
         }
 
         imageUri?.let {
             ImagePreview(uri = it) {
                 imageUri = null
+                valid = content.isNotEmpty() && content.length <= 256
             }
         }
     }
