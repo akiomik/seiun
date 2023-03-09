@@ -1,6 +1,9 @@
 package io.github.akiomik.seiun.ui.timeline
 
 import android.text.format.DateFormat
+import android.util.Log
+import android.view.Menu
+import android.widget.AutoCompleteTextView.OnDismissListener
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -9,14 +12,9 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.sharp.ChatBubbleOutline
-import androidx.compose.material.icons.sharp.Favorite
-import androidx.compose.material.icons.sharp.FavoriteBorder
-import androidx.compose.material.icons.sharp.SyncAlt
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.sharp.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.R
+import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.model.FeedViewPost
 import io.github.akiomik.seiun.ui.theme.Green700
 import io.github.akiomik.seiun.ui.theme.Red700
@@ -221,6 +220,86 @@ private fun UpvoteIndicator(viewPost: FeedViewPost) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DeleteConfirmDialog(feedViewPost: FeedViewPost, onDismissRequest: () -> Unit) {
+    val viewModel: TimelineViewModel = viewModel()
+    val context = LocalContext.current
+
+    AlertDialog(onDismissRequest = onDismissRequest) {
+        Surface(
+            modifier = Modifier
+                .wrapContentWidth()
+                .wrapContentHeight(),
+            shape = MaterialTheme.shapes.large
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(text = stringResource(id = R.string.timeline_delete_confirmation))
+                Spacer(modifier = Modifier.height(24.dp))
+                Row(modifier = Modifier.align(Alignment.End)) {
+                    TextButton(onClick = onDismissRequest) {
+                        Text(stringResource(id = R.string.cancel))
+                    }
+
+                    TextButton(onClick = {
+                        viewModel.deletePost(feedViewPost, onSuccess = {
+                            onDismissRequest()
+                        }, onError = {
+                            Log.d(SeiunApplication.TAG, it.toString())
+                            onDismissRequest()
+                            Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
+                        })
+                    }) {
+                        Text(stringResource(id = R.string.delete))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MenuButton(viewPost: FeedViewPost) {
+    val viewModel: TimelineViewModel = viewModel()
+    if (viewPost.post.author.did != viewModel.profile.value?.did) {
+        return
+    }
+
+    var showMenu by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
+    TextButton(onClick = { showMenu = true }) {
+        Icon(
+            painter = rememberVectorPainter(Icons.Sharp.MoreVert),
+            contentDescription = null,
+            modifier = Modifier.size(16.dp),
+            tint = Color.Gray
+        )
+    }
+
+    DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+        DropdownMenuItem(
+            text = { Text(stringResource(id = R.string.delete)) },
+            onClick = {
+                showMenu = false
+                showDeleteDialog = true
+            },
+            leadingIcon = {
+                Icon(
+                    Icons.Outlined.Delete,
+                    contentDescription = null
+                )
+            })
+    }
+
+    if (showDeleteDialog) {
+        DeleteConfirmDialog(
+            feedViewPost = viewPost,
+            onDismissRequest = { showDeleteDialog = false })
+    }
+}
+
 @Composable
 private fun FeedPostContent(viewPost: FeedViewPost) {
     val createdAt = DateFormat.format(
@@ -230,12 +309,15 @@ private fun FeedPostContent(viewPost: FeedViewPost) {
 
     Column {
         NameRow(viewPost = viewPost)
+
         if (viewPost.post.record.text.isNotEmpty()) {
             SelectionContainer {
                 Text(text = viewPost.post.record.text, modifier = Modifier.padding(top = 8.dp))
             }
         }
+
         ImageTile(viewPost)
+
         Row(
             modifier = Modifier.padding(top = 8.dp, bottom = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -244,6 +326,7 @@ private fun FeedPostContent(viewPost: FeedViewPost) {
             ReplyIndicator(viewPost = viewPost)
             RepostIndicator(viewPost = viewPost)
             UpvoteIndicator(viewPost = viewPost)
+            MenuButton(viewPost = viewPost)
         }
         Text(
             modifier = Modifier.padding(bottom = 4.dp),
@@ -261,7 +344,11 @@ fun ImageTile(viewPost: FeedViewPost) {
 
     viewPost.post.embed?.images?.let { images ->
         if (images.size == 1) {
-            Box(modifier = Modifier.fillMaxWidth().padding(top = paddingTop)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = paddingTop)
+            ) {
                 AsyncImage(
                     model = images[0].thumb,
                     contentDescription = images[0].alt,
@@ -277,7 +364,9 @@ fun ImageTile(viewPost: FeedViewPost) {
             }
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(minSize = 128.dp),
-                modifier = Modifier.height(maxHeight).padding(top = paddingTop)
+                modifier = Modifier
+                    .height(maxHeight)
+                    .padding(top = paddingTop)
             ) {
                 items(images) {
                     AsyncImage(

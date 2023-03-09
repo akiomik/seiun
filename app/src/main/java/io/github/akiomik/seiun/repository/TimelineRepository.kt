@@ -182,6 +182,23 @@ class TimelineRepository(private val atpService: AtpService) {
         }
     }
 
+    suspend fun deletePost(session: Session, feedViewPost: FeedViewPost) {
+        Log.d(SeiunApplication.TAG, "Delete post: uri = ${feedViewPost.post.uri}")
+
+        val rkey = feedViewPost.post.uri.split('/').last()
+        val body =
+            DeleteRecordParam(did = session.did, collection = "app.bsky.feed.post", rkey = rkey)
+        try {
+            atpService.deleteRecord("Bearer ${session.accessJwt}", body)
+        } catch (e: HttpException) {
+            if (e.code() == 401) {
+                throw UnauthorizedException("Unauthorized: ${e.code()} (${e.message()})")
+            } else {
+                throw IllegalStateException("HttpError: ${e.code()} (${e.message()})")
+            }
+        }
+    }
+
     suspend fun uploadImage(
         session: Session,
         image: ByteArray,

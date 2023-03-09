@@ -194,13 +194,23 @@ class TimelineViewModel : ApplicationViewModel() {
                 CreateReplyRef(root = root, parent = parent)
             }
 
-            withRetry(userRepository) {session: Session ->
+            withRetry(userRepository) { session: Session ->
                 val output = if (image != null && mimeType != null) {
                     timelineRepository.uploadImage(session, image, mimeType)
                 } else {
                     null
                 }
                 timelineRepository.createReply(session, content, to, output?.cid, mimeType)
+            }
+            refreshPosts()
+        }, onSuccess = { onSuccess() }, onError = onError)
+    }
+
+    fun deletePost(viewPost: FeedViewPost, onSuccess: () -> Unit, onError: (Throwable) -> Unit) {
+        wrapError(run = {
+            withRetry(userRepository) { session: Session ->
+                timelineRepository.deletePost(session, viewPost)
+                deleteFeedPost(viewPost.post.cid)
             }
             refreshPosts()
         }, onSuccess = { onSuccess() }, onError = onError)
@@ -229,6 +239,23 @@ class TimelineViewModel : ApplicationViewModel() {
         val stream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
         return stream.toByteArray()
+    }
+
+    private fun deleteFeedPost(cid: String) {
+        val index = feedViewPosts.value?.indexOfFirst { it.post.cid == cid } ?: -1
+        val target = feedViewPosts.value?.get(index)?.post
+        if (index >= 0 && target != null) {
+            _feedViewPosts.postValue(deleteFeedPostAt(feedViewPosts.value.orEmpty(), index))
+        }
+    }
+
+    private fun deleteFeedPostAt(
+        feedViewPosts: List<FeedViewPost>,
+        index: Int
+    ): List<FeedViewPost> {
+        val posts = feedViewPosts.toMutableList()
+        posts.removeAt(index)
+        return posts
     }
 
     // To avoid race conditions, we must use current feedPost instead of arguments (#7)

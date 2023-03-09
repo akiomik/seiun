@@ -4,6 +4,8 @@
     <string name="timeline">Home</string>
     <string name="notification">Notification</string>
     <string name="loading">Loading…</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
     <string name="login_title">Login</string>
     <string name="login_app_description">for ATP/Bluesky</string>
     <string name="login_handle_or_email">Handle or Email</string>
@@ -32,6 +34,7 @@
     <string name="notification_replied">%1$s replied to you</string>
     <string name="timeline_reposted">Reposted by %1$s</string>
     <string name="timeline_replying">Replying to %1$s</string>
+    <string name="timeline_delete_confirmation">Are you sure you want to delete this post?</string>
     <string name="timeline_new_post_cancel_button">Cancel</string>
     <string name="timeline_new_post_image_upload_button">Upload Image</string>
     <string name="timeline_new_post_post_button">Post</string>
