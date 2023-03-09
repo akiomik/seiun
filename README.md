@@ -12,6 +12,7 @@ Seiun (青雲: means blue cloud in Japanese) is an experimental ATP/Bluesky clie
 - Upvote / Repost
 - Send Post / Reply
 - Upload an image
+- Image preview
 - i18n support (en-US / ja-JP)
 
 ## Install

@@ -3,6 +3,9 @@ package io.github.akiomik.seiun.ui.timeline
 import android.text.format.DateFormat
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
@@ -20,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -226,9 +230,10 @@ private fun FeedPostContent(viewPost: FeedViewPost) {
 
     Column {
         NameRow(viewPost = viewPost)
-        SelectionContainer() {
-            Text(text = viewPost.post.record.text)
+        SelectionContainer {
+            Text(text = viewPost.post.record.text, modifier = Modifier.padding(top = 8.dp))
         }
+        ImageTile(viewPost)
         Row(
             modifier = Modifier.padding(top = 8.dp, bottom = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -244,6 +249,44 @@ private fun FeedPostContent(viewPost: FeedViewPost) {
             color = Color.Gray,
             style = MaterialTheme.typography.labelMedium
         )
+    }
+}
+
+@Composable
+fun ImageTile(viewPost: FeedViewPost) {
+    val paddingTop = 16.dp
+    val maxHeight = 240.dp
+
+    viewPost.post.embed?.images?.let { images ->
+        if (images.size == 1) {
+            Box(modifier = Modifier.fillMaxWidth().padding(top = paddingTop)) {
+                AsyncImage(
+                    model = images[0].thumb,
+                    contentDescription = images[0].alt,
+                    modifier = Modifier.height(maxHeight),
+                    contentScale = ContentScale.Crop
+                )
+            }
+        } else {
+            val height = if (images.size > 2) {
+                maxHeight / 2
+            } else {
+                maxHeight
+            }
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(minSize = 128.dp),
+                modifier = Modifier.height(maxHeight).padding(top = paddingTop)
+            ) {
+                items(images) {
+                    AsyncImage(
+                        model = it.thumb,
+                        contentDescription = it.alt,
+                        modifier = Modifier.height(height),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            }
+        }
     }
 }
 

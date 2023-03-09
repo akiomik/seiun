@@ -10,7 +10,8 @@ data class FeedPost(
     val upvoteCount: Int,
     val downvoteCount: Int,
     val indexedAt: String, // TODO: datetime
-    val viewer: ViewerState
+    val viewer: ViewerState,
+    val embed: FeedPostEmbed?,
 ) {
     fun reposted(uri: String): FeedPost {
         return copy(
