@@ -135,4 +135,27 @@ class TimelineRepository(private val atpService: AtpService) {
             }
         }
     }
+
+    suspend fun createReply(session: Session, content: String, to: CreateReplyRef) {
+        Log.d(SeiunApplication.TAG, "Create a reply: content = $content, to = $to")
+
+        val createdAt = Instant.now().toString()
+        val record = FeedPostRecord(text = content, createdAt = createdAt, reply = to)
+        val body = CreatePostParam(did = session.did, record = record)
+
+        when (val result =
+            atpService.createPost(authorization = "Bearer ${session.accessJwt}", body = body)) {
+            is ApiResult.Success -> {}
+            is ApiResult.Failure -> when (result) {
+                is ApiResult.Failure.HttpFailure -> {
+                    if (result.code == 401) {
+                        throw UnauthorizedException("Unauthorized: ${result.code} (${result.error})")
+                    } else {
+                        throw IllegalStateException("HttpError: ${result.code} (${result.error})")
+                    }
+                }
+                else -> throw IllegalStateException("ApiResult.Failure: ${result.response()}")
+            }
+        }
+    }
 }

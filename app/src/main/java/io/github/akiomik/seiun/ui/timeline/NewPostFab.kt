@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 fun NewPostFab() {
     var showPostForm by remember { mutableStateOf(false) }
     if (showPostForm) {
-        NewPostForm { showPostForm = false }
+        NewPostFormModal { showPostForm = false }
     } else {
         Box(modifier = Modifier.fillMaxSize()) {
             FloatingActionButton(

@@ -14,7 +14,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,11 +28,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.model.FeedViewPost
-import io.github.akiomik.seiun.ui.notification.DATETIME_FORMAT
 import io.github.akiomik.seiun.ui.theme.Green700
 import io.github.akiomik.seiun.ui.theme.Red700
 import io.github.akiomik.seiun.viewmodel.TimelineViewModel
-import java.time.Instant
 
 @Composable
 private fun RepostText(viewPost: FeedViewPost) {
@@ -109,9 +107,15 @@ private fun NameRow(viewPost: FeedViewPost) {
 
 @Composable
 private fun ReplyIndicator(viewPost: FeedViewPost) {
+    var showPostForm by remember { mutableStateOf(false) }
+
+    if (showPostForm) {
+        NewPostFormModal(viewPost) { showPostForm = false }
+    }
+
     TextButton(
         modifier = Modifier.width(64.dp),
-        onClick = { /*TODO*/ }
+        onClick = { showPostForm = true; }
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

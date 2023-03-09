@@ -15,17 +15,35 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.akiomik.seiun.R
+import io.github.akiomik.seiun.model.FeedPost
+import io.github.akiomik.seiun.model.FeedViewPost
+import io.github.akiomik.seiun.ui.embed.EmbedPost
 import io.github.akiomik.seiun.viewmodel.TimelineViewModel
 
 @Composable
-private fun PostButton(content: String, enabled: Boolean, onSuccess: () -> Unit) {
+private fun PostButton(
+    content: String,
+    enabled: Boolean,
+    feedViewPost: FeedViewPost?,
+    onSuccess: () -> Unit
+) {
     val viewModel: TimelineViewModel = viewModel()
     val context = LocalContext.current
 
     Button(onClick = {
-        viewModel.createPost(content, onSuccess = onSuccess, onError = {
-            Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
-        })
+        if (feedViewPost == null) {
+            viewModel.createPost(content, onSuccess = onSuccess, onError = {
+                Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
+            })
+        } else {
+            viewModel.createReply(
+                content = content,
+                feedViewPost = feedViewPost,
+                onSuccess = onSuccess,
+                onError = {
+                    Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
+                })
+        }
     }, enabled = enabled) {
         Text(stringResource(id = R.string.timeline_new_post_post_button))
     }
@@ -61,33 +79,46 @@ private fun PostContentField(content: String, onChange: (String) -> Unit) {
 }
 
 @Composable
-fun NewPostForm(onClose: () -> Unit) {
+fun NewPostForm(feedViewPost: FeedViewPost?, onClose: () -> Unit) {
     var content by remember { mutableStateOf("") }
     var valid by remember { mutableStateOf(false) }
 
+    Column(modifier = Modifier.padding(8.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            TextButton(onClick = onClose) {
+                Text(stringResource(id = R.string.timeline_new_post_cancel_button))
+            }
+            PostButton(content = content, enabled = valid, feedViewPost = feedViewPost) { onClose() }
+        }
+
+        Spacer(modifier = Modifier.size(8.dp))
+
+        if (feedViewPost != null) {
+            Box(modifier = Modifier
+                .padding(20.dp)
+                .fillMaxWidth()) {
+                EmbedPost(viewPost = feedViewPost)
+            }
+        }
+
+        PostContentField(content = content) {
+            content = it
+            valid = content.isNotEmpty() && content.length <= 256
+        }
+    }
+}
+
+@Composable
+fun NewPostFormModal(feedViewPost: FeedViewPost? = null, onClose: () -> Unit = {}) {
     Dialog(
         onDismissRequest = onClose,
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
         Surface(modifier = Modifier.fillMaxSize()) {
-            Column(modifier = Modifier.padding(8.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    TextButton(onClick = onClose) {
-                        Text(stringResource(id = R.string.timeline_new_post_cancel_button))
-                    }
-                    PostButton(content = content, enabled = valid) { onClose() }
-                }
-
-                Spacer(modifier = Modifier.size(8.dp))
-
-                PostContentField(content = content) {
-                    content = it
-                    valid = content.isNotEmpty() && content.length <= 256
-                }
-            }
+            NewPostForm(feedViewPost = feedViewPost, onClose = onClose)
         }
     }
 }

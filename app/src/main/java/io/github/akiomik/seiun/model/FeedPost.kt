@@ -39,4 +39,8 @@ data class FeedPost(
             viewer = viewer.copy(upvote = null),
         )
     }
+
+    fun toStrongRef(): StrongRef {
+        return StrongRef(uri = uri, cid = cid)
+    }
 }

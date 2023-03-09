@@ -5,10 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.github.akiomik.seiun.SeiunApplication
-import io.github.akiomik.seiun.model.FeedPost
-import io.github.akiomik.seiun.model.FeedViewPost
-import io.github.akiomik.seiun.model.Profile
-import io.github.akiomik.seiun.model.StrongRef
+import io.github.akiomik.seiun.model.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -159,6 +156,21 @@ class TimelineViewModel : ApplicationViewModel() {
     fun createPost(content: String, onSuccess: () -> Unit, onError: (Throwable) -> Unit = {}) {
         wrapError(run = {
             withRetry(userRepository) { timelineRepository.createPost(it, content) }
+            refreshPosts()
+        }, onSuccess = { onSuccess() }, onError = onError)
+    }
+
+    fun createReply(content: String, feedViewPost: FeedViewPost, onSuccess: () -> Unit, onError: (Throwable) -> Unit = {}) {
+        wrapError(run = {
+            val to = if (feedViewPost.reply == null) {
+                val ref = feedViewPost.post.toStrongRef()
+                CreateReplyRef(root = ref, parent = ref)
+            } else {
+                val root = feedViewPost.reply.root.toStrongRef()
+                val parent = feedViewPost.post.toStrongRef()
+                CreateReplyRef(root = root, parent = parent)
+            }
+            withRetry(userRepository) { timelineRepository.createReply(it, content, to) }
             refreshPosts()
         }, onSuccess = { onSuccess() }, onError = onError)
     }
