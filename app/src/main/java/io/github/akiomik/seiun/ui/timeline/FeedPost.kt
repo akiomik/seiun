@@ -230,8 +230,10 @@ private fun FeedPostContent(viewPost: FeedViewPost) {
 
     Column {
         NameRow(viewPost = viewPost)
-        SelectionContainer {
-            Text(text = viewPost.post.record.text, modifier = Modifier.padding(top = 8.dp))
+        if (viewPost.post.record.text.isNotEmpty()) {
+            SelectionContainer {
+                Text(text = viewPost.post.record.text, modifier = Modifier.padding(top = 8.dp))
+            }
         }
         ImageTile(viewPost)
         Row(
