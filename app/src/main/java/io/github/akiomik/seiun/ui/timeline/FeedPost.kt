@@ -365,7 +365,7 @@ fun ImageTile(viewPost: FeedViewPost) {
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(minSize = 128.dp),
                 modifier = Modifier
-                    .height(maxHeight)
+                    .height(maxHeight + 16.dp) // NOTE: Avoid inner scroll
                     .padding(top = paddingTop)
             ) {
                 items(images) {
