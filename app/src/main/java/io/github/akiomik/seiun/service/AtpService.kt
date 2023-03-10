@@ -2,7 +2,18 @@ package io.github.akiomik.seiun.service
 
 import com.slack.eithernet.ApiResult
 import com.slack.eithernet.DecodeErrorBody
-import io.github.akiomik.seiun.model.*
+import io.github.akiomik.seiun.model.AtpError
+import io.github.akiomik.seiun.model.app.bsky.actor.Profile
+import io.github.akiomik.seiun.model.app.bsky.blob.UploadBlobOutput
+import io.github.akiomik.seiun.model.app.bsky.feed.*
+import io.github.akiomik.seiun.model.com.atproto.repo.CreateRecordInput
+import io.github.akiomik.seiun.model.com.atproto.repo.CreateRecordOutput
+import io.github.akiomik.seiun.model.com.atproto.repo.DeleteRecordInput
+import io.github.akiomik.seiun.model.com.atproto.session.SessionRefreshOutput
+import io.github.akiomik.seiun.model.com.atproto.account.AccountCreateInput
+import io.github.akiomik.seiun.model.com.atproto.account.AccountCreateOutput
+import io.github.akiomik.seiun.model.com.atproto.session.SessionCreateInput
+import io.github.akiomik.seiun.model.com.atproto.session.SessionCreateOutput
 import okhttp3.*
 import retrofit2.http.*
 
@@ -10,20 +21,20 @@ interface AtpService {
     @DecodeErrorBody
     @POST("com.atproto.account.create")
     suspend fun createAccount(
-        @Body body: AccountCreateParam,
-    ): ApiResult<Session, AtpError>
+        @Body body: AccountCreateInput,
+    ): ApiResult<AccountCreateOutput, AtpError>
 
     @DecodeErrorBody
     @POST("com.atproto.session.create")
-    suspend fun login(
-        @Body body: LoginParam,
-    ): ApiResult<Session, AtpError>
+    suspend fun createSession(
+        @Body body: SessionCreateInput,
+    ): ApiResult<SessionCreateOutput, AtpError>
 
     @DecodeErrorBody
     @POST("com.atproto.session.refresh")
     suspend fun refreshSession(
         @Header("Authorization") authorization: String,
-    ): ApiResult<Session, AtpError>
+    ): ApiResult<SessionRefreshOutput, AtpError>
 
     @DecodeErrorBody
     @GET("app.bsky.actor.getProfile")
@@ -31,17 +42,6 @@ interface AtpService {
         @Header("Authorization") authorization: String,
         @Query("actor") actor: String,
     ): ApiResult<Profile, AtpError>
-
-    @DecodeErrorBody
-    @GET("com.atproto.repo.listRecords")
-    suspend fun listRecords(
-        @Query("user") user: String,
-        @Query("collection") collection: String,
-        @Query("limit") limit: Int? = null,
-        @Query("before") before: String? = null,
-        @Query("after") after: String? = null,
-        @Query("reverse") reverse: Boolean? = null
-    ): ApiResult<ListRecords, AtpError>
 
     @DecodeErrorBody
     @GET("app.bsky.feed.getTimeline")
@@ -56,29 +56,29 @@ interface AtpService {
     @POST("com.atproto.repo.createRecord")
     suspend fun createPost(
         @Header("Authorization") authorization: String,
-        @Body body: CreatePostParam
-    ): ApiResult<CreateRecordResponse, AtpError>
+        @Body body: CreateRecordInput<Post>
+    ): ApiResult<CreateRecordOutput, AtpError>
 
     @DecodeErrorBody
     @POST("com.atproto.repo.createRecord")
     suspend fun repost(
         @Header("Authorization") authorization: String,
-        @Body body: RepostParam
-    ): ApiResult<CreateRecordResponse, AtpError>
+        @Body body: CreateRecordInput<Repost>
+    ): ApiResult<CreateRecordOutput, AtpError>
 
     @DecodeErrorBody
     @POST("com.atproto.repo.deleteRecord")
     suspend fun deleteRecord(
         @Header("Authorization") authorization: String,
-        @Body body: DeleteRecordParam
+        @Body body: DeleteRecordInput
     ) // TODO: Handle empty response with EitherNet
 
     @DecodeErrorBody
     @POST("app.bsky.feed.setVote")
-    suspend fun upvote(
+    suspend fun setVote(
         @Header("Authorization") authorization: String,
-        @Body body: SetVoteParam
-    ): ApiResult<SetVoteResponse, AtpError>
+        @Body body: SetVoteInput
+    ): ApiResult<SetVoteOutput, AtpError>
 
     @DecodeErrorBody
     @GET("app.bsky.notification.list")
@@ -86,7 +86,7 @@ interface AtpService {
         @Header("Authorization") authorization: String,
         @Query("limit") limit: Int? = null,
         @Query("before") before: String? = null,
-    ): ApiResult<NotificationList, AtpError>
+    ): ApiResult<io.github.akiomik.seiun.model.app.bsky.notification.NotificationList, AtpError>
 
     @DecodeErrorBody
     @POST("com.atproto.blob.upload")

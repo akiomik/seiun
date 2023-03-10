@@ -1,7 +1,7 @@
 package io.github.akiomik.seiun.viewmodel
 
 import io.github.akiomik.seiun.SeiunApplication
-import io.github.akiomik.seiun.model.Session
+import io.github.akiomik.seiun.model.ISession
 
 class RegistrationViewModel : ApplicationViewModel() {
     private val userRepository = SeiunApplication.instance!!.userRepository
@@ -11,7 +11,7 @@ class RegistrationViewModel : ApplicationViewModel() {
         handle: String,
         password: String,
         inviteCode: String,
-        onSuccess: (Session) -> Unit,
+        onSuccess: (ISession) -> Unit,
         onError: (Throwable) -> Unit
     ) {
         wrapError(run = {

@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.github.akiomik.seiun.SeiunApplication
-import io.github.akiomik.seiun.model.Notification
+import io.github.akiomik.seiun.model.app.bsky.notification.Notification
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

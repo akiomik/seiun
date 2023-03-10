@@ -27,7 +27,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
-import io.github.akiomik.seiun.model.Profile
+import io.github.akiomik.seiun.model.app.bsky.actor.Profile
 import io.github.akiomik.seiun.ui.login.LoginScreen
 import io.github.akiomik.seiun.ui.notification.NotificationScreen
 import io.github.akiomik.seiun.ui.registration.RegistrationScreen

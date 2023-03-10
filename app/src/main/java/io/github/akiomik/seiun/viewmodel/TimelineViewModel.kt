@@ -7,7 +7,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.github.akiomik.seiun.SeiunApplication
-import io.github.akiomik.seiun.model.*
+import io.github.akiomik.seiun.model.ISession
+import io.github.akiomik.seiun.model.app.bsky.actor.Profile
+import io.github.akiomik.seiun.model.app.bsky.feed.FeedViewPost
+import io.github.akiomik.seiun.model.app.bsky.feed.PostReplyRef
+import io.github.akiomik.seiun.model.app.bsky.feed.PostView
+import io.github.akiomik.seiun.model.com.atproto.repo.StrongRef
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -111,48 +116,48 @@ class TimelineViewModel : ApplicationViewModel() {
         }, onError = onError)
     }
 
-    fun upvote(feedPost: FeedPost, onSuccess: () -> Unit = {}, onError: (Throwable) -> Unit = {}) {
-        val ref = StrongRef(cid = feedPost.cid, uri = feedPost.uri)
+    fun upvote(post: PostView, onSuccess: () -> Unit = {}, onError: (Throwable) -> Unit = {}) {
+        val ref = StrongRef(cid = post.cid, uri = post.uri)
         wrapError(run = {
             val result = withRetry(userRepository) { timelineRepository.upvote(it, ref) }
-            updateFeedPost(feedPost.cid) { it.upvoted(result.upvote ?: "") }
+            updateFeedPost(post.cid) { it.upvoted(result.upvote ?: "") }
         }, onSuccess = { onSuccess() }, onError = onError)
     }
 
     fun cancelVote(
-        feedPost: FeedPost,
+        post: PostView,
         onSuccess: () -> Unit = {},
         onError: (Throwable) -> Unit = {}
     ) {
-        val ref = StrongRef(cid = feedPost.cid, uri = feedPost.uri)
+        val ref = StrongRef(cid = post.cid, uri = post.uri)
         wrapError(run = {
             withRetry(userRepository) { timelineRepository.cancelVote(it, ref) }
-            updateFeedPost(feedPost.cid) { it.upvoteCanceled() }
+            updateFeedPost(post.cid) { it.upvoteCanceled() }
         }, onSuccess = { onSuccess() }, onError = onError)
     }
 
-    fun repost(feedPost: FeedPost, onSuccess: () -> Unit = {}, onError: (Throwable) -> Unit = {}) {
-        val ref = StrongRef(cid = feedPost.cid, uri = feedPost.uri)
+    fun repost(post: PostView, onSuccess: () -> Unit = {}, onError: (Throwable) -> Unit = {}) {
+        val ref = StrongRef(cid = post.cid, uri = post.uri)
         wrapError(run = {
             val response = withRetry(userRepository) { timelineRepository.repost(it, ref) }
-            updateFeedPost(feedPost.cid) { it.reposted(response.uri) }
+            updateFeedPost(post.cid) { it.reposted(response.uri) }
         }, onSuccess = { onSuccess() }, onError = onError)
     }
 
     fun cancelRepost(
-        feedPost: FeedPost,
+        post: PostView,
         onSuccess: () -> Unit = {},
         onError: (Throwable) -> Unit = {}
     ) {
-        if (feedPost.viewer.repost == null) {
+        if (post.viewer.repost == null) {
             return
         }
 
         wrapError(run = {
             withRetry(userRepository) {
-                timelineRepository.cancelRepost(it, feedPost.viewer.repost)
+                timelineRepository.cancelRepost(it, post.viewer.repost)
             }
-            updateFeedPost(feedPost.cid) { it.repostCanceled() }
+            updateFeedPost(post.cid) { it.repostCanceled() }
         }, onSuccess = { onSuccess() }, onError = onError)
     }
 
@@ -164,7 +169,7 @@ class TimelineViewModel : ApplicationViewModel() {
         onError: (Throwable) -> Unit = {}
     ) {
         wrapError(run = {
-            withRetry(userRepository) { session: Session ->
+            withRetry(userRepository) { session: ISession ->
                 val output = if (image != null && mimeType != null) {
                     timelineRepository.uploadImage(session, image, mimeType)
                 } else {
@@ -187,14 +192,14 @@ class TimelineViewModel : ApplicationViewModel() {
         wrapError(run = {
             val to = if (feedViewPost.reply == null) {
                 val ref = feedViewPost.post.toStrongRef()
-                CreateReplyRef(root = ref, parent = ref)
+                PostReplyRef(root = ref, parent = ref)
             } else {
                 val root = feedViewPost.reply.root.toStrongRef()
                 val parent = feedViewPost.post.toStrongRef()
-                CreateReplyRef(root = root, parent = parent)
+                PostReplyRef(root = root, parent = parent)
             }
 
-            withRetry(userRepository) { session: Session ->
+            withRetry(userRepository) { session: ISession ->
                 val output = if (image != null && mimeType != null) {
                     timelineRepository.uploadImage(session, image, mimeType)
                 } else {
@@ -208,7 +213,7 @@ class TimelineViewModel : ApplicationViewModel() {
 
     fun deletePost(viewPost: FeedViewPost, onSuccess: () -> Unit, onError: (Throwable) -> Unit) {
         wrapError(run = {
-            withRetry(userRepository) { session: Session ->
+            withRetry(userRepository) { session: ISession ->
                 timelineRepository.deletePost(session, viewPost)
                 deleteFeedPost(viewPost.post.cid)
             }
@@ -259,7 +264,7 @@ class TimelineViewModel : ApplicationViewModel() {
     }
 
     // To avoid race conditions, we must use current feedPost instead of arguments (#7)
-    private fun updateFeedPost(cid: String, run: (FeedPost) -> FeedPost) {
+    private fun updateFeedPost(cid: String, run: (PostView) -> PostView) {
         val index = feedViewPosts.value?.indexOfFirst { it.post.cid == cid } ?: -1
         val target = feedViewPosts.value?.get(index)?.post
         if (index >= 0 && target != null) {
@@ -269,11 +274,11 @@ class TimelineViewModel : ApplicationViewModel() {
 
     private fun updateFeedPostOf(
         feedViewPosts: List<FeedViewPost>,
-        feedPost: FeedPost
+        post: PostView
     ): List<FeedViewPost> {
         return feedViewPosts.map {
-            if (it.post.uri === feedPost.uri) {
-                it.copy(post = feedPost)
+            if (it.post.uri === post.uri) {
+                it.copy(post = post)
             } else {
                 it
             }
@@ -283,11 +288,11 @@ class TimelineViewModel : ApplicationViewModel() {
     private fun updateFeedPostAt(
         feedViewPosts: List<FeedViewPost>,
         index: Int,
-        feedPost: FeedPost
+        post: PostView
     ): List<FeedViewPost> {
         val posts = feedViewPosts.toMutableList()
         val feedViewPost = feedViewPosts[index]
-        posts[index] = feedViewPost.copy(post = feedPost)
+        posts[index] = feedViewPost.copy(post = post)
         return posts
     }
 

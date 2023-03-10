@@ -6,10 +6,13 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.slack.eithernet.ApiResult
 import io.github.akiomik.seiun.SeiunApplication
-import io.github.akiomik.seiun.model.AccountCreateParam
-import io.github.akiomik.seiun.model.LoginParam
-import io.github.akiomik.seiun.model.Profile
-import io.github.akiomik.seiun.model.Session
+import io.github.akiomik.seiun.model.ISession
+import io.github.akiomik.seiun.model.app.bsky.actor.Profile
+import io.github.akiomik.seiun.model.com.atproto.account.AccountCreateInput
+import io.github.akiomik.seiun.model.com.atproto.account.AccountCreateOutput
+import io.github.akiomik.seiun.model.com.atproto.session.SessionCreateInput
+import io.github.akiomik.seiun.model.com.atproto.session.SessionCreateOutput
+import io.github.akiomik.seiun.model.com.atproto.session.SessionRefreshOutput
 import io.github.akiomik.seiun.service.AtpService
 
 class UserRepository(context: Context, private val atpService: AtpService) {
@@ -25,16 +28,21 @@ class UserRepository(context: Context, private val atpService: AtpService) {
         EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
     )
 
-    fun getSession(): Session {
+    fun getSession(): ISession {
         val accessJwt = sharedPreferences.getString("accessJwt", "") ?: ""
         val refreshJwt = sharedPreferences.getString("refreshJwt", "") ?: ""
         val handle = sharedPreferences.getString("handle", "") ?: ""
         val did = sharedPreferences.getString("did", "") ?: ""
 
-        return Session(accessJwt = accessJwt, refreshJwt = refreshJwt, handle = handle, did = did)
+        return SessionCreateOutput(
+            accessJwt = accessJwt,
+            refreshJwt = refreshJwt,
+            handle = handle,
+            did = did
+        )
     }
 
-    fun saveSession(session: Session) {
+    fun saveSession(session: ISession) {
         with(sharedPreferences.edit()) {
             putString("handle", session.handle)
             putString("did", session.did)
@@ -66,14 +74,14 @@ class UserRepository(context: Context, private val atpService: AtpService) {
         handle: String,
         password: String,
         inviteCode: String
-    ): Session {
+    ): AccountCreateOutput {
         Log.d(SeiunApplication.TAG, "Create account: $handle")
-        val param = AccountCreateParam(
+        val param = AccountCreateInput(
             email = email,
             handle = handle,
             password = password,
             inviteCode = inviteCode
-        );
+        )
         return when (val result = atpService.createAccount(param)) {
             is ApiResult.Success -> result.value
             is ApiResult.Failure -> when (result) {
@@ -85,9 +93,10 @@ class UserRepository(context: Context, private val atpService: AtpService) {
         }
     }
 
-    suspend fun login(handleOrEmail: String, password: String): Session {
+    suspend fun login(handleOrEmail: String, password: String): SessionCreateOutput {
         Log.d(SeiunApplication.TAG, "Create session")
-        return when (val result = atpService.login(LoginParam(handleOrEmail, password))) {
+        return when (val result =
+            atpService.createSession(SessionCreateInput(handleOrEmail, password))) {
             is ApiResult.Success -> result.value
             is ApiResult.Failure -> when (result) {
                 is ApiResult.Failure.HttpFailure -> throw IllegalStateException(
@@ -98,7 +107,7 @@ class UserRepository(context: Context, private val atpService: AtpService) {
         }
     }
 
-    suspend fun refresh(): Session {
+    suspend fun refresh(): SessionRefreshOutput {
         Log.d(SeiunApplication.TAG, "Refresh session")
         val oldSession = getSession()
         return when (val result = atpService.refreshSession("Bearer ${oldSession.refreshJwt}")) {
@@ -107,9 +116,10 @@ class UserRepository(context: Context, private val atpService: AtpService) {
         }
     }
 
-    suspend fun getProfile(session: Session): Profile {
+    suspend fun getProfile(session: ISession): Profile {
         Log.d(SeiunApplication.TAG, "Get profile")
-        return when (val result = atpService.getProfile("Bearer ${session.accessJwt}", session.did)) {
+        return when (val result =
+            atpService.getProfile("Bearer ${session.accessJwt}", session.did)) {
             is ApiResult.Success -> result.value
             is ApiResult.Failure -> throw IllegalStateException("ApiResult.Failure: $result")
         }

@@ -14,8 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.R
-import io.github.akiomik.seiun.model.Notification
-import io.github.akiomik.seiun.model.NotificationReason
+import io.github.akiomik.seiun.model.app.bsky.notification.Notification
 
 const val DATETIME_FORMAT = "yyyy/MM/dd HH:mm"
 
@@ -184,11 +183,12 @@ private fun ReplyItem(notification: Notification) {
 @Composable
 fun NotificationListItem(notification: Notification) {
     when (notification.reason) {
-        NotificationReason.vote -> VoteItem(notification = notification)
-        NotificationReason.repost -> RepostItem(notification = notification)
-        NotificationReason.follow -> FollowItem(notification = notification)
-        NotificationReason.invite -> InviteItem(notification = notification)
-        NotificationReason.mention -> MentionItem(notification = notification)
-        NotificationReason.reply -> ReplyItem(notification = notification)
+        "vote" -> VoteItem(notification = notification)
+        "repost" -> RepostItem(notification = notification)
+        "follow" -> FollowItem(notification = notification)
+        "invite" -> InviteItem(notification = notification)
+        "mention" -> MentionItem(notification = notification)
+        "reply" -> ReplyItem(notification = notification)
+        else -> {}
     }
 }

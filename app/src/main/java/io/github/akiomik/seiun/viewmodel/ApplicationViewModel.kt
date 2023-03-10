@@ -4,16 +4,16 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.akiomik.seiun.SeiunApplication
-import io.github.akiomik.seiun.model.Session
+import io.github.akiomik.seiun.model.ISession
 import io.github.akiomik.seiun.repository.UserRepository
 import io.github.akiomik.seiun.service.UnauthorizedException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 abstract class ApplicationViewModel : ViewModel() {
-    suspend fun <T> withRetry(userRepository: UserRepository, run: suspend (Session) -> T): T {
+    suspend fun <T> withRetry(userRepository: UserRepository, run: suspend (ISession) -> T): T {
         return try {
-            val session = userRepository.getSession();
+            val session = userRepository.getSession()
             run(session)
         } catch (e: UnauthorizedException) {
             Log.d(SeiunApplication.TAG, "Retrying request")

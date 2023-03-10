@@ -2,8 +2,6 @@ package io.github.akiomik.seiun.ui.timeline
 
 import android.text.format.DateFormat
 import android.util.Log
-import android.view.Menu
-import android.widget.AutoCompleteTextView.OnDismissListener
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -30,7 +28,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.SeiunApplication
-import io.github.akiomik.seiun.model.FeedViewPost
+import io.github.akiomik.seiun.model.app.bsky.feed.FeedViewPost
 import io.github.akiomik.seiun.ui.theme.Green700
 import io.github.akiomik.seiun.ui.theme.Red700
 import io.github.akiomik.seiun.viewmodel.TimelineViewModel
@@ -195,11 +193,11 @@ private fun UpvoteIndicator(viewPost: FeedViewPost) {
         modifier = Modifier.width(64.dp),
         onClick = {
             if (upvoted) {
-                viewModel.cancelVote(feedPost = viewPost.post, onError = {
+                viewModel.cancelVote(post = viewPost.post, onError = {
                     Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
                 })
             } else {
-                viewModel.upvote(feedPost = viewPost.post, onError = {
+                viewModel.upvote(post = viewPost.post, onError = {
                     Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
                 })
             }

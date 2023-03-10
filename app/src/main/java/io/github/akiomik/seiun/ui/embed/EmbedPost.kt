@@ -15,7 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import io.github.akiomik.seiun.model.FeedViewPost
+import io.github.akiomik.seiun.model.app.bsky.feed.FeedViewPost
 
 @Composable
 private fun Avatar(viewPost: FeedViewPost) {
