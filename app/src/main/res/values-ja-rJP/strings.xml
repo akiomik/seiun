@@ -7,6 +7,10 @@
     <string name="loading">読み込み中…</string>
     <string name="delete">削除</string>
     <string name="cancel">キャンセル</string>
+    <string name="report">通報</string>
+    <string name="optional">任意</string>
+    <string name="spam">スパム</string>
+    <string name="others">その他</string>
     <string name="login_title">ログイン</string>
     <string name="login_app_description">for ATP/Bluesky</string>
     <string name="login_handle_or_email">ハンドルネーム または メールアドレス</string>
@@ -42,6 +46,10 @@
     <string name="timeline_new_post_content">内容</string>
     <string name="timeline_new_post_content_placeholder">今なにしてる？</string>
     <string name="timeline_new_post_delete_image">画像を削除</string>
+    <string name="timeline_report_message">以下の投稿を通報します</string>
+    <string name="timeline_report_type">種類</string>
+    <string name="timeline_report_reason">通報理由</string>
+    <string name="timeline_reported">通報しました</string>
     <string name="timeline_no_posts_yet">まだ投稿がありません</string>
     <string name="timeline_no_more_posts">これ以上投稿はありません</string>
     <string name="timeline_error">タイムラインの取得に失敗しました。後ほどお試しください</string>

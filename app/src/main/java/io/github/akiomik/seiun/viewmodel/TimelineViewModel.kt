@@ -217,7 +217,14 @@ class TimelineViewModel : ApplicationViewModel() {
                 timelineRepository.deletePost(session, viewPost)
                 deleteFeedPost(viewPost.post.cid)
             }
-            refreshPosts()
+        }, onSuccess = { onSuccess() }, onError = onError)
+    }
+
+    fun reportPost(viewPost: FeedViewPost, reasonType: String, reason: String, onSuccess: () -> kotlin.Unit, onError: (Throwable) -> Unit) {
+        wrapError(run = {
+            withRetry(userRepository) { session: ISession ->
+                timelineRepository.reportPost(session, viewPost, reasonType, reason)
+            }
         }, onSuccess = { onSuccess() }, onError = onError)
     }
 

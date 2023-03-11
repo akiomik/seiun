@@ -16,6 +16,9 @@ import io.github.akiomik.seiun.model.app.bsky.feed.SetVoteInput
 import io.github.akiomik.seiun.model.app.bsky.feed.SetVoteOutput
 import io.github.akiomik.seiun.model.app.bsky.feed.Timeline
 import io.github.akiomik.seiun.model.app.bsky.feed.VoteDirection
+import io.github.akiomik.seiun.model.app.bsky.report.RepoRefOrRecordRef
+import io.github.akiomik.seiun.model.app.bsky.report.ReportCreateInput
+import io.github.akiomik.seiun.model.app.bsky.report.ReportCreateOutput
 import io.github.akiomik.seiun.model.com.atproto.repo.CreateRecordInput
 import io.github.akiomik.seiun.model.com.atproto.repo.CreateRecordOutput
 import io.github.akiomik.seiun.model.com.atproto.repo.DeleteRecordInput
@@ -188,7 +191,8 @@ class TimelineRepository(private val atpService: AtpService) {
 
         val createdAt = Instant.now().toString()
         val embed = if (imageCid != null && imageMimeType != null) {
-            val image = Image(image = ImageType(imageCid, imageMimeType), alt = "app.bsky.feed.post")
+            val image =
+                Image(image = ImageType(imageCid, imageMimeType), alt = "app.bsky.feed.post")
             ImagesOrExternal(images = listOf(image), type = "app.bsky.embed.images")
         } else {
             null
@@ -243,6 +247,39 @@ class TimelineRepository(private val atpService: AtpService) {
                     contentType = mimeType,
                     body = image.toRequestBody()
                 )
+        ) {
+            is ApiResult.Success -> return result.value
+            is ApiResult.Failure -> when (result) {
+                is ApiResult.Failure.HttpFailure -> {
+                    if (result.code == 401) {
+                        throw UnauthorizedException("Unauthorized: ${result.code} (${result.error})")
+                    } else {
+                        throw IllegalStateException("HttpError: ${result.code} (${result.error})")
+                    }
+                }
+                else -> throw IllegalStateException("ApiResult.Failure: ${result.response()}")
+            }
+        }
+    }
+
+    suspend fun reportPost(
+        session: ISession,
+        feedViewPost: FeedViewPost,
+        reasonType: String,
+        reason: String? = null
+    ): ReportCreateOutput {
+        val body = ReportCreateInput(
+            subject = RepoRefOrRecordRef(
+                type = "com.atproto.repo.recordRef",
+                uri = feedViewPost.post.uri,
+                cid = feedViewPost.post.cid
+            ),
+            reasonType = reasonType,
+            reason = reason
+        )
+        when (
+            val result =
+                atpService.createReport(authorization = "Bearer ${session.accessJwt}", body = body)
         ) {
             is ApiResult.Success -> return result.value
             is ApiResult.Failure -> when (result) {
