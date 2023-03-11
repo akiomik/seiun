@@ -8,5 +8,5 @@ data class Notification(
     val author: RefWithInfo,
     val reason: String,
     val record: NotificationRecord, // TODO unknown
-    val reasonSubject: String? = null,
+    val reasonSubject: String? = null
 )

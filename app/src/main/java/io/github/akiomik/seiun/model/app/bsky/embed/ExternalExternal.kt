@@ -6,5 +6,5 @@ data class ExternalExternal(
     val uri: String,
     val title: String,
     val description: String,
-    val thumb: ImageType,
+    val thumb: ImageType
 )

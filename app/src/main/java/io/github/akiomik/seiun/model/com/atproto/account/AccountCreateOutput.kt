@@ -7,4 +7,4 @@ data class AccountCreateOutput(
     override val refreshJwt: String,
     override val handle: String,
     override val did: String
-): ISession
+) : ISession

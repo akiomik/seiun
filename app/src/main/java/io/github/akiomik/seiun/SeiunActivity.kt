@@ -4,12 +4,27 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -94,7 +109,6 @@ fun BottomBar(
                     selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                     onClick = {
                         navController.navigate(screen.route) {
-
                             if (screen.route == "timeline" && screen.route == currentDestination?.route) {
                                 coroutineScope.launch {
                                     timelineListState.animateScrollToItem(0)
@@ -140,8 +154,8 @@ fun Navigation(
             LoginScreen(onLoginSuccess = {
                 navController.navigate("timeline")
             }, onCreateAccountClick = {
-                navController.navigate("registration")
-            })
+                    navController.navigate("registration")
+                })
         }
         composable("registration") {
             RegistrationScreen(onRegistrationSuccess = {
@@ -181,7 +195,6 @@ fun App() {
             fabState.value = {}
         }
     }
-
 
     SeiunTheme {
         Scaffold(

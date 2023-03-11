@@ -7,5 +7,5 @@ data class ReasonTrendOrReasonRepost(
     @Json(name = "\$type")
     val type: String,
     val by: RefWithInfo,
-    val indexedAt: String, // TODO: datetime
+    val indexedAt: String // TODO: datetime
 )

@@ -4,5 +4,5 @@ import io.github.akiomik.seiun.model.type.Image as ImageType
 
 data class Image(
     val image: ImageType,
-    val alt: String,
+    val alt: String
 )

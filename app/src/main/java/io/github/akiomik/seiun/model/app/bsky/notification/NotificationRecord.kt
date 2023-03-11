@@ -3,7 +3,6 @@ package io.github.akiomik.seiun.model.app.bsky.notification
 import com.squareup.moshi.Json
 import io.github.akiomik.seiun.model.app.bsky.feed.PostReplyRef
 import io.github.akiomik.seiun.model.app.bsky.feed.VoteDirection
-import io.github.akiomik.seiun.model.com.atproto.repo.StrongRef
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 

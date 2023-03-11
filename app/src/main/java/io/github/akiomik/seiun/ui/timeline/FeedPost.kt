@@ -3,17 +3,45 @@ package io.github.akiomik.seiun.ui.timeline
 import android.text.format.DateFormat
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.sharp.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.sharp.ChatBubbleOutline
+import androidx.compose.material.icons.sharp.Delete
+import androidx.compose.material.icons.sharp.Favorite
+import androidx.compose.material.icons.sharp.FavoriteBorder
+import androidx.compose.material.icons.sharp.MoreVert
+import androidx.compose.material.icons.sharp.SyncAlt
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -160,7 +188,7 @@ private fun RepostIndicator(viewPost: FeedViewPost) {
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Icon(
                 painter = rememberVectorPainter(Icons.Sharp.SyncAlt),
@@ -243,10 +271,10 @@ fun DeleteConfirmDialog(feedViewPost: FeedViewPost, onDismissRequest: () -> Unit
                         viewModel.deletePost(feedViewPost, onSuccess = {
                             onDismissRequest()
                         }, onError = {
-                            Log.d(SeiunApplication.TAG, it.toString())
-                            onDismissRequest()
-                            Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
-                        })
+                                Log.d(SeiunApplication.TAG, it.toString())
+                                onDismissRequest()
+                                Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
+                            })
                     }) {
                         Text(stringResource(id = R.string.delete))
                     }
@@ -285,16 +313,18 @@ fun MenuButton(viewPost: FeedViewPost) {
             },
             leadingIcon = {
                 Icon(
-                    Icons.Outlined.Delete,
+                    Icons.Sharp.Delete,
                     contentDescription = null
                 )
-            })
+            }
+        )
     }
 
     if (showDeleteDialog) {
         DeleteConfirmDialog(
             feedViewPost = viewPost,
-            onDismissRequest = { showDeleteDialog = false })
+            onDismissRequest = { showDeleteDialog = false }
+        )
     }
 }
 

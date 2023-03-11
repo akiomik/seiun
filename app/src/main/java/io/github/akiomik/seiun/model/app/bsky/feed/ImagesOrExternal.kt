@@ -8,5 +8,5 @@ data class ImagesOrExternal(
     @Json(name = "\$type")
     val type: String,
     val images: List<Image>? = null, // from app.bsky.embed.images
-    val external: External? = null, // from app.bsky.embed.external
+    val external: External? = null // from app.bsky.embed.external
 )

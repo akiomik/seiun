@@ -5,5 +5,5 @@ data class NotificationSubject(
     val uri: String? = null,
     val cid: String? = null,
     val did: String? = null,
-    val declarationCid: String? = null,
+    val declarationCid: String? = null
 )

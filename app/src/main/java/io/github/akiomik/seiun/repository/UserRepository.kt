@@ -95,8 +95,10 @@ class UserRepository(context: Context, private val atpService: AtpService) {
 
     suspend fun login(handleOrEmail: String, password: String): SessionCreateOutput {
         Log.d(SeiunApplication.TAG, "Create session")
-        return when (val result =
-            atpService.createSession(SessionCreateInput(handleOrEmail, password))) {
+        return when (
+            val result =
+                atpService.createSession(SessionCreateInput(handleOrEmail, password))
+        ) {
             is ApiResult.Success -> result.value
             is ApiResult.Failure -> when (result) {
                 is ApiResult.Failure.HttpFailure -> throw IllegalStateException(
@@ -118,8 +120,10 @@ class UserRepository(context: Context, private val atpService: AtpService) {
 
     suspend fun getProfile(session: ISession): Profile {
         Log.d(SeiunApplication.TAG, "Get profile")
-        return when (val result =
-            atpService.getProfile("Bearer ${session.accessJwt}", session.did)) {
+        return when (
+            val result =
+                atpService.getProfile("Bearer ${session.accessJwt}", session.did)
+        ) {
             is ApiResult.Success -> result.value
             is ApiResult.Failure -> throw IllegalStateException("ApiResult.Failure: $result")
         }

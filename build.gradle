@@ -9,3 +9,12 @@ plugins {
     id 'com.android.library' version '7.4.2' apply false
     id 'org.jetbrains.kotlin.android' version '1.7.0' apply false
 }
+
+task installGitHook(type: Copy) {
+    from new File(rootProject.rootDir, 'git-hooks/pre-commit')
+    from new File(rootProject.rootDir, 'git-hooks/pre-push')
+    into { new File(rootProject.rootDir, '.git/hooks') }
+    fileMode 0777
+}
+
+tasks.getByPath(':app:preBuild').dependsOn installGitHook

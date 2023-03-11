@@ -19,28 +19,28 @@ data class PostView(
     fun reposted(uri: String): PostView {
         return copy(
             repostCount = repostCount + 1,
-            viewer = viewer.copy(repost = uri),
+            viewer = viewer.copy(repost = uri)
         )
     }
 
     fun repostCanceled(): PostView {
         return copy(
             repostCount = repostCount - 1,
-            viewer = viewer.copy(repost = null),
+            viewer = viewer.copy(repost = null)
         )
     }
 
     fun upvoted(uri: String): PostView {
         return copy(
             upvoteCount = upvoteCount + 1,
-            viewer = viewer.copy(upvote = uri),
+            viewer = viewer.copy(upvote = uri)
         )
     }
 
     fun upvoteCanceled(): PostView {
         return copy(
             upvoteCount = upvoteCount - 1,
-            viewer = viewer.copy(upvote = null),
+            viewer = viewer.copy(upvote = null)
         )
     }
 

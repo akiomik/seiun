@@ -49,20 +49,20 @@ class TimelineViewModel : ApplicationViewModel() {
                 val profile = withRetry(userRepository) { userRepository.getProfile(it) }
                 Pair(timeline, profile)
             }, onSuccess = { (timeline, profile) ->
-                // NOTE: 50 is default limit of getTimeline
-                if (timeline.feed.size < 50) {
-                    _seenAllFeed.postValue(true)
-                }
+                    // NOTE: 50 is default limit of getTimeline
+                    if (timeline.feed.size < 50) {
+                        _seenAllFeed.postValue(true)
+                    }
 
-                _profile.postValue(profile)
-                _feedViewPosts.postValue(timeline.feed)
-                _cursor.postValue(timeline.cursor)
-                _state.value = State.Loaded
-            }, onError = {
-                Log.d(SeiunApplication.TAG, "Error occurred: $it")
-                _feedViewPosts.postValue(emptyList())
-                _state.value = State.Error
-            })
+                    _profile.postValue(profile)
+                    _feedViewPosts.postValue(timeline.feed)
+                    _cursor.postValue(timeline.cursor)
+                    _state.value = State.Loaded
+                }, onError = {
+                    Log.d(SeiunApplication.TAG, "Error occurred: $it")
+                    _feedViewPosts.postValue(emptyList())
+                    _state.value = State.Error
+                })
         }
     }
 
@@ -89,8 +89,8 @@ class TimelineViewModel : ApplicationViewModel() {
                 Log.d(SeiunApplication.TAG, "Skip merge because cursor is unchanged")
             }
         }, onComplete = {
-            _isRefreshing.postValue(false)
-        }, onError = onError)
+                _isRefreshing.postValue(false)
+            }, onError = onError)
     }
 
     fun loadMorePosts(onError: (Throwable) -> Unit = {}) {

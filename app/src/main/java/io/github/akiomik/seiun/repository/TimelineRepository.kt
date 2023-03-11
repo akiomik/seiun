@@ -7,8 +7,15 @@ import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.model.ISession
 import io.github.akiomik.seiun.model.app.bsky.blob.UploadBlobOutput
 import io.github.akiomik.seiun.model.app.bsky.embed.Image
-import io.github.akiomik.seiun.model.type.Image as ImageType
-import io.github.akiomik.seiun.model.app.bsky.feed.*
+import io.github.akiomik.seiun.model.app.bsky.feed.FeedViewPost
+import io.github.akiomik.seiun.model.app.bsky.feed.ImagesOrExternal
+import io.github.akiomik.seiun.model.app.bsky.feed.Post
+import io.github.akiomik.seiun.model.app.bsky.feed.PostReplyRef
+import io.github.akiomik.seiun.model.app.bsky.feed.Repost
+import io.github.akiomik.seiun.model.app.bsky.feed.SetVoteInput
+import io.github.akiomik.seiun.model.app.bsky.feed.SetVoteOutput
+import io.github.akiomik.seiun.model.app.bsky.feed.Timeline
+import io.github.akiomik.seiun.model.app.bsky.feed.VoteDirection
 import io.github.akiomik.seiun.model.com.atproto.repo.CreateRecordInput
 import io.github.akiomik.seiun.model.com.atproto.repo.CreateRecordOutput
 import io.github.akiomik.seiun.model.com.atproto.repo.DeleteRecordInput
@@ -18,13 +25,16 @@ import io.github.akiomik.seiun.service.UnauthorizedException
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.HttpException
 import java.time.Instant
+import io.github.akiomik.seiun.model.type.Image as ImageType
 
 class TimelineRepository(private val atpService: AtpService) {
     suspend fun getTimeline(session: ISession, before: String? = null): Timeline {
         Log.d(SeiunApplication.TAG, "Get timeline: before = $before")
 
-        return when (val result =
-            atpService.getTimeline("Bearer ${session.accessJwt}", before = before)) {
+        return when (
+            val result =
+                atpService.getTimeline("Bearer ${session.accessJwt}", before = before)
+        ) {
             is ApiResult.Success -> result.value
             is ApiResult.Failure -> when (result) {
                 is ApiResult.Failure.HttpFailure -> {
@@ -43,8 +53,10 @@ class TimelineRepository(private val atpService: AtpService) {
         Log.d(SeiunApplication.TAG, "Upvote post: uri = ${subject.uri}, cid = ${subject.cid}")
 
         val body = SetVoteInput(subject = subject, direction = VoteDirection.up)
-        when (val result =
-            atpService.setVote(authorization = "Bearer ${session.accessJwt}", body = body)) {
+        when (
+            val result =
+                atpService.setVote(authorization = "Bearer ${session.accessJwt}", body = body)
+        ) {
             is ApiResult.Success -> return result.value
             is ApiResult.Failure -> when (result) {
                 is ApiResult.Failure.HttpFailure -> {
@@ -63,8 +75,10 @@ class TimelineRepository(private val atpService: AtpService) {
         Log.d(SeiunApplication.TAG, "Cancel vote post: uri = ${subject.uri}, cid = ${subject.cid}")
 
         val body = SetVoteInput(subject = subject, direction = VoteDirection.none)
-        when (val result =
-            atpService.setVote(authorization = "Bearer ${session.accessJwt}", body = body)) {
+        when (
+            val result =
+                atpService.setVote(authorization = "Bearer ${session.accessJwt}", body = body)
+        ) {
             is ApiResult.Success -> {}
             is ApiResult.Failure -> when (result) {
                 is ApiResult.Failure.HttpFailure -> {
@@ -90,8 +104,10 @@ class TimelineRepository(private val atpService: AtpService) {
             collection = "app.bsky.feed.repost"
         )
 
-        when (val result =
-            atpService.repost(authorization = "Bearer ${session.accessJwt}", body = body)) {
+        when (
+            val result =
+                atpService.repost(authorization = "Bearer ${session.accessJwt}", body = body)
+        ) {
             is ApiResult.Success -> return result.value
             is ApiResult.Failure -> when (result) {
                 is ApiResult.Failure.HttpFailure -> {
@@ -143,8 +159,10 @@ class TimelineRepository(private val atpService: AtpService) {
         val body =
             CreateRecordInput(did = session.did, record = record, collection = "app.bsky.feed.post")
 
-        when (val result =
-            atpService.createPost(authorization = "Bearer ${session.accessJwt}", body = body)) {
+        when (
+            val result =
+                atpService.createPost(authorization = "Bearer ${session.accessJwt}", body = body)
+        ) {
             is ApiResult.Success -> {}
             is ApiResult.Failure -> when (result) {
                 is ApiResult.Failure.HttpFailure -> {
@@ -178,8 +196,10 @@ class TimelineRepository(private val atpService: AtpService) {
         val record = Post(text = content, createdAt = createdAt, reply = to, embed = embed)
         val body = CreateRecordInput(did = session.did, record = record, collection = "")
 
-        when (val result =
-            atpService.createPost(authorization = "Bearer ${session.accessJwt}", body = body)) {
+        when (
+            val result =
+                atpService.createPost(authorization = "Bearer ${session.accessJwt}", body = body)
+        ) {
             is ApiResult.Success -> {}
             is ApiResult.Failure -> when (result) {
                 is ApiResult.Failure.HttpFailure -> {
@@ -214,14 +234,16 @@ class TimelineRepository(private val atpService: AtpService) {
     suspend fun uploadImage(
         session: ISession,
         image: ByteArray,
-        mimeType: String,
+        mimeType: String
     ): UploadBlobOutput {
-        when (val result =
-            atpService.uploadBlob(
-                authorization = "Bearer ${session.accessJwt}",
-                contentType = mimeType,
-                body = image.toRequestBody(),
-            )) {
+        when (
+            val result =
+                atpService.uploadBlob(
+                    authorization = "Bearer ${session.accessJwt}",
+                    contentType = mimeType,
+                    body = image.toRequestBody()
+                )
+        ) {
             is ApiResult.Success -> return result.value
             is ApiResult.Failure -> when (result) {
                 is ApiResult.Failure.HttpFailure -> {
