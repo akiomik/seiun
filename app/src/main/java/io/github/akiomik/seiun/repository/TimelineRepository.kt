@@ -240,6 +240,8 @@ class TimelineRepository(private val atpService: AtpService) {
         image: ByteArray,
         mimeType: String
     ): UploadBlobOutput {
+        Log.d(SeiunApplication.TAG, "Upload image: mimeType = $mimeType")
+
         when (
             val result =
                 atpService.uploadBlob(
@@ -268,6 +270,11 @@ class TimelineRepository(private val atpService: AtpService) {
         reasonType: String,
         reason: String? = null
     ): ReportCreateOutput {
+        Log.d(
+            SeiunApplication.TAG,
+            "Report post: cid = ${feedViewPost.post.cid}, reasonType = $reasonType"
+        )
+
         val body = ReportCreateInput(
             subject = RepoRefOrRecordRef(
                 type = "com.atproto.repo.recordRef",
