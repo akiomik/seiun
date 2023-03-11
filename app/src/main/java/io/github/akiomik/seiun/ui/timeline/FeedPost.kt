@@ -1,6 +1,5 @@
 package io.github.akiomik.seiun.ui.timeline
 
-import DeleteConfirmDialog
 import android.text.format.DateFormat
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -51,6 +50,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.model.app.bsky.feed.FeedViewPost
+import io.github.akiomik.seiun.ui.dialog.DeleteDialog
 import io.github.akiomik.seiun.ui.dialog.ReportDialog
 import io.github.akiomik.seiun.ui.theme.Green700
 import io.github.akiomik.seiun.ui.theme.Red700
@@ -290,7 +290,7 @@ fun MenuButton(viewPost: FeedViewPost) {
     }
 
     if (showDeleteDialog) {
-        DeleteConfirmDialog(
+        DeleteDialog(
             feedViewPost = viewPost,
             onDismissRequest = { showDeleteDialog = false }
         )
