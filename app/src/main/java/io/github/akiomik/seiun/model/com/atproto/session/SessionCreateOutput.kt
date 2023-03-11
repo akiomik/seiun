@@ -6,5 +6,5 @@ data class SessionCreateOutput(
     override val accessJwt: String,
     override val refreshJwt: String,
     override val handle: String,
-    override val did: String,
-): ISession
+    override val did: String
+) : ISession

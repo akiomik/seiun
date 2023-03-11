@@ -160,7 +160,7 @@ private fun RepostIndicator(viewPost: FeedViewPost) {
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Icon(
                 painter = rememberVectorPainter(Icons.Sharp.SyncAlt),
@@ -243,10 +243,10 @@ fun DeleteConfirmDialog(feedViewPost: FeedViewPost, onDismissRequest: () -> Unit
                         viewModel.deletePost(feedViewPost, onSuccess = {
                             onDismissRequest()
                         }, onError = {
-                            Log.d(SeiunApplication.TAG, it.toString())
-                            onDismissRequest()
-                            Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
-                        })
+                                Log.d(SeiunApplication.TAG, it.toString())
+                                onDismissRequest()
+                                Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
+                            })
                     }) {
                         Text(stringResource(id = R.string.delete))
                     }
@@ -288,13 +288,15 @@ fun MenuButton(viewPost: FeedViewPost) {
                     Icons.Outlined.Delete,
                     contentDescription = null
                 )
-            })
+            }
+        )
     }
 
     if (showDeleteDialog) {
         DeleteConfirmDialog(
             feedViewPost = viewPost,
-            onDismissRequest = { showDeleteDialog = false })
+            onDismissRequest = { showDeleteDialog = false }
+        )
     }
 }
 

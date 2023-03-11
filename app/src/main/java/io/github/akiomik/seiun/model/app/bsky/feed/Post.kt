@@ -8,7 +8,7 @@ data class Post(
     val createdAt: String, // TODO: datetime
     val entities: List<PostEntity>? = null,
     val reply: PostReplyRef? = null,
-    val embed: ImagesOrExternal? = null,
+    val embed: ImagesOrExternal? = null
 ) {
     fun createdAtAsInstant(): Instant {
         return Instant.from(DateTimeFormatter.ISO_DATE_TIME.parse(createdAt))

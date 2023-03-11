@@ -94,7 +94,6 @@ fun BottomBar(
                     selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                     onClick = {
                         navController.navigate(screen.route) {
-
                             if (screen.route == "timeline" && screen.route == currentDestination?.route) {
                                 coroutineScope.launch {
                                     timelineListState.animateScrollToItem(0)
@@ -140,8 +139,8 @@ fun Navigation(
             LoginScreen(onLoginSuccess = {
                 navController.navigate("timeline")
             }, onCreateAccountClick = {
-                navController.navigate("registration")
-            })
+                    navController.navigate("registration")
+                })
         }
         composable("registration") {
             RegistrationScreen(onRegistrationSuccess = {
@@ -181,7 +180,6 @@ fun App() {
             fabState.value = {}
         }
     }
-
 
     SeiunTheme {
         Scaffold(

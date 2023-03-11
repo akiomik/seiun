@@ -4,5 +4,5 @@ import io.github.akiomik.seiun.model.com.atproto.repo.StrongRef
 
 data class Repost(
     val subject: StrongRef,
-    val createdAt: String, // TODO: datetime
+    val createdAt: String // TODO: datetime
 )

@@ -109,7 +109,7 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
 
                 viewModel.register(
                     email = email,
-                    handle = "${handle}.bsky.social",
+                    handle = "$handle.bsky.social",
                     password = password,
                     inviteCode = inviteCode,
                     onSuccess = { session ->
@@ -145,4 +145,3 @@ fun RegistrationScreen(onRegistrationSuccess: () -> Unit) {
         }
     }
 }
-

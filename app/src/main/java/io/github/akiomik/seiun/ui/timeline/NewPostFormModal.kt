@@ -24,10 +24,10 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.akiomik.seiun.R
-import io.github.akiomik.seiun.ui.embed.EmbedPost
-import io.github.akiomik.seiun.viewmodel.TimelineViewModel
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.model.app.bsky.feed.FeedViewPost
+import io.github.akiomik.seiun.ui.embed.EmbedPost
+import io.github.akiomik.seiun.viewmodel.TimelineViewModel
 
 @Composable
 private fun PostButton(
@@ -117,7 +117,7 @@ private fun PostContentField(content: String, onChange: (String) -> Unit) {
             Text(
                 text = "${content.length} / 256",
                 modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.End,
+                textAlign = TextAlign.End
             )
         }
     )

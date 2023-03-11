@@ -34,21 +34,21 @@ class NotificationViewModel : ApplicationViewModel() {
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            wrapError (run = {
+            wrapError(run = {
                 withRetry(userRepository) { notificationRepository.listNotifications(it) }
             }, onSuccess = {
-                _notifications.postValue(it.notifications)
+                    _notifications.postValue(it.notifications)
 
-                // NOTE: 50 is default limit of listNotifications
-                if (it.notifications.size < 50) {
-                    _seenAllNotifications.postValue(true)
-                }
-                _cursor.postValue(it.cursor)
-                _state.value = State.Loaded
-            }, onError = {
-                _notifications.postValue(emptyList())
-                _state.value = State.Error
-            })
+                    // NOTE: 50 is default limit of listNotifications
+                    if (it.notifications.size < 50) {
+                        _seenAllNotifications.postValue(true)
+                    }
+                    _cursor.postValue(it.cursor)
+                    _state.value = State.Loaded
+                }, onError = {
+                    _notifications.postValue(emptyList())
+                    _state.value = State.Error
+                })
         }
     }
 
@@ -76,8 +76,8 @@ class NotificationViewModel : ApplicationViewModel() {
                 Log.d(SeiunApplication.TAG, "Skip merge because cursor is unchanged")
             }
         }, onComplete = {
-            _isRefreshing.postValue(false)
-        }, onError = onError)
+                _isRefreshing.postValue(false)
+            }, onError = onError)
     }
 
     fun loadMoreNotifications(onError: (Throwable) -> Unit = {}) {
@@ -107,7 +107,7 @@ class NotificationViewModel : ApplicationViewModel() {
         currentPosts: List<Notification>,
         newPosts: List<Notification>
     ): List<Notification> {
-        val top50Posts = currentPosts.take(50)// NOTE: 50 is default limit of getTimeline
+        val top50Posts = currentPosts.take(50) // NOTE: 50 is default limit of getTimeline
 
         // TODO: improve merge logic
         return newPosts.reversed().fold(currentPosts) { acc, post ->

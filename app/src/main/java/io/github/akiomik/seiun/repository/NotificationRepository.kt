@@ -13,8 +13,10 @@ class NotificationRepository(private val atpService: AtpService) {
     suspend fun listNotifications(session: ISession, before: String? = null): NotificationList {
         Log.d(SeiunApplication.TAG, "Get notifications: before = $before")
 
-        return when (val result =
-            atpService.listNotifications("Bearer ${session.accessJwt}", before = before)) {
+        return when (
+            val result =
+                atpService.listNotifications("Bearer ${session.accessJwt}", before = before)
+        ) {
             is ApiResult.Success -> result.value
             is ApiResult.Failure -> when (result) {
                 is ApiResult.Failure.HttpFailure -> {
