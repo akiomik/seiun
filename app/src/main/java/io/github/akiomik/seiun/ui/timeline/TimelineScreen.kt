@@ -107,8 +107,10 @@ private fun Timeline(listState: LazyListState) {
     Box(modifier = Modifier.pullRefresh(state = refreshState)) {
         LazyColumn(state = listState) {
             items(feedViewPosts.value.orEmpty()) { feedViewPost ->
-                FeedPost(viewPost = feedViewPost)
-                Divider(color = Color.Gray)
+                if (feedViewPost.post.viewer.muted != true) {
+                    FeedPost(viewPost = feedViewPost)
+                    Divider(color = Color.Gray)
+                }
             }
 
             if (errored == TimelineViewModel.State.Error) {

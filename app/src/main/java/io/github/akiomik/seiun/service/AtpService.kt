@@ -10,6 +10,8 @@ import io.github.akiomik.seiun.model.app.bsky.feed.Repost
 import io.github.akiomik.seiun.model.app.bsky.feed.SetVoteInput
 import io.github.akiomik.seiun.model.app.bsky.feed.SetVoteOutput
 import io.github.akiomik.seiun.model.app.bsky.feed.Timeline
+import io.github.akiomik.seiun.model.app.bsky.graph.MuteInput
+import io.github.akiomik.seiun.model.app.bsky.graph.UnmuteInput
 import io.github.akiomik.seiun.model.app.bsky.report.ReportCreateInput
 import io.github.akiomik.seiun.model.app.bsky.report.ReportCreateOutput
 import io.github.akiomik.seiun.model.com.atproto.account.AccountCreateInput
@@ -112,4 +114,18 @@ interface AtpService {
         @Header("Authorization") authorization: String,
         @Body body: ReportCreateInput
     ): ApiResult<ReportCreateOutput, AtpError>
+
+    @DecodeErrorBody
+    @POST("app.bsky.graph.mute")
+    suspend fun mute(
+        @Header("Authorization") authorization: String,
+        @Body body: MuteInput
+    ) // TODO: Handle empty response with EitherNet
+
+    @DecodeErrorBody
+    @POST("app.bsky.graph.unmute")
+    suspend fun unmute(
+        @Header("Authorization") authorization: String,
+        @Body body: UnmuteInput
+    ) // TODO: Handle empty response with EitherNet
 }

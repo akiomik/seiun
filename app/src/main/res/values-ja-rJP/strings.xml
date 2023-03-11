@@ -11,6 +11,7 @@
     <string name="optional">任意</string>
     <string name="spam">スパム</string>
     <string name="others">その他</string>
+    <string name="mute">ミュート</string>
     <string name="login_title">ログイン</string>
     <string name="login_app_description">for ATP/Bluesky</string>
     <string name="login_handle_or_email">ハンドルネーム または メールアドレス</string>
@@ -40,6 +41,8 @@
     <string name="timeline_reposted">%1$s がリポスト</string>
     <string name="timeline_replying">%1$s への返信</string>
     <string name="timeline_delete_confirmation">投稿を削除してもよろしいですか？</string>
+    <string name="timeline_mute_confirmation">\@%1$s をミュートしますか？</string>
+    <string name="timeline_muted">ミュートしました</string>
     <string name="timeline_new_post_cancel_button">キャンセル</string>
     <string name="timeline_new_post_image_upload_button">画像をアップロード</string>
     <string name="timeline_new_post_post_button">送信</string>

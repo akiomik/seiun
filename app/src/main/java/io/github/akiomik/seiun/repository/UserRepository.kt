@@ -8,12 +8,16 @@ import com.slack.eithernet.ApiResult
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.model.ISession
 import io.github.akiomik.seiun.model.app.bsky.actor.Profile
+import io.github.akiomik.seiun.model.app.bsky.graph.MuteInput
+import io.github.akiomik.seiun.model.app.bsky.graph.UnmuteInput
 import io.github.akiomik.seiun.model.com.atproto.account.AccountCreateInput
 import io.github.akiomik.seiun.model.com.atproto.account.AccountCreateOutput
 import io.github.akiomik.seiun.model.com.atproto.session.SessionCreateInput
 import io.github.akiomik.seiun.model.com.atproto.session.SessionCreateOutput
 import io.github.akiomik.seiun.model.com.atproto.session.SessionRefreshOutput
 import io.github.akiomik.seiun.service.AtpService
+import io.github.akiomik.seiun.service.UnauthorizedException
+import retrofit2.HttpException
 
 class UserRepository(context: Context, private val atpService: AtpService) {
     private val key = MasterKey.Builder(context)
@@ -126,6 +130,36 @@ class UserRepository(context: Context, private val atpService: AtpService) {
         ) {
             is ApiResult.Success -> result.value
             is ApiResult.Failure -> throw IllegalStateException("ApiResult.Failure: $result")
+        }
+    }
+
+    suspend fun mute(session: ISession, did: String) {
+        Log.d(SeiunApplication.TAG, "Mute user: $did")
+        val body = MuteInput(user = did)
+
+        try {
+            atpService.mute("Bearer ${session.accessJwt}", body = body)
+        } catch (e: HttpException) {
+            if (e.code() == 401) {
+                throw UnauthorizedException("Unauthorized: ${e.code()} (${e.message()})")
+            } else {
+                throw IllegalStateException("HttpError: ${e.code()} (${e.message()})")
+            }
+        }
+    }
+
+    suspend fun unmute(session: ISession, did: String) {
+        Log.d(SeiunApplication.TAG, "Unmute user: $did")
+        val body = UnmuteInput(user = did)
+
+        try {
+            atpService.unmute("Bearer ${session.accessJwt}", body = body)
+        } catch (e: HttpException) {
+            if (e.code() == 401) {
+                throw UnauthorizedException("Unauthorized: ${e.code()} (${e.message()})")
+            } else {
+                throw IllegalStateException("HttpError: ${e.code()} (${e.message()})")
+            }
         }
     }
 }
