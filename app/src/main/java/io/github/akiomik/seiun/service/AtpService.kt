@@ -5,7 +5,11 @@ import com.slack.eithernet.DecodeErrorBody
 import io.github.akiomik.seiun.model.AtpError
 import io.github.akiomik.seiun.model.app.bsky.actor.Profile
 import io.github.akiomik.seiun.model.app.bsky.blob.UploadBlobOutput
-import io.github.akiomik.seiun.model.app.bsky.feed.*
+import io.github.akiomik.seiun.model.app.bsky.feed.Post
+import io.github.akiomik.seiun.model.app.bsky.feed.Repost
+import io.github.akiomik.seiun.model.app.bsky.feed.SetVoteInput
+import io.github.akiomik.seiun.model.app.bsky.feed.SetVoteOutput
+import io.github.akiomik.seiun.model.app.bsky.feed.Timeline
 import io.github.akiomik.seiun.model.com.atproto.account.AccountCreateInput
 import io.github.akiomik.seiun.model.com.atproto.account.AccountCreateOutput
 import io.github.akiomik.seiun.model.com.atproto.repo.CreateRecordInput
@@ -14,8 +18,12 @@ import io.github.akiomik.seiun.model.com.atproto.repo.DeleteRecordInput
 import io.github.akiomik.seiun.model.com.atproto.session.SessionCreateInput
 import io.github.akiomik.seiun.model.com.atproto.session.SessionCreateOutput
 import io.github.akiomik.seiun.model.com.atproto.session.SessionRefreshOutput
-import okhttp3.*
-import retrofit2.http.*
+import okhttp3.RequestBody
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.POST
+import retrofit2.http.Query
 
 interface AtpService {
     @DecodeErrorBody
