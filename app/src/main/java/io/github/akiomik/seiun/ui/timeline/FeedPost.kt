@@ -24,6 +24,7 @@ import androidx.compose.material.icons.sharp.Favorite
 import androidx.compose.material.icons.sharp.FavoriteBorder
 import androidx.compose.material.icons.sharp.MoreVert
 import androidx.compose.material.icons.sharp.SyncAlt
+import androidx.compose.material.icons.sharp.VolumeMute
 import androidx.compose.material.icons.sharp.Warning
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -51,6 +52,7 @@ import coil.compose.AsyncImage
 import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.model.app.bsky.feed.FeedViewPost
 import io.github.akiomik.seiun.ui.dialog.DeleteDialog
+import io.github.akiomik.seiun.ui.dialog.MuteDialog
 import io.github.akiomik.seiun.ui.dialog.ReportDialog
 import io.github.akiomik.seiun.ui.theme.Green700
 import io.github.akiomik.seiun.ui.theme.Red700
@@ -248,6 +250,7 @@ fun MenuButton(viewPost: FeedViewPost) {
     var showMenu by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showReportDialog by remember { mutableStateOf(false) }
+    var showMuteDialog by remember { mutableStateOf(false) }
 
     TextButton(onClick = { showMenu = true }) {
         Icon(
@@ -269,6 +272,20 @@ fun MenuButton(viewPost: FeedViewPost) {
                 leadingIcon = {
                     Icon(
                         Icons.Sharp.Delete,
+                        contentDescription = null
+                    )
+                }
+            )
+        } else {
+            DropdownMenuItem(
+                text = { Text(stringResource(id = R.string.mute)) },
+                onClick = {
+                    showMenu = false
+                    showMuteDialog = true
+                },
+                leadingIcon = {
+                    Icon(
+                        Icons.Sharp.VolumeMute,
                         contentDescription = null
                     )
                 }
@@ -298,6 +315,11 @@ fun MenuButton(viewPost: FeedViewPost) {
         ReportDialog(
             feedViewPost = viewPost,
             onDismissRequest = { showReportDialog = false }
+        )
+    } else if (showMuteDialog) {
+        MuteDialog(
+            actor = viewPost.post.author,
+            onDismissRequest = { showMuteDialog = false }
         )
     }
 }

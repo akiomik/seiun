@@ -220,10 +220,32 @@ class TimelineViewModel : ApplicationViewModel() {
         }, onSuccess = { onSuccess() }, onError = onError)
     }
 
-    fun reportPost(viewPost: FeedViewPost, reasonType: String, reason: String, onSuccess: () -> kotlin.Unit, onError: (Throwable) -> Unit) {
+    fun reportPost(
+        viewPost: FeedViewPost,
+        reasonType: String,
+        reason: String,
+        onSuccess: () -> kotlin.Unit,
+        onError: (Throwable) -> Unit
+    ) {
         wrapError(run = {
             withRetry(userRepository) { session: ISession ->
                 timelineRepository.reportPost(session, viewPost, reasonType, reason)
+            }
+        }, onSuccess = { onSuccess() }, onError = onError)
+    }
+
+    fun mute(did: String, onSuccess: () -> Unit, onError: (Throwable) -> Unit) {
+        wrapError(run = {
+            withRetry(userRepository) { session: ISession ->
+                userRepository.mute(session, did)
+            }
+        }, onSuccess = { onSuccess() }, onError = onError)
+    }
+
+    fun unmute(did: String, onSuccess: () -> Unit, onError: (Throwable) -> Unit) {
+        wrapError(run = {
+            withRetry(userRepository) { session: ISession ->
+                userRepository.unmute(session, did)
             }
         }, onSuccess = { onSuccess() }, onError = onError)
     }
