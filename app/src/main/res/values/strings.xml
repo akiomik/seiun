@@ -6,6 +6,10 @@
     <string name="loading">Loading…</string>
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
+    <string name="report">Report</string>
+    <string name="optional">Optional</string>
+    <string name="spam">Spam</string>
+    <string name="others">Others</string>
     <string name="login_title">Login</string>
     <string name="login_app_description">for ATP/Bluesky</string>
     <string name="login_handle_or_email">Handle or Email</string>
@@ -41,6 +45,10 @@
     <string name="timeline_new_post_content">Content</string>
     <string name="timeline_new_post_content_placeholder">What\'s up?</string>
     <string name="timeline_new_post_delete_image">Delete Image</string>
+    <string name="timeline_report_message">Report the following post</string>
+    <string name="timeline_report_type">Type</string>
+    <string name="timeline_report_reason">Report reason</string>
+    <string name="timeline_reported">Reported this post</string>
     <string name="timeline_no_posts_yet">No posts yet</string>
     <string name="timeline_no_more_posts">No more posts</string>
     <string name="timeline_error">Failed to get timeline. Please try later</string>

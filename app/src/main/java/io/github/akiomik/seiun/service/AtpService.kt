@@ -10,6 +10,8 @@ import io.github.akiomik.seiun.model.app.bsky.feed.Repost
 import io.github.akiomik.seiun.model.app.bsky.feed.SetVoteInput
 import io.github.akiomik.seiun.model.app.bsky.feed.SetVoteOutput
 import io.github.akiomik.seiun.model.app.bsky.feed.Timeline
+import io.github.akiomik.seiun.model.app.bsky.report.ReportCreateInput
+import io.github.akiomik.seiun.model.app.bsky.report.ReportCreateOutput
 import io.github.akiomik.seiun.model.com.atproto.account.AccountCreateInput
 import io.github.akiomik.seiun.model.com.atproto.account.AccountCreateOutput
 import io.github.akiomik.seiun.model.com.atproto.repo.CreateRecordInput
@@ -103,4 +105,11 @@ interface AtpService {
         @Header("Content-Type") contentType: String,
         @Body body: RequestBody
     ): ApiResult<UploadBlobOutput, AtpError>
+
+    @DecodeErrorBody
+    @POST("com.atproto.report.create")
+    suspend fun createReport(
+        @Header("Authorization") authorization: String,
+        @Body body: ReportCreateInput
+    ): ApiResult<ReportCreateOutput, AtpError>
 }
