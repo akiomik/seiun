@@ -83,7 +83,7 @@ interface AtpService {
     suspend fun deleteRecord(
         @Header("Authorization") authorization: String,
         @Body body: DeleteRecordInput
-    ) // TODO: Handle empty response with EitherNet
+    ): ApiResult<Unit, AtpError>
 
     @DecodeErrorBody
     @POST("app.bsky.feed.setVote")
@@ -120,12 +120,12 @@ interface AtpService {
     suspend fun mute(
         @Header("Authorization") authorization: String,
         @Body body: MuteInput
-    ) // TODO: Handle empty response with EitherNet
+    ): ApiResult<Unit, AtpError>
 
     @DecodeErrorBody
     @POST("app.bsky.graph.unmute")
     suspend fun unmute(
         @Header("Authorization") authorization: String,
         @Body body: UnmuteInput
-    ) // TODO: Handle empty response with EitherNet
+    ): ApiResult<Unit, AtpError>
 }
