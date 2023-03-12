@@ -2,6 +2,8 @@ package io.github.akiomik.seiun.ui.timeline
 
 import android.text.format.DateFormat
 import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,9 +14,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
@@ -30,6 +35,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -47,9 +53,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.R
+import io.github.akiomik.seiun.model.app.bsky.embed.PresentedImage
 import io.github.akiomik.seiun.model.app.bsky.feed.FeedViewPost
 import io.github.akiomik.seiun.ui.dialog.DeleteDialog
 import io.github.akiomik.seiun.ui.dialog.MuteDialog
@@ -363,6 +371,9 @@ private fun FeedPostContent(viewPost: FeedViewPost) {
 
 @Composable
 fun ImageTile(viewPost: FeedViewPost) {
+    var showImagePager by remember { mutableStateOf(false) }
+    var selectedIndex by remember { mutableStateOf(0) }
+
     val paddingTop = 16.dp
     val maxHeight = 240.dp
 
@@ -376,7 +387,12 @@ fun ImageTile(viewPost: FeedViewPost) {
                 AsyncImage(
                     model = images[0].thumb,
                     contentDescription = images[0].alt,
-                    modifier = Modifier.height(maxHeight),
+                    modifier = Modifier
+                        .height(maxHeight)
+                        .clickable {
+                            showImagePager = true
+                            selectedIndex = 0
+                        },
                     contentScale = ContentScale.Crop
                 )
             }
@@ -392,14 +408,54 @@ fun ImageTile(viewPost: FeedViewPost) {
                     .height(maxHeight + 16.dp) // NOTE: Avoid inner scroll
                     .padding(top = paddingTop)
             ) {
-                items(images) {
+                items(images.withIndex().toList()) { (index, image) ->
                     AsyncImage(
-                        model = it.thumb,
-                        contentDescription = it.alt,
-                        modifier = Modifier.height(height),
+                        model = image.thumb,
+                        contentDescription = image.alt,
+                        modifier = Modifier
+                            .height(height)
+                            .clickable {
+                                showImagePager = true
+                                selectedIndex = index
+                            },
                         contentScale = ContentScale.Crop
                     )
                 }
+            }
+        }
+
+        if (showImagePager) {
+            ImagePager(
+                images = images,
+                initialIndex = selectedIndex,
+                onDismissRequest = { showImagePager = false }
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun ImagePager(images: List<PresentedImage>, initialIndex: Int, onDismissRequest: () -> Unit) {
+    val pagerState = rememberPagerState(initialIndex)
+
+    Dialog(
+        onDismissRequest = onDismissRequest
+    ) {
+        Surface(
+            modifier = Modifier.wrapContentSize(),
+            shape = MaterialTheme.shapes.large
+        ) {
+            HorizontalPager(
+                pageCount = images.size,
+                state = pagerState,
+                modifier = Modifier.wrapContentSize()
+            ) { page ->
+                AsyncImage(
+                    model = images[page].fullsize,
+                    contentDescription = null,
+                    modifier = Modifier.wrapContentSize()
+                )
             }
         }
     }
