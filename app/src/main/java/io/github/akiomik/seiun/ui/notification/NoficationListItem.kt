@@ -38,7 +38,7 @@ private fun Avatar(notification: Notification) {
 private fun VoteItem(notification: Notification) {
     val createdAt = DateFormat.format(
         DATETIME_FORMAT,
-        notification.record.createdAtAsInstant().toEpochMilli()
+        notification.record.createdAt.toInstant().toEpochMilli()
     )
 
     Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -63,7 +63,7 @@ private fun VoteItem(notification: Notification) {
 private fun RepostItem(notification: Notification) {
     val createdAt = DateFormat.format(
         DATETIME_FORMAT,
-        notification.record.createdAtAsInstant().toEpochMilli()
+        notification.record.createdAt.toInstant().toEpochMilli()
     )
 
     Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -88,7 +88,7 @@ private fun RepostItem(notification: Notification) {
 private fun FollowItem(notification: Notification) {
     val createdAt = DateFormat.format(
         DATETIME_FORMAT,
-        notification.record.createdAtAsInstant().toEpochMilli()
+        notification.record.createdAt.toInstant().toEpochMilli()
     )
 
     Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -113,7 +113,7 @@ private fun FollowItem(notification: Notification) {
 private fun InviteItem(notification: Notification) {
     val createdAt = DateFormat.format(
         DATETIME_FORMAT,
-        notification.record.createdAtAsInstant().toEpochMilli()
+        notification.record.createdAt.toInstant().toEpochMilli()
     )
 
     Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -138,7 +138,7 @@ private fun InviteItem(notification: Notification) {
 private fun MentionItem(notification: Notification) {
     val createdAt = DateFormat.format(
         DATETIME_FORMAT,
-        notification.record.createdAtAsInstant().toEpochMilli()
+        notification.record.createdAt.toInstant().toEpochMilli()
     )
 
     Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -163,7 +163,7 @@ private fun MentionItem(notification: Notification) {
 private fun ReplyItem(notification: Notification) {
     val createdAt = DateFormat.format(
         DATETIME_FORMAT,
-        notification.record.createdAtAsInstant().toEpochMilli()
+        notification.record.createdAt.toInstant().toEpochMilli()
     )
 
     Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {

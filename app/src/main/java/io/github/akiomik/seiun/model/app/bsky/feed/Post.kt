@@ -1,16 +1,11 @@
 package io.github.akiomik.seiun.model.app.bsky.feed
 
-import java.time.Instant
-import java.time.format.DateTimeFormatter
+import java.util.*
 
 data class Post(
     val text: String,
-    val createdAt: String, // TODO: datetime
+    val createdAt: Date,
     val entities: List<PostEntity>? = null,
     val reply: PostReplyRef? = null,
     val embed: ImagesOrExternal? = null
-) {
-    fun createdAtAsInstant(): Instant {
-        return Instant.from(DateTimeFormatter.ISO_DATE_TIME.parse(createdAt))
-    }
-}
+)

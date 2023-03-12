@@ -27,7 +27,7 @@ import io.github.akiomik.seiun.service.AtpService
 import io.github.akiomik.seiun.service.UnauthorizedException
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.HttpException
-import java.time.Instant
+import java.util.*
 import io.github.akiomik.seiun.model.type.Image as ImageType
 
 class TimelineRepository(private val atpService: AtpService) {
@@ -99,8 +99,7 @@ class TimelineRepository(private val atpService: AtpService) {
     suspend fun repost(session: ISession, subject: StrongRef): CreateRecordOutput {
         Log.d(SeiunApplication.TAG, "Cancel repost: uri = ${subject.uri}, cid = ${subject.cid}")
 
-        val createdAt = Instant.now().toString()
-        val record = Repost(subject = subject, createdAt)
+        val record = Repost(subject = subject, Date())
         val body = CreateRecordInput(
             did = session.did,
             record = record,
@@ -155,14 +154,13 @@ class TimelineRepository(private val atpService: AtpService) {
     ) {
         Log.d(SeiunApplication.TAG, "Create a post: content = $content")
 
-        val createdAt = Instant.now().toString()
         val embed = if (imageCid != null && imageMimeType != null) {
             val image = Image(image = ImageType(imageCid, imageMimeType), alt = "")
             ImagesOrExternal(images = listOf(image), type = "app.bsky.embed.images")
         } else {
             null
         }
-        val record = Post(text = content, createdAt = createdAt, embed = embed)
+        val record = Post(text = content, createdAt = Date(), embed = embed)
         val body =
             CreateRecordInput(did = session.did, record = record, collection = "app.bsky.feed.post")
 
@@ -193,7 +191,6 @@ class TimelineRepository(private val atpService: AtpService) {
     ) {
         Log.d(SeiunApplication.TAG, "Create a reply: content = $content, to = $to")
 
-        val createdAt = Instant.now().toString()
         val embed = if (imageCid != null && imageMimeType != null) {
             val image =
                 Image(image = ImageType(imageCid, imageMimeType), alt = "app.bsky.feed.post")
@@ -201,7 +198,7 @@ class TimelineRepository(private val atpService: AtpService) {
         } else {
             null
         }
-        val record = Post(text = content, createdAt = createdAt, reply = to, embed = embed)
+        val record = Post(text = content, createdAt = Date(), reply = to, embed = embed)
         val body = CreateRecordInput(did = session.did, record = record, collection = "")
 
         when (

@@ -70,7 +70,7 @@ private fun NameRow(viewPost: FeedViewPost) {
 private fun PostContent(viewPost: FeedViewPost) {
     val createdAt = DateFormat.format(
         "yyyy/MM/dd HH:mm",
-        viewPost.post.record.createdAtAsInstant().toEpochMilli()
+        viewPost.post.record.createdAt.toInstant().toEpochMilli()
     )
 
     Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {

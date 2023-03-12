@@ -2,6 +2,7 @@ package io.github.akiomik.seiun.model.app.bsky.feed
 
 import io.github.akiomik.seiun.model.app.bsky.actor.RefWithInfo
 import io.github.akiomik.seiun.model.com.atproto.repo.StrongRef
+import java.util.*
 
 data class PostView(
     val uri: String,
@@ -12,7 +13,7 @@ data class PostView(
     val repostCount: Int,
     val upvoteCount: Int,
     val downvoteCount: Int,
-    val indexedAt: String, // TODO: datetime
+    val indexedAt: Date,
     val viewer: PostViewViewerState,
     val embed: ImagesPresentedOrExternalPresented? = null
 ) {
