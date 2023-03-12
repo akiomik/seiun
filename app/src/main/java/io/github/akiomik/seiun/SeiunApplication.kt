@@ -2,13 +2,13 @@ package io.github.akiomik.seiun
 
 import android.app.Application
 import com.slack.eithernet.ApiResultCallAdapterFactory
-import com.slack.eithernet.ApiResultConverterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import io.github.akiomik.seiun.repository.NotificationRepository
 import io.github.akiomik.seiun.repository.TimelineRepository
 import io.github.akiomik.seiun.repository.UserRepository
 import io.github.akiomik.seiun.service.AtpService
+import io.github.akiomik.seiun.service.CustomApiResultConverterFactory
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.create
@@ -34,7 +34,7 @@ class SeiunApplication : Application() {
             .build()
         val atpService = Retrofit.Builder()
             .baseUrl("https://bsky.social/xrpc/")
-            .addConverterFactory(ApiResultConverterFactory)
+            .addConverterFactory(CustomApiResultConverterFactory)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .addCallAdapterFactory(ApiResultCallAdapterFactory)
             .build()

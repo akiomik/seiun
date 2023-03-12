@@ -17,7 +17,6 @@ import io.github.akiomik.seiun.model.com.atproto.session.SessionCreateOutput
 import io.github.akiomik.seiun.model.com.atproto.session.SessionRefreshOutput
 import io.github.akiomik.seiun.service.AtpService
 import io.github.akiomik.seiun.service.UnauthorizedException
-import retrofit2.HttpException
 
 class UserRepository(context: Context, private val atpService: AtpService) {
     private val key = MasterKey.Builder(context)
@@ -137,13 +136,17 @@ class UserRepository(context: Context, private val atpService: AtpService) {
         Log.d(SeiunApplication.TAG, "Mute user: $did")
         val body = MuteInput(user = did)
 
-        try {
-            atpService.mute("Bearer ${session.accessJwt}", body = body)
-        } catch (e: HttpException) {
-            if (e.code() == 401) {
-                throw UnauthorizedException("Unauthorized: ${e.code()} (${e.message()})")
-            } else {
-                throw IllegalStateException("HttpError: ${e.code()} (${e.message()})")
+        when (val res = atpService.mute("Bearer ${session.accessJwt}", body = body)) {
+            is ApiResult.Success -> {}
+            is ApiResult.Failure -> when (res) {
+                is ApiResult.Failure.HttpFailure -> {
+                    if (res.code == 401) {
+                        throw UnauthorizedException(res.error?.message.orEmpty())
+                    } else {
+                        throw IllegalStateException(res.error?.message.orEmpty())
+                    }
+                }
+                else -> throw IllegalStateException(res.toString())
             }
         }
     }
@@ -152,13 +155,17 @@ class UserRepository(context: Context, private val atpService: AtpService) {
         Log.d(SeiunApplication.TAG, "Unmute user: $did")
         val body = UnmuteInput(user = did)
 
-        try {
-            atpService.unmute("Bearer ${session.accessJwt}", body = body)
-        } catch (e: HttpException) {
-            if (e.code() == 401) {
-                throw UnauthorizedException("Unauthorized: ${e.code()} (${e.message()})")
-            } else {
-                throw IllegalStateException("HttpError: ${e.code()} (${e.message()})")
+        when (val res = atpService.unmute("Bearer ${session.accessJwt}", body = body)) {
+            is ApiResult.Success -> {}
+            is ApiResult.Failure -> when (res) {
+                is ApiResult.Failure.HttpFailure -> {
+                    if (res.code == 401) {
+                        throw UnauthorizedException(res.error?.message.orEmpty())
+                    } else {
+                        throw IllegalStateException(res.error?.message.orEmpty())
+                    }
+                }
+                else -> throw IllegalStateException(res.toString())
             }
         }
     }

@@ -132,13 +132,17 @@ class TimelineRepository(private val atpService: AtpService) {
         val body =
             DeleteRecordInput(did = session.did, rkey = rkey, collection = "app.bsky.feed.repost")
 
-        try {
-            atpService.deleteRecord(authorization = "Bearer ${session.accessJwt}", body = body)
-        } catch (e: HttpException) {
-            if (e.code() == 401) {
-                throw UnauthorizedException("Unauthorized: ${e.code()} (${e.message()})")
-            } else {
-                throw IllegalStateException("HttpError: ${e.code()} (${e.message()})")
+        when (val res = atpService.deleteRecord("Bearer ${session.accessJwt}", body = body)) {
+            is ApiResult.Success -> {}
+            is ApiResult.Failure -> when (res) {
+                is ApiResult.Failure.HttpFailure -> {
+                    if (res.code == 401) {
+                        throw UnauthorizedException(res.error?.message.orEmpty())
+                    } else {
+                        throw IllegalStateException(res.error?.message.orEmpty())
+                    }
+                }
+                else -> throw IllegalStateException(res.toString())
             }
         }
     }
