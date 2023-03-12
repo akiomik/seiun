@@ -328,7 +328,7 @@ fun MenuButton(viewPost: FeedViewPost) {
 private fun FeedPostContent(viewPost: FeedViewPost) {
     val createdAt = DateFormat.format(
         "yyyy/MM/dd HH:mm",
-        viewPost.post.record.createdAtAsInstant().toEpochMilli()
+        viewPost.post.record.createdAt.toInstant().toEpochMilli()
     )
 
     Column {
