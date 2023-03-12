@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import com.slack.eithernet.ApiResult
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.model.ISession
 import io.github.akiomik.seiun.model.app.bsky.actor.Profile
@@ -16,9 +15,9 @@ import io.github.akiomik.seiun.model.com.atproto.session.SessionCreateInput
 import io.github.akiomik.seiun.model.com.atproto.session.SessionCreateOutput
 import io.github.akiomik.seiun.model.com.atproto.session.SessionRefreshOutput
 import io.github.akiomik.seiun.service.AtpService
-import io.github.akiomik.seiun.service.UnauthorizedException
 
-class UserRepository(context: Context, private val atpService: AtpService) {
+class UserRepository(context: Context, private val atpService: AtpService) :
+    ApplicationRepository() {
     private val key = MasterKey.Builder(context)
         .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
         .build()
@@ -85,58 +84,32 @@ class UserRepository(context: Context, private val atpService: AtpService) {
             password = password,
             inviteCode = inviteCode
         )
-        return when (val result = atpService.createAccount(param)) {
-            is ApiResult.Success -> result.value
-            is ApiResult.Failure -> when (result) {
-                is ApiResult.Failure.HttpFailure -> throw IllegalStateException(
-                    result.error?.message ?: ""
-                )
-                else -> throw IllegalStateException("Failed to create account")
-            }
-        }
+
+        return handleRequest { atpService.createAccount(param) }
     }
 
     suspend fun login(handleOrEmail: String, password: String): SessionCreateOutput {
         Log.d(SeiunApplication.TAG, "Create session")
-        return when (
-            val result =
-                atpService.createSession(SessionCreateInput(handleOrEmail, password))
-        ) {
-            is ApiResult.Success -> result.value
-            is ApiResult.Failure -> when (result) {
-                is ApiResult.Failure.HttpFailure -> throw IllegalStateException(
-                    result.error?.message ?: ""
-                )
-                else -> throw IllegalStateException("Failed to login")
-            }
+
+        return handleRequest {
+            atpService.createSession(SessionCreateInput(handleOrEmail, password))
         }
     }
 
     suspend fun refresh(): SessionRefreshOutput {
         Log.d(SeiunApplication.TAG, "Refresh session")
         val oldSession = getSession()
-        return when (val result = atpService.refreshSession("Bearer ${oldSession.refreshJwt}")) {
-            is ApiResult.Success -> result.value
-            is ApiResult.Failure -> throw IllegalStateException("ApiResult.Failure: $result")
+
+        return handleRequest {
+            atpService.refreshSession("Bearer ${oldSession.refreshJwt}")
         }
     }
 
     suspend fun getProfile(session: ISession): Profile {
         Log.d(SeiunApplication.TAG, "Get profile")
-        return when (
-            val res = atpService.getProfile("Bearer ${session.accessJwt}", session.did)
-        ) {
-            is ApiResult.Success -> res.value
-            is ApiResult.Failure -> when (res) {
-                is ApiResult.Failure.HttpFailure -> {
-                    if (res.code == 401) {
-                        throw UnauthorizedException(res.error?.message.orEmpty())
-                    } else {
-                        throw IllegalStateException(res.error?.message.orEmpty())
-                    }
-                }
-                else -> throw IllegalStateException(res.toString())
-            }
+
+        return handleRequest {
+            atpService.getProfile("Bearer ${session.accessJwt}", session.did)
         }
     }
 
@@ -144,37 +117,17 @@ class UserRepository(context: Context, private val atpService: AtpService) {
         Log.d(SeiunApplication.TAG, "Mute user: $did")
         val body = MuteInput(user = did)
 
-        when (val res = atpService.mute("Bearer ${session.accessJwt}", body = body)) {
-            is ApiResult.Success -> {}
-            is ApiResult.Failure -> when (res) {
-                is ApiResult.Failure.HttpFailure -> {
-                    if (res.code == 401) {
-                        throw UnauthorizedException(res.error?.message.orEmpty())
-                    } else {
-                        throw IllegalStateException(res.error?.message.orEmpty())
-                    }
-                }
-                else -> throw IllegalStateException(res.toString())
-            }
+        handleRequest {
+            atpService.mute("Bearer ${session.accessJwt}", body = body)
         }
     }
 
     suspend fun unmute(session: ISession, did: String) {
         Log.d(SeiunApplication.TAG, "Unmute user: $did")
-        val body = UnmuteInput(user = did)
 
-        when (val res = atpService.unmute("Bearer ${session.accessJwt}", body = body)) {
-            is ApiResult.Success -> {}
-            is ApiResult.Failure -> when (res) {
-                is ApiResult.Failure.HttpFailure -> {
-                    if (res.code == 401) {
-                        throw UnauthorizedException(res.error?.message.orEmpty())
-                    } else {
-                        throw IllegalStateException(res.error?.message.orEmpty())
-                    }
-                }
-                else -> throw IllegalStateException(res.toString())
-            }
+        val body = UnmuteInput(user = did)
+        handleRequest {
+            atpService.unmute("Bearer ${session.accessJwt}", body = body)
         }
     }
 }
