@@ -124,11 +124,19 @@ class UserRepository(context: Context, private val atpService: AtpService) {
     suspend fun getProfile(session: ISession): Profile {
         Log.d(SeiunApplication.TAG, "Get profile")
         return when (
-            val result =
-                atpService.getProfile("Bearer ${session.accessJwt}", session.did)
+            val res = atpService.getProfile("Bearer ${session.accessJwt}", session.did)
         ) {
-            is ApiResult.Success -> result.value
-            is ApiResult.Failure -> throw IllegalStateException("ApiResult.Failure: $result")
+            is ApiResult.Success -> res.value
+            is ApiResult.Failure -> when (res) {
+                is ApiResult.Failure.HttpFailure -> {
+                    if (res.code == 401) {
+                        throw UnauthorizedException(res.error?.message.orEmpty())
+                    } else {
+                        throw IllegalStateException(res.error?.message.orEmpty())
+                    }
+                }
+                else -> throw IllegalStateException(res.toString())
+            }
         }
     }
 
