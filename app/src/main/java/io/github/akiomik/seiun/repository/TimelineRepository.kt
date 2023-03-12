@@ -1,8 +1,6 @@
 package io.github.akiomik.seiun.repository
 
 import android.util.Log
-import com.slack.eithernet.ApiResult
-import com.slack.eithernet.response
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.model.ISession
 import io.github.akiomik.seiun.model.app.bsky.blob.UploadBlobOutput
@@ -24,31 +22,16 @@ import io.github.akiomik.seiun.model.com.atproto.repo.CreateRecordOutput
 import io.github.akiomik.seiun.model.com.atproto.repo.DeleteRecordInput
 import io.github.akiomik.seiun.model.com.atproto.repo.StrongRef
 import io.github.akiomik.seiun.service.AtpService
-import io.github.akiomik.seiun.service.UnauthorizedException
 import okhttp3.RequestBody.Companion.toRequestBody
-import retrofit2.HttpException
 import java.util.*
 import io.github.akiomik.seiun.model.type.Image as ImageType
 
-class TimelineRepository(private val atpService: AtpService) {
+class TimelineRepository(private val atpService: AtpService) : ApplicationRepository() {
     suspend fun getTimeline(session: ISession, before: String? = null): Timeline {
         Log.d(SeiunApplication.TAG, "Get timeline: before = $before")
 
-        return when (
-            val result =
-                atpService.getTimeline("Bearer ${session.accessJwt}", before = before)
-        ) {
-            is ApiResult.Success -> result.value
-            is ApiResult.Failure -> when (result) {
-                is ApiResult.Failure.HttpFailure -> {
-                    if (result.code == 401) {
-                        throw UnauthorizedException("Unauthorized: ${result.code} (${result.error})")
-                    } else {
-                        throw IllegalStateException("HttpError: ${result.code} (${result.error})")
-                    }
-                }
-                else -> throw IllegalStateException("ApiResult.Failure: ${result.response()}")
-            }
+        return handleRequest {
+            atpService.getTimeline("Bearer ${session.accessJwt}", before = before)
         }
     }
 
@@ -56,48 +39,22 @@ class TimelineRepository(private val atpService: AtpService) {
         Log.d(SeiunApplication.TAG, "Upvote post: uri = ${subject.uri}, cid = ${subject.cid}")
 
         val body = SetVoteInput(subject = subject, direction = VoteDirection.up)
-        when (
-            val result =
-                atpService.setVote(authorization = "Bearer ${session.accessJwt}", body = body)
-        ) {
-            is ApiResult.Success -> return result.value
-            is ApiResult.Failure -> when (result) {
-                is ApiResult.Failure.HttpFailure -> {
-                    if (result.code == 401) {
-                        throw UnauthorizedException("Unauthorized: ${result.code} (${result.error})")
-                    } else {
-                        throw IllegalStateException("HttpError: ${result.code} (${result.error})")
-                    }
-                }
-                else -> throw IllegalStateException("ApiResult.Failure: ${result.response()}")
-            }
+        return handleRequest {
+            atpService.setVote(authorization = "Bearer ${session.accessJwt}", body = body)
         }
     }
 
-    suspend fun cancelVote(session: ISession, subject: StrongRef) {
+    suspend fun cancelVote(session: ISession, subject: StrongRef): SetVoteOutput {
         Log.d(SeiunApplication.TAG, "Cancel vote post: uri = ${subject.uri}, cid = ${subject.cid}")
 
         val body = SetVoteInput(subject = subject, direction = VoteDirection.none)
-        when (
-            val result =
-                atpService.setVote(authorization = "Bearer ${session.accessJwt}", body = body)
-        ) {
-            is ApiResult.Success -> {}
-            is ApiResult.Failure -> when (result) {
-                is ApiResult.Failure.HttpFailure -> {
-                    if (result.code == 401) {
-                        throw UnauthorizedException("Unauthorized: ${result.code} (${result.error})")
-                    } else {
-                        throw IllegalStateException("HttpError: ${result.code} (${result.error})")
-                    }
-                }
-                else -> throw IllegalStateException("ApiResult.Failure: ${result.response()}")
-            }
+        return handleRequest {
+            atpService.setVote(authorization = "Bearer ${session.accessJwt}", body = body)
         }
     }
 
     suspend fun repost(session: ISession, subject: StrongRef): CreateRecordOutput {
-        Log.d(SeiunApplication.TAG, "Cancel repost: uri = ${subject.uri}, cid = ${subject.cid}")
+        Log.d(SeiunApplication.TAG, "Repost: uri = ${subject.uri}, cid = ${subject.cid}")
 
         val record = Repost(subject = subject, Date())
         val body = CreateRecordInput(
@@ -106,21 +63,8 @@ class TimelineRepository(private val atpService: AtpService) {
             collection = "app.bsky.feed.repost"
         )
 
-        when (
-            val result =
-                atpService.repost(authorization = "Bearer ${session.accessJwt}", body = body)
-        ) {
-            is ApiResult.Success -> return result.value
-            is ApiResult.Failure -> when (result) {
-                is ApiResult.Failure.HttpFailure -> {
-                    if (result.code == 401) {
-                        throw UnauthorizedException("Unauthorized: ${result.code} (${result.error})")
-                    } else {
-                        throw IllegalStateException("HttpError: ${result.code} (${result.error})")
-                    }
-                }
-                else -> throw IllegalStateException("ApiResult.Failure: ${result.response()}")
-            }
+        return handleRequest {
+            atpService.repost(authorization = "Bearer ${session.accessJwt}", body = body)
         }
     }
 
@@ -131,18 +75,8 @@ class TimelineRepository(private val atpService: AtpService) {
         val body =
             DeleteRecordInput(did = session.did, rkey = rkey, collection = "app.bsky.feed.repost")
 
-        when (val res = atpService.deleteRecord("Bearer ${session.accessJwt}", body = body)) {
-            is ApiResult.Success -> {}
-            is ApiResult.Failure -> when (res) {
-                is ApiResult.Failure.HttpFailure -> {
-                    if (res.code == 401) {
-                        throw UnauthorizedException(res.error?.message.orEmpty())
-                    } else {
-                        throw IllegalStateException(res.error?.message.orEmpty())
-                    }
-                }
-                else -> throw IllegalStateException(res.toString())
-            }
+        handleRequest {
+            atpService.deleteRecord("Bearer ${session.accessJwt}", body = body)
         }
     }
 
@@ -151,7 +85,7 @@ class TimelineRepository(private val atpService: AtpService) {
         content: String,
         imageCid: String?,
         imageMimeType: String?
-    ) {
+    ): CreateRecordOutput {
         Log.d(SeiunApplication.TAG, "Create a post: content = $content")
 
         val embed = if (imageCid != null && imageMimeType != null) {
@@ -160,25 +94,13 @@ class TimelineRepository(private val atpService: AtpService) {
         } else {
             null
         }
+
         val record = Post(text = content, createdAt = Date(), embed = embed)
         val body =
             CreateRecordInput(did = session.did, record = record, collection = "app.bsky.feed.post")
 
-        when (
-            val result =
-                atpService.createPost(authorization = "Bearer ${session.accessJwt}", body = body)
-        ) {
-            is ApiResult.Success -> {}
-            is ApiResult.Failure -> when (result) {
-                is ApiResult.Failure.HttpFailure -> {
-                    if (result.code == 401) {
-                        throw UnauthorizedException("Unauthorized: ${result.code} (${result.error})")
-                    } else {
-                        throw IllegalStateException("HttpError: ${result.code} (${result.error})")
-                    }
-                }
-                else -> throw IllegalStateException("ApiResult.Failure: ${result.response()}")
-            }
+        return handleRequest {
+            atpService.createPost(authorization = "Bearer ${session.accessJwt}", body = body)
         }
     }
 
@@ -188,7 +110,7 @@ class TimelineRepository(private val atpService: AtpService) {
         to: PostReplyRef,
         imageCid: String?,
         imageMimeType: String?
-    ) {
+    ): CreateRecordOutput {
         Log.d(SeiunApplication.TAG, "Create a reply: content = $content, to = $to")
 
         val embed = if (imageCid != null && imageMimeType != null) {
@@ -201,21 +123,8 @@ class TimelineRepository(private val atpService: AtpService) {
         val record = Post(text = content, createdAt = Date(), reply = to, embed = embed)
         val body = CreateRecordInput(did = session.did, record = record, collection = "")
 
-        when (
-            val result =
-                atpService.createPost(authorization = "Bearer ${session.accessJwt}", body = body)
-        ) {
-            is ApiResult.Success -> {}
-            is ApiResult.Failure -> when (result) {
-                is ApiResult.Failure.HttpFailure -> {
-                    if (result.code == 401) {
-                        throw UnauthorizedException("Unauthorized: ${result.code} (${result.error})")
-                    } else {
-                        throw IllegalStateException("HttpError: ${result.code} (${result.error})")
-                    }
-                }
-                else -> throw IllegalStateException("ApiResult.Failure: ${result.response()}")
-            }
+        return handleRequest {
+            atpService.createPost(authorization = "Bearer ${session.accessJwt}", body = body)
         }
     }
 
@@ -225,14 +134,9 @@ class TimelineRepository(private val atpService: AtpService) {
         val rkey = feedViewPost.post.uri.split('/').last()
         val body =
             DeleteRecordInput(did = session.did, collection = "app.bsky.feed.post", rkey = rkey)
-        try {
+
+        handleRequest {
             atpService.deleteRecord("Bearer ${session.accessJwt}", body)
-        } catch (e: HttpException) {
-            if (e.code() == 401) {
-                throw UnauthorizedException("Unauthorized: ${e.code()} (${e.message()})")
-            } else {
-                throw IllegalStateException("HttpError: ${e.code()} (${e.message()})")
-            }
         }
     }
 
@@ -243,25 +147,12 @@ class TimelineRepository(private val atpService: AtpService) {
     ): UploadBlobOutput {
         Log.d(SeiunApplication.TAG, "Upload image: mimeType = $mimeType")
 
-        when (
-            val result =
-                atpService.uploadBlob(
-                    authorization = "Bearer ${session.accessJwt}",
-                    contentType = mimeType,
-                    body = image.toRequestBody()
-                )
-        ) {
-            is ApiResult.Success -> return result.value
-            is ApiResult.Failure -> when (result) {
-                is ApiResult.Failure.HttpFailure -> {
-                    if (result.code == 401) {
-                        throw UnauthorizedException("Unauthorized: ${result.code} (${result.error})")
-                    } else {
-                        throw IllegalStateException("HttpError: ${result.code} (${result.error})")
-                    }
-                }
-                else -> throw IllegalStateException("ApiResult.Failure: ${result.response()}")
-            }
+        return handleRequest {
+            atpService.uploadBlob(
+                authorization = "Bearer ${session.accessJwt}",
+                contentType = mimeType,
+                body = image.toRequestBody()
+            )
         }
     }
 
@@ -285,21 +176,9 @@ class TimelineRepository(private val atpService: AtpService) {
             reasonType = reasonType,
             reason = reason
         )
-        when (
-            val result =
-                atpService.createReport(authorization = "Bearer ${session.accessJwt}", body = body)
-        ) {
-            is ApiResult.Success -> return result.value
-            is ApiResult.Failure -> when (result) {
-                is ApiResult.Failure.HttpFailure -> {
-                    if (result.code == 401) {
-                        throw UnauthorizedException("Unauthorized: ${result.code} (${result.error})")
-                    } else {
-                        throw IllegalStateException("HttpError: ${result.code} (${result.error})")
-                    }
-                }
-                else -> throw IllegalStateException("ApiResult.Failure: ${result.response()}")
-            }
+
+        return handleRequest {
+            atpService.createReport(authorization = "Bearer ${session.accessJwt}", body = body)
         }
     }
 }
