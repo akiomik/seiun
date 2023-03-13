@@ -224,7 +224,7 @@ class TimelineViewModel : ApplicationViewModel() {
         viewPost: FeedViewPost,
         reasonType: String,
         reason: String,
-        onSuccess: () -> kotlin.Unit,
+        onSuccess: () -> Unit,
         onError: (Throwable) -> Unit
     ) {
         wrapError(run = {

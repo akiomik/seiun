@@ -21,6 +21,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -91,30 +92,31 @@ private fun ErrorMessage() {
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun NotificationList(listState: LazyListState) {
-    val viewModel: NotificationViewModel = viewModel()
-    val notifications = viewModel.notifications.observeAsState()
-    val isRefreshing = viewModel.isRefreshing.observeAsState()
     val context = LocalContext.current
+    val viewModel: NotificationViewModel = viewModel()
+    val notifications by viewModel.notifications.observeAsState(emptyList())
+    val isRefreshing by viewModel.isRefreshing.observeAsState(false)
+    val notificationStatus by viewModel.state.collectAsState()
+    val seenAllNotifications by viewModel.seenAllNotifications.observeAsState(false)
     val refreshState =
-        rememberPullRefreshState(refreshing = isRefreshing.value ?: false, onRefresh = {
+        rememberPullRefreshState(refreshing = isRefreshing, onRefresh = {
             viewModel.refreshNotifications(onError = {
                 Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
             })
         })
-    val status = viewModel.state.collectAsState().value
 
     Box(modifier = Modifier.pullRefresh(state = refreshState)) {
         LazyColumn(state = listState) {
-            items(notifications.value.orEmpty()) {
+            items(notifications) {
                 NotificationListItem(it)
                 Divider(color = Color.Gray)
             }
 
-            if (status == NotificationViewModel.State.Error) {
+            if (notificationStatus == NotificationViewModel.State.Error) {
                 item { ErrorMessage() }
-            } else if (viewModel.notifications.value?.size == 0) {
+            } else if (notifications.isEmpty()) {
                 item { NoNotificationsYetMessage() }
-            } else if (viewModel.seenAllNotifications.value == true) {
+            } else if (seenAllNotifications) {
                 item { NoMoreNotificationsMessage() }
             } else {
                 item { LoadingIndicator() }
@@ -122,7 +124,7 @@ private fun NotificationList(listState: LazyListState) {
         }
 
         PullRefreshIndicator(
-            refreshing = isRefreshing.value ?: false,
+            refreshing = isRefreshing,
             state = refreshState,
             modifier = Modifier.align(Alignment.TopCenter)
         )
@@ -132,12 +134,13 @@ private fun NotificationList(listState: LazyListState) {
 @Composable
 fun NotificationScreen(listState: LazyListState) {
     val viewModel: NotificationViewModel = viewModel()
+    val notificationStatus by viewModel.state.collectAsState()
 
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        when (viewModel.state.collectAsState().value) {
+        when (notificationStatus) {
             is NotificationViewModel.State.Loading -> LoadingText()
             is NotificationViewModel.State.Loaded -> NotificationList(listState)
             is NotificationViewModel.State.Error -> NotificationList(listState)

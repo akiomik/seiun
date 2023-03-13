@@ -20,12 +20,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -76,13 +77,14 @@ private fun Avatar(profile: Profile?) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(scrollBehavior: TopAppBarScrollBehavior, visible: MutableState<Boolean>) {
+fun TopBar(scrollBehavior: TopAppBarScrollBehavior, visible: Boolean) {
     val viewModel: TimelineViewModel = viewModel()
+    val profile by viewModel.profile.observeAsState()
 
-    AnimatedVisibility(visible = visible.value) {
+    AnimatedVisibility(visible = visible) {
         CenterAlignedTopAppBar(
             title = { Text(stringResource(id = R.string.app_name)) },
-            navigationIcon = { Avatar(viewModel.profile.value) },
+            navigationIcon = { Avatar(profile) },
             scrollBehavior = scrollBehavior
         )
     }
@@ -91,14 +93,14 @@ fun TopBar(scrollBehavior: TopAppBarScrollBehavior, visible: MutableState<Boolea
 @Composable
 fun BottomBar(
     navController: NavController,
-    visible: MutableState<Boolean>,
+    visible: Boolean,
     timelineListState: LazyListState,
     notificationListState: LazyListState
 ) {
     val items = listOf(Screen.Timeline, Screen.Notification)
     val coroutineScope = rememberCoroutineScope()
 
-    AnimatedVisibility(visible = visible.value) {
+    AnimatedVisibility(visible = visible) {
         NavigationBar {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentDestination = navBackStackEntry?.destination
@@ -169,30 +171,29 @@ fun Navigation(
 @Composable
 fun App() {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-
     val navController = rememberNavController()
-    val topBarState = rememberSaveable { (mutableStateOf(false)) }
-    val bottomBarState = rememberSaveable { (mutableStateOf(false)) }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val fabState = remember { (mutableStateOf<@Composable () -> Unit>({})) }
     val timelineListState = rememberLazyListState()
     val notificationListState = rememberLazyListState()
+    var topBarState by rememberSaveable { (mutableStateOf(false)) }
+    var bottomBarState by rememberSaveable { (mutableStateOf(false)) }
+    var fabState by remember { (mutableStateOf<@Composable () -> Unit>({})) }
 
     when (navBackStackEntry?.destination?.route) {
         "timeline" -> {
-            topBarState.value = true
-            bottomBarState.value = true
-            fabState.value = { NewPostFab() }
+            topBarState = true
+            bottomBarState = true
+            fabState = { NewPostFab() }
         }
         "notification" -> {
-            topBarState.value = true
-            bottomBarState.value = true
-            fabState.value = {}
+            topBarState = true
+            bottomBarState = true
+            fabState = {}
         }
         else -> {
-            topBarState.value = false
-            bottomBarState.value = false
-            fabState.value = {}
+            topBarState = false
+            bottomBarState = false
+            fabState = {}
         }
     }
 
@@ -207,7 +208,7 @@ fun App() {
                     notificationListState = notificationListState
                 )
             },
-            floatingActionButton = fabState.value,
+            floatingActionButton = fabState,
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             content = {
                 Navigation(

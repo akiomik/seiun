@@ -55,12 +55,12 @@ private fun PostButton(
     imageUri: Uri?,
     onSuccess: () -> Unit
 ) {
-    val isUploading = remember { mutableStateOf(false) }
+    var isUploading by remember { mutableStateOf(false) }
     val viewModel: TimelineViewModel = viewModel()
     val context = LocalContext.current
 
     Button(onClick = {
-        isUploading.value = true
+        isUploading = true
 
         val image = imageUri?.let { uri ->
             val source = ImageDecoder.createSource(context.contentResolver, uri)
@@ -69,12 +69,12 @@ private fun PostButton(
         }
 
         val handleSuccess = {
-            isUploading.value = false
+            isUploading = false
             onSuccess()
         }
 
         val handleError = { error: Throwable ->
-            isUploading.value = false
+            isUploading = false
             Log.d(SeiunApplication.TAG, error.toString())
             Toast.makeText(context, error.toString(), Toast.LENGTH_LONG).show()
         }
@@ -97,7 +97,7 @@ private fun PostButton(
                 onError = handleError
             )
         }
-    }, enabled = enabled && !isUploading.value) {
+    }, enabled = enabled && !isUploading) {
         Text(stringResource(id = R.string.timeline_new_post_post_button))
     }
 }
@@ -147,14 +147,14 @@ private fun PostContentField(content: String, onChange: (String) -> Unit) {
 
 @Composable
 private fun ImagePreview(uri: Uri, onDelete: () -> Unit) {
-    val bitmap = remember { mutableStateOf<Bitmap?>(null) }
+    var bitmap by remember { mutableStateOf<Bitmap?>(null) }
     val source = ImageDecoder.createSource(LocalContext.current.contentResolver, uri)
 
-    if (bitmap.value == null) {
-        bitmap.value = ImageDecoder.decodeBitmap(source)
+    if (bitmap == null) {
+        bitmap = ImageDecoder.decodeBitmap(source)
     }
 
-    bitmap.value?.let {
+    bitmap?.let {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Button(onClick = onDelete) {
                 Text(stringResource(id = R.string.timeline_new_post_delete_image))

@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -92,13 +93,14 @@ fun ErrorMessage() {
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun Timeline(listState: LazyListState) {
-    val viewModel: TimelineViewModel = viewModel()
-    val feedViewPosts = viewModel.feedViewPosts.observeAsState()
-    val isRefreshing = viewModel.isRefreshing.observeAsState()
     val context = LocalContext.current
-    val errored = viewModel.state.collectAsState().value
+    val viewModel: TimelineViewModel = viewModel()
+    val feedViewPosts by viewModel.feedViewPosts.observeAsState(emptyList())
+    val isRefreshing by viewModel.isRefreshing.observeAsState(false)
+    val errored by viewModel.state.collectAsState()
+    val seenAllFeed by viewModel.seenAllFeed.observeAsState(false)
     val refreshState =
-        rememberPullRefreshState(refreshing = isRefreshing.value ?: false, onRefresh = {
+        rememberPullRefreshState(refreshing = isRefreshing, onRefresh = {
             viewModel.refreshPosts(onError = {
                 Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
             })
@@ -106,7 +108,7 @@ private fun Timeline(listState: LazyListState) {
 
     Box(modifier = Modifier.pullRefresh(state = refreshState)) {
         LazyColumn(state = listState) {
-            items(feedViewPosts.value.orEmpty()) { feedViewPost ->
+            items(feedViewPosts) { feedViewPost ->
                 if (feedViewPost.post.viewer.muted != true) {
                     FeedPost(viewPost = feedViewPost)
                     Divider(color = Color.Gray)
@@ -115,9 +117,9 @@ private fun Timeline(listState: LazyListState) {
 
             if (errored == TimelineViewModel.State.Error) {
                 item { ErrorMessage() }
-            } else if (viewModel.feedViewPosts.value?.size == 0) {
+            } else if (feedViewPosts.isEmpty()) {
                 item { NoPostsYetMessage() }
-            } else if (viewModel.seenAllFeed.value == true) {
+            } else if (seenAllFeed) {
                 item { NoMorePostsMessage() }
             } else {
                 item { LoadingIndicator() }
@@ -125,7 +127,7 @@ private fun Timeline(listState: LazyListState) {
         }
 
         PullRefreshIndicator(
-            refreshing = isRefreshing.value ?: false,
+            refreshing = isRefreshing,
             state = refreshState,
             modifier = Modifier.align(Alignment.TopCenter)
         )
@@ -135,12 +137,13 @@ private fun Timeline(listState: LazyListState) {
 @Composable
 fun TimelineScreen(listState: LazyListState) {
     val viewModel: TimelineViewModel = viewModel()
+    val timelineState by viewModel.state.collectAsState()
 
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        when (viewModel.state.collectAsState().value) {
+        when (timelineState) {
             is TimelineViewModel.State.Loading -> LoadingText()
             is TimelineViewModel.State.Loaded -> Timeline(listState)
             is TimelineViewModel.State.Error -> Timeline(listState)

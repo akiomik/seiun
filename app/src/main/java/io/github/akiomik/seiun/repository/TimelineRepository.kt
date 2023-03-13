@@ -25,7 +25,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.*
 import io.github.akiomik.seiun.model.type.Image as ImageType
 
-class TimelineRepository() : ApplicationRepository() {
+class TimelineRepository : ApplicationRepository() {
     suspend fun getTimeline(session: ISession, before: String? = null): Timeline {
         Log.d(SeiunApplication.TAG, "Get timeline: before = $before")
 
