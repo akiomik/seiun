@@ -75,7 +75,6 @@ private fun TypeDropdownMenu(onChange: (String) -> Unit) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReportDialog(feedViewPost: FeedViewPost, onDismissRequest: () -> Unit) {
     val viewModel: TimelineViewModel = viewModel()
