@@ -17,7 +17,11 @@ class LoginViewModel : ApplicationViewModel() {
         }, onSuccess = onSuccess, onError = onError)
     }
 
-    fun getLoginParam(): Pair<String, String> {
+    fun getLoginParam(): Triple<String, String, String> {
         return userRepository.getLoginParam()
+    }
+
+    fun isLoginParamValid(serviceProvider: String, handleOrEmail: String, password: String): Boolean {
+        return serviceProvider.isNotEmpty() && handleOrEmail.isNotEmpty() && password.isNotEmpty()
     }
 }

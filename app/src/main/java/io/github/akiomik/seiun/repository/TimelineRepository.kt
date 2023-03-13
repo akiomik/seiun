@@ -21,17 +21,16 @@ import io.github.akiomik.seiun.model.com.atproto.repo.CreateRecordInput
 import io.github.akiomik.seiun.model.com.atproto.repo.CreateRecordOutput
 import io.github.akiomik.seiun.model.com.atproto.repo.DeleteRecordInput
 import io.github.akiomik.seiun.model.com.atproto.repo.StrongRef
-import io.github.akiomik.seiun.service.AtpService
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.*
 import io.github.akiomik.seiun.model.type.Image as ImageType
 
-class TimelineRepository(private val atpService: AtpService) : ApplicationRepository() {
+class TimelineRepository() : ApplicationRepository() {
     suspend fun getTimeline(session: ISession, before: String? = null): Timeline {
         Log.d(SeiunApplication.TAG, "Get timeline: before = $before")
 
         return handleRequest {
-            atpService.getTimeline("Bearer ${session.accessJwt}", before = before)
+            getAtpClient().getTimeline("Bearer ${session.accessJwt}", before = before)
         }
     }
 
@@ -40,7 +39,7 @@ class TimelineRepository(private val atpService: AtpService) : ApplicationReposi
 
         val body = SetVoteInput(subject = subject, direction = VoteDirection.up)
         return handleRequest {
-            atpService.setVote(authorization = "Bearer ${session.accessJwt}", body = body)
+            getAtpClient().setVote(authorization = "Bearer ${session.accessJwt}", body = body)
         }
     }
 
@@ -49,7 +48,7 @@ class TimelineRepository(private val atpService: AtpService) : ApplicationReposi
 
         val body = SetVoteInput(subject = subject, direction = VoteDirection.none)
         return handleRequest {
-            atpService.setVote(authorization = "Bearer ${session.accessJwt}", body = body)
+            getAtpClient().setVote(authorization = "Bearer ${session.accessJwt}", body = body)
         }
     }
 
@@ -64,7 +63,7 @@ class TimelineRepository(private val atpService: AtpService) : ApplicationReposi
         )
 
         return handleRequest {
-            atpService.repost(authorization = "Bearer ${session.accessJwt}", body = body)
+            getAtpClient().repost(authorization = "Bearer ${session.accessJwt}", body = body)
         }
     }
 
@@ -76,7 +75,7 @@ class TimelineRepository(private val atpService: AtpService) : ApplicationReposi
             DeleteRecordInput(did = session.did, rkey = rkey, collection = "app.bsky.feed.repost")
 
         handleRequest {
-            atpService.deleteRecord("Bearer ${session.accessJwt}", body = body)
+            getAtpClient().deleteRecord("Bearer ${session.accessJwt}", body = body)
         }
     }
 
@@ -100,7 +99,7 @@ class TimelineRepository(private val atpService: AtpService) : ApplicationReposi
             CreateRecordInput(did = session.did, record = record, collection = "app.bsky.feed.post")
 
         return handleRequest {
-            atpService.createPost(authorization = "Bearer ${session.accessJwt}", body = body)
+            getAtpClient().createPost(authorization = "Bearer ${session.accessJwt}", body = body)
         }
     }
 
@@ -124,7 +123,7 @@ class TimelineRepository(private val atpService: AtpService) : ApplicationReposi
         val body = CreateRecordInput(did = session.did, record = record, collection = "")
 
         return handleRequest {
-            atpService.createPost(authorization = "Bearer ${session.accessJwt}", body = body)
+            getAtpClient().createPost(authorization = "Bearer ${session.accessJwt}", body = body)
         }
     }
 
@@ -136,7 +135,7 @@ class TimelineRepository(private val atpService: AtpService) : ApplicationReposi
             DeleteRecordInput(did = session.did, collection = "app.bsky.feed.post", rkey = rkey)
 
         handleRequest {
-            atpService.deleteRecord("Bearer ${session.accessJwt}", body)
+            getAtpClient().deleteRecord("Bearer ${session.accessJwt}", body)
         }
     }
 
@@ -148,7 +147,7 @@ class TimelineRepository(private val atpService: AtpService) : ApplicationReposi
         Log.d(SeiunApplication.TAG, "Upload image: mimeType = $mimeType")
 
         return handleRequest {
-            atpService.uploadBlob(
+            getAtpClient().uploadBlob(
                 authorization = "Bearer ${session.accessJwt}",
                 contentType = mimeType,
                 body = image.toRequestBody()
@@ -178,7 +177,7 @@ class TimelineRepository(private val atpService: AtpService) : ApplicationReposi
         )
 
         return handleRequest {
-            atpService.createReport(authorization = "Bearer ${session.accessJwt}", body = body)
+            getAtpClient().createReport(authorization = "Bearer ${session.accessJwt}", body = body)
         }
     }
 }

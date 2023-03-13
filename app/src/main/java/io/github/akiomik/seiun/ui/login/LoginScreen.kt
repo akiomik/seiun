@@ -64,10 +64,19 @@ private fun LoginTitle() {
 @Composable
 private fun LoginForm(onLoginSuccess: () -> Unit) {
     val viewModel: LoginViewModel = viewModel()
-    val (savedHandleOrEmail, savedPassword) = viewModel.getLoginParam()
+    val (savedServiceProvider, savedHandleOrEmail, savedPassword) = viewModel.getLoginParam()
+    var serviceProvider by remember { mutableStateOf(savedServiceProvider) }
     var handleOrEmail by remember { mutableStateOf(savedHandleOrEmail) }
     var password by remember { mutableStateOf(savedPassword) }
-    var valid by remember { mutableStateOf(handleOrEmail.isNotEmpty() && password.isNotEmpty()) }
+    var valid by remember {
+        mutableStateOf(
+            viewModel.isLoginParamValid(
+                serviceProvider,
+                handleOrEmail,
+                password
+            )
+        )
+    }
     var errorMessage by remember { mutableStateOf("") }
     val loginErrorMessage = stringResource(id = R.string.login_error)
 
@@ -77,10 +86,26 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
         }
 
         TextField(
+            value = serviceProvider,
+            onValueChange = {
+                serviceProvider = it
+                valid = viewModel.isLoginParamValid(serviceProvider, handleOrEmail, password)
+            },
+            label = { Text(stringResource(id = R.string.service_provider)) },
+            placeholder = { Text("bsky.social") },
+            maxLines = 1,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
+            modifier = Modifier
+                .padding(20.dp)
+                .fillMaxWidth(),
+            singleLine = true
+        )
+
+        TextField(
             value = handleOrEmail,
             onValueChange = {
                 handleOrEmail = it
-                valid = handleOrEmail.isNotEmpty() && password.isNotEmpty()
+                valid = viewModel.isLoginParamValid(serviceProvider, handleOrEmail, password)
             },
             label = { Text(stringResource(id = R.string.login_handle_or_email)) },
             placeholder = { Text(text = stringResource(id = R.string.login_handle_or_email_placeholder)) },
@@ -96,7 +121,7 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
             value = password,
             onValueChange = {
                 password = it
-                valid = handleOrEmail.isNotEmpty() && password.isNotEmpty()
+                valid = viewModel.isLoginParamValid(serviceProvider, handleOrEmail, password)
             },
             label = { Text(stringResource(id = R.string.login_password)) },
             maxLines = 1,
@@ -110,10 +135,13 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
 
         ElevatedButton(
             onClick = {
-                Log.d(SeiunApplication.TAG, "Login as $handleOrEmail")
+                Log.d(SeiunApplication.TAG, "Login as $handleOrEmail on $serviceProvider")
+
+                // NOTE: Init atpClient here using serviceProvider
+                SeiunApplication.instance!!.updateServiceProvider(serviceProvider)
 
                 val userRepository = SeiunApplication.instance!!.userRepository
-                userRepository.saveLoginParam(handleOrEmail, password)
+                userRepository.saveLoginParam(serviceProvider, handleOrEmail, password)
 
                 viewModel.login(
                     handle = handleOrEmail,

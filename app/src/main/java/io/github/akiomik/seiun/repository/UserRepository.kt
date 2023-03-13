@@ -14,10 +14,8 @@ import io.github.akiomik.seiun.model.com.atproto.account.AccountCreateOutput
 import io.github.akiomik.seiun.model.com.atproto.session.SessionCreateInput
 import io.github.akiomik.seiun.model.com.atproto.session.SessionCreateOutput
 import io.github.akiomik.seiun.model.com.atproto.session.SessionRefreshOutput
-import io.github.akiomik.seiun.service.AtpService
 
-class UserRepository(context: Context, private val atpService: AtpService) :
-    ApplicationRepository() {
+class UserRepository(context: Context) : ApplicationRepository() {
     private val key = MasterKey.Builder(context)
         .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
         .build()
@@ -54,17 +52,19 @@ class UserRepository(context: Context, private val atpService: AtpService) :
         }
     }
 
-    fun getLoginParam(): Pair<String, String> {
+    fun getLoginParam(): Triple<String, String, String> {
+        val serviceProvider = sharedPreferences.getString("serviceProvider", "bsky.social") ?: ""
         var handleOrEmail = sharedPreferences.getString("handleOrEmail", "") ?: ""
         if (handleOrEmail.isEmpty()) {
             handleOrEmail = sharedPreferences.getString("handle", "") ?: ""
         }
         val password = sharedPreferences.getString("password", "") ?: ""
-        return Pair(handleOrEmail, password)
+        return Triple(serviceProvider, handleOrEmail, password)
     }
 
-    fun saveLoginParam(handleOrEmail: String, password: String) {
+    fun saveLoginParam(serviceProvider: String, handleOrEmail: String, password: String) {
         with(sharedPreferences.edit()) {
+            putString("serviceProvider", serviceProvider)
             putString("handleOrEmail", handleOrEmail)
             putString("password", password)
             apply()
@@ -85,14 +85,14 @@ class UserRepository(context: Context, private val atpService: AtpService) :
             inviteCode = inviteCode
         )
 
-        return handleRequest { atpService.createAccount(param) }
+        return handleRequest { getAtpClient().createAccount(param) }
     }
 
     suspend fun login(handleOrEmail: String, password: String): SessionCreateOutput {
         Log.d(SeiunApplication.TAG, "Create session")
 
         return handleRequest {
-            atpService.createSession(SessionCreateInput(handleOrEmail, password))
+            getAtpClient().createSession(SessionCreateInput(handleOrEmail, password))
         }
     }
 
@@ -101,7 +101,7 @@ class UserRepository(context: Context, private val atpService: AtpService) :
         val oldSession = getSession()
 
         return handleRequest {
-            atpService.refreshSession("Bearer ${oldSession.refreshJwt}")
+            getAtpClient().refreshSession("Bearer ${oldSession.refreshJwt}")
         }
     }
 
@@ -109,7 +109,7 @@ class UserRepository(context: Context, private val atpService: AtpService) :
         Log.d(SeiunApplication.TAG, "Get profile")
 
         return handleRequest {
-            atpService.getProfile("Bearer ${session.accessJwt}", session.did)
+            getAtpClient().getProfile("Bearer ${session.accessJwt}", session.did)
         }
     }
 
@@ -118,7 +118,7 @@ class UserRepository(context: Context, private val atpService: AtpService) :
         val body = MuteInput(user = did)
 
         handleRequest {
-            atpService.mute("Bearer ${session.accessJwt}", body = body)
+            getAtpClient().mute("Bearer ${session.accessJwt}", body = body)
         }
     }
 
@@ -127,7 +127,7 @@ class UserRepository(context: Context, private val atpService: AtpService) :
 
         val body = UnmuteInput(user = did)
         handleRequest {
-            atpService.unmute("Bearer ${session.accessJwt}", body = body)
+            getAtpClient().unmute("Bearer ${session.accessJwt}", body = body)
         }
     }
 }

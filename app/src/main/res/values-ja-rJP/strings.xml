@@ -13,6 +13,7 @@
     <string name="others">その他</string>
     <string name="mute">ミュート</string>
     <string name="login_title">ログイン</string>
+    <string name="service_provider">サービスプロバイダ</string>
     <string name="login_app_description">for ATP/Bluesky</string>
     <string name="login_handle_or_email">ハンドルネーム または メールアドレス</string>
     <string name="login_handle_or_email_placeholder">jack.bsky.social または jack@example.com</string>

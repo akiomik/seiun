@@ -23,4 +23,13 @@ class RegistrationViewModel : ApplicationViewModel() {
             )
         }, onSuccess = onSuccess, onError = onError)
     }
+
+    fun isRegisterParamValid(
+        serviceProvider: String,
+        email: String,
+        handle: String,
+        password: String
+    ): Boolean {
+        return serviceProvider.isNotEmpty() && email.isNotEmpty() && handle.isNotEmpty() && password.isNotEmpty()
+    }
 }

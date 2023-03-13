@@ -41,12 +41,21 @@ fun RegistrationTitle() {
 @Composable
 fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
     val viewModel: RegistrationViewModel = viewModel()
+    var serviceProvider by remember { mutableStateOf("bsky.social") }
     var email by remember { mutableStateOf("") }
     var handle by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var inviteCode by remember { mutableStateOf("") }
-    val valid =
-        email.isNotEmpty() && handle.isNotEmpty() && password.isNotEmpty() && inviteCode.isNotEmpty()
+    var valid by remember {
+        mutableStateOf(
+            viewModel.isRegisterParamValid(
+                serviceProvider,
+                email,
+                handle,
+                password
+            )
+        )
+    }
     var errorMessage by remember { mutableStateOf("") }
 
     Column {
@@ -55,8 +64,27 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
         }
 
         TextField(
+            value = serviceProvider,
+            onValueChange = {
+                serviceProvider = it
+                valid = viewModel.isRegisterParamValid(serviceProvider, email, handle, password)
+            },
+            label = { Text(stringResource(id = R.string.service_provider)) },
+            placeholder = { Text("bsky.social") },
+            maxLines = 1,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            modifier = Modifier
+                .padding(20.dp)
+                .fillMaxWidth(),
+            singleLine = true
+        )
+
+        TextField(
             value = email,
-            onValueChange = { email = it },
+            onValueChange = {
+                email = it
+                valid = viewModel.isRegisterParamValid(serviceProvider, email, handle, password)
+            },
             label = { Text(stringResource(id = R.string.registration_email)) },
             placeholder = { Text(text = stringResource(id = R.string.registration_email_placeholder)) },
             maxLines = 1,
@@ -69,12 +97,15 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
 
         TextField(
             value = handle,
-            onValueChange = { handle = it },
+            onValueChange = {
+                handle = it
+                valid = viewModel.isRegisterParamValid(serviceProvider, email, handle, password)
+            },
             label = { Text(stringResource(id = R.string.registration_handle)) },
             placeholder = { Text(text = stringResource(id = R.string.registration_handle_placeholder)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
             prefix = { Text(text = "@") },
-            suffix = { Text(text = ".bsky.social") },
+            suffix = { Text(text = ".$serviceProvider") },
             maxLines = 1,
             modifier = Modifier
                 .padding(20.dp)
@@ -84,7 +115,10 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
 
         TextField(
             value = password,
-            onValueChange = { password = it },
+            onValueChange = {
+                password = it
+                valid = viewModel.isRegisterParamValid(serviceProvider, email, handle, password)
+            },
             label = { Text(stringResource(id = R.string.registration_password)) },
             maxLines = 1,
             visualTransformation = PasswordVisualTransformation(),
@@ -97,7 +131,10 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
 
         TextField(
             value = inviteCode,
-            onValueChange = { inviteCode = it },
+            onValueChange = {
+                inviteCode = it
+                valid = viewModel.isRegisterParamValid(serviceProvider, email, handle, password)
+            },
             label = { Text(stringResource(id = R.string.registration_invite_code)) },
             placeholder = { Text(text = "bsky.social-XXXXXX") },
             maxLines = 1,
@@ -110,14 +147,21 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
 
         ElevatedButton(
             onClick = {
-                Log.d(SeiunApplication.TAG, "Create account for $handle")
+                Log.d(SeiunApplication.TAG, "Create account for $handle on $serviceProvider")
+
+                // NOTE: Init atpClient here using serviceProvider
+                SeiunApplication.instance!!.updateServiceProvider(serviceProvider)
 
                 val userRepository = SeiunApplication.instance!!.userRepository
-                userRepository.saveLoginParam(handle, password)
+                userRepository.saveLoginParam(
+                    serviceProvider,
+                    "$handle.$serviceProvider",
+                    password
+                )
 
                 viewModel.register(
                     email = email,
-                    handle = "$handle.bsky.social",
+                    handle = "$handle.$serviceProvider",
                     password = password,
                     inviteCode = inviteCode,
                     onSuccess = { session ->

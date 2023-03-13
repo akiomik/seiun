@@ -1,10 +1,16 @@
 package io.github.akiomik.seiun.repository
 
 import com.slack.eithernet.ApiResult
+import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.model.AtpError
+import io.github.akiomik.seiun.service.AtpService
 import io.github.akiomik.seiun.service.UnauthorizedException
 
 abstract class ApplicationRepository {
+    protected fun getAtpClient(): AtpService {
+        return SeiunApplication.instance!!.atpService
+    }
+
     protected suspend fun <A : Any> handleRequest(run: suspend () -> ApiResult<A, AtpError>): A {
         when (val res = run()) {
             is ApiResult.Success -> return res.value
