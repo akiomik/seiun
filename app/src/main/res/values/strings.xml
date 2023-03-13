@@ -11,6 +11,7 @@
     <string name="spam">Spam</string>
     <string name="others">Others</string>
     <string name="mute">Mute</string>
+    <string name="service_provider">Service Provider</string>
     <string name="login_title">Login</string>
     <string name="login_app_description">for ATP/Bluesky</string>
     <string name="login_handle_or_email">Handle or Email</string>
