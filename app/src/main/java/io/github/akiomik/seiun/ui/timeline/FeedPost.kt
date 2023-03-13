@@ -40,6 +40,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -259,6 +260,7 @@ fun MenuButton(viewPost: FeedViewPost) {
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showReportDialog by remember { mutableStateOf(false) }
     var showMuteDialog by remember { mutableStateOf(false) }
+    val profile by viewModel.profile.observeAsState()
 
     TextButton(onClick = { showMenu = true }) {
         Icon(
@@ -270,7 +272,7 @@ fun MenuButton(viewPost: FeedViewPost) {
     }
 
     DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
-        if (viewPost.post.author.did == viewModel.profile.value?.did) {
+        if (viewPost.post.author.did == profile?.did) {
             DropdownMenuItem(
                 text = { Text(stringResource(id = R.string.delete)) },
                 onClick = {
