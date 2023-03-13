@@ -10,21 +10,35 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -76,7 +90,62 @@ class SeiunActivity : ComponentActivity() {
 }
 
 @Composable
-private fun Avatar(profile: Profile?) {
+private fun DrawerAvatar(profile: Profile?) {
+    AsyncImage(
+        model = profile?.avatar,
+        contentDescription = null,
+        modifier = Modifier
+            .width(48.dp)
+            .height(48.dp)
+            .clip(CircleShape)
+    )
+}
+
+@Composable
+fun Drawer(state: DrawerState, content: @Composable () -> Unit) {
+    val viewModel: TimelineViewModel = viewModel()
+    val profile by viewModel.profile.observeAsState()
+    val scope = rememberCoroutineScope()
+    val items = listOf(Icons.Default.Favorite, Icons.Default.Face, Icons.Default.Email)
+    val selectedItem = remember { mutableStateOf(items[0]) }
+
+    ModalNavigationDrawer(
+        drawerState = state,
+        drawerContent = {
+            ModalDrawerSheet {
+//                Spacer(Modifier.height(12.dp))
+                Row(
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                ) {
+                    DrawerAvatar(profile = profile)
+                    Column {
+                        Text(profile?.displayName.orEmpty())
+                        Text(profile?.handle.orEmpty())
+                    }
+                }
+                Divider()
+//                items.forEach { item ->
+//                    NavigationDrawerItem(
+//                        icon = { Icon(item, contentDescription = null) },
+//                        label = { Text(item.name) },
+//                        selected = item == selectedItem.value,
+//                        onClick = {
+//                            scope.launch { state.close() }
+//                            selectedItem.value = item
+//                        },
+//                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+//                    )
+//                }
+            }
+        },
+        content = content
+    )
+}
+
+@Composable
+private fun TopBarAvatar(profile: Profile?, drawerState: DrawerState) {
+    val scope = rememberCoroutineScope()
+
     AsyncImage(
         model = profile?.avatar,
         contentDescription = null,
@@ -84,19 +153,30 @@ private fun Avatar(profile: Profile?) {
             .width(36.dp)
             .height(36.dp)
             .clip(CircleShape)
+            .clickable { scope.launch { drawerState.open() } }
+    )
+}
+
+@Composable
+fun AppName(drawerState: DrawerState) {
+    val scope = rememberCoroutineScope()
+
+    Text(
+        text = stringResource(R.string.app_name),
+        modifier = Modifier.clickable { scope.launch { drawerState.open() } }
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(scrollBehavior: TopAppBarScrollBehavior, visible: Boolean) {
+fun TopBar(scrollBehavior: TopAppBarScrollBehavior, visible: Boolean, drawerState: DrawerState) {
     val viewModel: TimelineViewModel = viewModel()
     val profile by viewModel.profile.observeAsState()
 
     AnimatedVisibility(visible = visible) {
         CenterAlignedTopAppBar(
-            title = { Text(stringResource(id = R.string.app_name)) },
-            navigationIcon = { Avatar(profile) },
+            title = { AppName(drawerState) },
+            navigationIcon = { TopBarAvatar(profile, drawerState) },
             scrollBehavior = scrollBehavior
         )
     }
@@ -236,6 +316,7 @@ fun App(from: String?) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val timelineListState = rememberLazyListState()
     val notificationListState = rememberLazyListState()
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
     var topBarState by rememberSaveable { (mutableStateOf(false)) }
     var bottomBarState by rememberSaveable { (mutableStateOf(false)) }
     var fabState by remember { (mutableStateOf<@Composable () -> Unit>({})) }
@@ -269,27 +350,29 @@ fun App(from: String?) {
     }
 
     SeiunTheme {
-        Scaffold(
-            topBar = { TopBar(scrollBehavior, visible = topBarState) },
-            bottomBar = {
-                BottomBar(
-                    navController = navController,
-                    visible = bottomBarState,
-                    timelineListState = timelineListState,
-                    notificationListState = notificationListState
-                )
-            },
-            floatingActionButton = fabState,
-            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-            content = {
-                Navigation(
-                    navController = navController,
-                    modifier = Modifier.padding(it),
-                    timelineListState = timelineListState,
-                    notificationListState = notificationListState,
-                    startDestination = startDestination
-                )
-            }
-        )
+        Drawer(drawerState) {
+            Scaffold(
+                topBar = { TopBar(scrollBehavior, visible = topBarState, drawerState = drawerState) },
+                bottomBar = {
+                    BottomBar(
+                        navController = navController,
+                        visible = bottomBarState,
+                        timelineListState = timelineListState,
+                        notificationListState = notificationListState
+                    )
+                },
+                floatingActionButton = fabState,
+                modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+                content = {
+                    Navigation(
+                        navController = navController,
+                        modifier = Modifier.padding(it),
+                        timelineListState = timelineListState,
+                        notificationListState = notificationListState,
+                        startDestination = startDestination
+                    )
+                }
+            )
+        }
     }
 }
