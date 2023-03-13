@@ -10,6 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.*
 
 class NotificationViewModel : ApplicationViewModel() {
     sealed class State {
@@ -35,7 +36,11 @@ class NotificationViewModel : ApplicationViewModel() {
     init {
         viewModelScope.launch(Dispatchers.IO) {
             wrapError(run = {
-                withRetry(userRepository) { notificationRepository.listNotifications(it) }
+                withRetry(userRepository) {
+                    val notifications = notificationRepository.listNotifications(it)
+                    notificationRepository.updateNotificationSeen(it, Date())
+                    notifications
+                }
             }, onSuccess = {
                     _notifications.postValue(it.notifications)
 
@@ -61,22 +66,24 @@ class NotificationViewModel : ApplicationViewModel() {
         _isRefreshing.postValue(true)
 
         wrapError(run = {
-            val data = withRetry(userRepository) { notificationRepository.listNotifications(it) }
+            val data = withRetry(userRepository) {
+                val notifications = notificationRepository.listNotifications(it)
+                notificationRepository.updateNotificationSeen(it, Date())
+                notifications
+            }
 
             if (_cursor.value == null) {
                 _cursor.postValue(data.cursor)
             }
 
-            if (data.cursor != _cursor.value) {
-                val newNotifications =
-                    mergeNotifications(_notifications.value.orEmpty(), data.notifications)
-                _notifications.postValue(newNotifications)
-                Log.d(SeiunApplication.TAG, "Notifications are merged")
-            } else {
-                Log.d(SeiunApplication.TAG, "Skip merge because cursor is unchanged")
-            }
+            // NOTE: Update always for updating isRead
+            val newNotifications =
+                mergeNotifications(_notifications.value.orEmpty(), data.notifications)
+            _notifications.postValue(newNotifications)
+            Log.d(SeiunApplication.TAG, "Notifications are merged")
         }, onComplete = {
                 _isRefreshing.postValue(false)
+                SeiunApplication.instance!!.clearNotifications()
             }, onError = onError)
     }
 
@@ -103,18 +110,27 @@ class NotificationViewModel : ApplicationViewModel() {
         }, onError = onError)
     }
 
+    private fun updateNotificationAt(
+        notifications: List<Notification>,
+        index: Int,
+        notification: Notification
+    ): List<Notification> {
+        val notifications = notifications.toMutableList()
+        notifications[index] = notification
+        return notifications
+    }
+
     private fun mergeNotifications(
-        currentPosts: List<Notification>,
+        currentNotifications: List<Notification>,
         newPosts: List<Notification>
     ): List<Notification> {
-        val top50Posts = currentPosts.take(50) // NOTE: 50 is default limit of getTimeline
-
         // TODO: improve merge logic
-        return newPosts.reversed().fold(currentPosts) { acc, post ->
-            if (!top50Posts.any { post.cid == it.cid && post.reason == it.reason }) {
-                listOf(post) + acc
+        return newPosts.reversed().fold(currentNotifications) { acc, post ->
+            val index = acc.indexOfFirst { post.cid == it.cid && post.reason == it.reason }
+            if (index >= 0) {
+                updateNotificationAt(acc, index, post)
             } else {
-                acc
+                listOf(post) + acc
             }
         }
     }

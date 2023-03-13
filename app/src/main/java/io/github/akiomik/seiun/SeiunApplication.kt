@@ -1,7 +1,11 @@
 package io.github.akiomik.seiun
 
 import android.app.Application
+import android.app.NotificationManager
+import android.content.Context
 import android.util.Log
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.slack.eithernet.ApiResultCallAdapterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
@@ -14,10 +18,11 @@ import io.github.akiomik.seiun.service.CustomApiResultConverterFactory
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.create
+import java.time.Duration
 import java.util.*
 
 class SeiunApplication : Application() {
-    lateinit var atpService: AtpService
+    var atpService: AtpService? = null
     lateinit var userRepository: UserRepository
     lateinit var timelineRepository: TimelineRepository
     lateinit var notificationRepository: NotificationRepository
@@ -28,6 +33,7 @@ class SeiunApplication : Application() {
             private set
 
         const val TAG = "Seiun"
+        const val NOTIFICATION_ID = 0
     }
 
     override fun onCreate() {
@@ -39,7 +45,15 @@ class SeiunApplication : Application() {
         instance = this
     }
 
-    fun updateServiceProvider(serviceProvider: String) {
+    fun isAtpServiceInitialized(): Boolean {
+        return atpService != null
+    }
+
+    fun setAtpClient() {
+        setAtpClient(userRepository.getLoginParam().first)
+    }
+
+    fun setAtpClient(serviceProvider: String) {
         Log.d(TAG, "Change serviceProvider to $serviceProvider")
 
         val moshi = Moshi.Builder()
@@ -53,5 +67,21 @@ class SeiunApplication : Application() {
             .addCallAdapterFactory(ApiResultCallAdapterFactory)
             .build()
             .create()
+    }
+
+    fun registerNotificationWorker() {
+        val notificationWorkRequest =
+            PeriodicWorkRequestBuilder<NotificationWorker>(Duration.ofMinutes(15))
+                .setInitialDelay(Duration.ofMinutes(3))
+                .build()
+        val manager = WorkManager.getInstance(this)
+        manager.cancelAllWork()
+        manager.enqueue(notificationWorkRequest)
+    }
+
+    fun clearNotifications() {
+        val notificationManager =
+            this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancel(NOTIFICATION_ID)
     }
 }

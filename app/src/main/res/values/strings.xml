@@ -56,4 +56,6 @@
     <string name="timeline_no_posts_yet">No posts yet</string>
     <string name="timeline_no_more_posts">No more posts</string>
     <string name="timeline_error">Failed to get timeline. Please try later</string>
+    <string name="notification_name">Post and activities</string>
+    <string name="notification_title">You\'ve got %1$d recent notifications</string>
 </resources>

@@ -57,4 +57,6 @@
     <string name="timeline_no_posts_yet">まだ投稿がありません</string>
     <string name="timeline_no_more_posts">これ以上投稿はありません</string>
     <string name="timeline_error">タイムラインの取得に失敗しました。後ほどお試しください</string>
+    <string name="notification_name">投稿とアクティビティ</string>
+    <string name="notification_title">新しい通知が %1$d 件あります</string>
 </resources>

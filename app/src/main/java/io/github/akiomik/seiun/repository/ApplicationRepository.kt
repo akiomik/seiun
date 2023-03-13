@@ -8,7 +8,7 @@ import io.github.akiomik.seiun.service.UnauthorizedException
 
 abstract class ApplicationRepository {
     protected fun getAtpClient(): AtpService {
-        return SeiunApplication.instance!!.atpService
+        return SeiunApplication.instance!!.atpService!!
     }
 
     protected suspend fun <A : Any> handleRequest(run: suspend () -> ApiResult<A, AtpError>): A {

@@ -138,7 +138,7 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
                 Log.d(SeiunApplication.TAG, "Login as $handleOrEmail on $serviceProvider")
 
                 // NOTE: Init atpClient here using serviceProvider
-                SeiunApplication.instance!!.updateServiceProvider(serviceProvider)
+                SeiunApplication.instance!!.setAtpClient(serviceProvider)
 
                 val userRepository = SeiunApplication.instance!!.userRepository
                 userRepository.saveLoginParam(serviceProvider, handleOrEmail, password)

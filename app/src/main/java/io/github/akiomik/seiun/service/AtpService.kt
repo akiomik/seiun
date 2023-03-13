@@ -12,6 +12,7 @@ import io.github.akiomik.seiun.model.app.bsky.feed.SetVoteOutput
 import io.github.akiomik.seiun.model.app.bsky.feed.Timeline
 import io.github.akiomik.seiun.model.app.bsky.graph.MuteInput
 import io.github.akiomik.seiun.model.app.bsky.graph.UnmuteInput
+import io.github.akiomik.seiun.model.app.bsky.notification.UpdateNotificationSeenInput
 import io.github.akiomik.seiun.model.app.bsky.report.ReportCreateInput
 import io.github.akiomik.seiun.model.app.bsky.report.ReportCreateOutput
 import io.github.akiomik.seiun.model.com.atproto.account.AccountCreateInput
@@ -99,6 +100,13 @@ interface AtpService {
         @Query("limit") limit: Int? = null,
         @Query("before") before: String? = null
     ): ApiResult<io.github.akiomik.seiun.model.app.bsky.notification.NotificationList, AtpError>
+
+    @DecodeErrorBody
+    @POST("app.bsky.notification.updateSeen")
+    suspend fun updateNotificationSeen(
+        @Header("Authorization") authorization: String,
+        @Body() body: UpdateNotificationSeenInput
+    ): ApiResult<Unit, AtpError>
 
     @DecodeErrorBody
     @POST("com.atproto.blob.upload")

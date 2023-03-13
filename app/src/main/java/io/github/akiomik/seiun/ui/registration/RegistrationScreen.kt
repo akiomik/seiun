@@ -150,7 +150,7 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
                 Log.d(SeiunApplication.TAG, "Create account for $handle on $serviceProvider")
 
                 // NOTE: Init atpClient here using serviceProvider
-                SeiunApplication.instance!!.updateServiceProvider(serviceProvider)
+                SeiunApplication.instance!!.setAtpClient(serviceProvider)
 
                 val userRepository = SeiunApplication.instance!!.userRepository
                 userRepository.saveLoginParam(

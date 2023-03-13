@@ -1,8 +1,14 @@
 package io.github.akiomik.seiun
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -31,8 +37,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -42,6 +50,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.work.WorkManager
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.model.app.bsky.actor.Profile
 import io.github.akiomik.seiun.ui.login.LoginScreen
@@ -57,8 +66,11 @@ class SeiunActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val from = intent.getStringExtra("from")
+        Log.d(SeiunApplication.TAG, "from = $from")
+
         setContent {
-            App()
+            App(from)
         }
     }
 }
@@ -147,11 +159,62 @@ fun Navigation(
     navController: NavHostController,
     modifier: Modifier,
     timelineListState: LazyListState,
-    notificationListState: LazyListState
+    notificationListState: LazyListState,
+    startDestination: String
 ) {
-    NavHost(navController = navController, startDestination = "login", modifier = modifier) {
-        composable("timeline") { TimelineScreen(timelineListState) }
-        composable("notification") { NotificationScreen(notificationListState) }
+    val application = SeiunApplication.instance!!
+    val context = LocalContext.current
+
+    val isNotificationGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        val postNotificationPermission =
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
+        postNotificationPermission == PackageManager.PERMISSION_GRANTED
+    } else {
+        true
+    }
+
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
+        if (it) {
+            Log.d(SeiunApplication.TAG, "Queue notification worker")
+            application.registerNotificationWorker()
+        }
+    }
+
+    NavHost(
+        navController = navController,
+        startDestination = startDestination,
+        modifier = modifier
+    ) {
+        composable("timeline") {
+            if (!application.isAtpServiceInitialized()) {
+                application.setAtpClient()
+            }
+
+            // NOTE: Register notification worker when already granted
+            if (isNotificationGranted) {
+                Log.d(SeiunApplication.TAG, "Queue notification worker")
+                application.registerNotificationWorker()
+            }
+
+            TimelineScreen(timelineListState)
+        }
+        composable("notification") {
+            if (!application.isAtpServiceInitialized()) {
+                application.setAtpClient()
+            }
+
+            application.clearNotifications()
+
+            // NOTE: Request permission and register notification worker when granted
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            } else {
+                Log.d(SeiunApplication.TAG, "Queue notification worker")
+                application.registerNotificationWorker()
+            }
+
+            NotificationScreen(notificationListState)
+        }
         composable("login") {
             LoginScreen(onLoginSuccess = {
                 navController.navigate("timeline")
@@ -160,16 +223,14 @@ fun Navigation(
                 })
         }
         composable("registration") {
-            RegistrationScreen(onRegistrationSuccess = {
-                navController.navigate("timeline")
-            })
+            RegistrationScreen(onRegistrationSuccess = { navController.navigate("timeline") })
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun App() {
+fun App(from: String?) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -178,6 +239,13 @@ fun App() {
     var topBarState by rememberSaveable { (mutableStateOf(false)) }
     var bottomBarState by rememberSaveable { (mutableStateOf(false)) }
     var fabState by remember { (mutableStateOf<@Composable () -> Unit>({})) }
+
+    val startDestination =
+        if (from == "notification" && SeiunApplication.instance!!.isAtpServiceInitialized()) {
+            "notification"
+        } else {
+            "login"
+        }
 
     when (navBackStackEntry?.destination?.route) {
         "timeline" -> {
@@ -191,6 +259,9 @@ fun App() {
             fabState = {}
         }
         else -> {
+            Log.d(SeiunApplication.TAG, "Cancel all work")
+            WorkManager.getInstance(LocalContext.current).cancelAllWork()
+
             topBarState = false
             bottomBarState = false
             fabState = {}
@@ -215,7 +286,8 @@ fun App() {
                     navController = navController,
                     modifier = Modifier.padding(it),
                     timelineListState = timelineListState,
-                    notificationListState = notificationListState
+                    notificationListState = notificationListState,
+                    startDestination = startDestination
                 )
             }
         )
