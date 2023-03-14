@@ -1,8 +1,11 @@
 package io.github.akiomik.seiun.ui.notification
 
 import android.text.format.DateFormat
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -10,6 +13,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -186,13 +190,19 @@ private fun ReplyItem(notification: Notification) {
 
 @Composable
 fun NotificationListItem(notification: Notification) {
-    when (notification.reason) {
-        "vote" -> VoteItem(notification = notification)
-        "repost" -> RepostItem(notification = notification)
-        "follow" -> FollowItem(notification = notification)
-        "invite" -> InviteItem(notification = notification)
-        "mention" -> MentionItem(notification = notification)
-        "reply" -> ReplyItem(notification = notification)
-        else -> {}
+    val readColor = MaterialTheme.colorScheme.surface
+    val unreadColor = MaterialTheme.colorScheme.primaryContainer
+    val color = if (notification.isRead) readColor else unreadColor
+
+    Box(modifier = Modifier.background(color).fillMaxWidth()) {
+        when (notification.reason) {
+            "vote" -> VoteItem(notification = notification)
+            "repost" -> RepostItem(notification = notification)
+            "follow" -> FollowItem(notification = notification)
+            "invite" -> InviteItem(notification = notification)
+            "mention" -> MentionItem(notification = notification)
+            "reply" -> ReplyItem(notification = notification)
+            else -> {}
+        }
     }
 }
