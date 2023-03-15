@@ -9,6 +9,7 @@ import androidx.work.WorkManager
 import io.github.akiomik.seiun.api.AtpService
 import io.github.akiomik.seiun.datastores.CredentialDataStore
 import io.github.akiomik.seiun.datastores.SessionDataStore
+import io.github.akiomik.seiun.repository.AuthRepository
 import io.github.akiomik.seiun.repository.NotificationRepository
 import io.github.akiomik.seiun.repository.TimelineRepository
 import io.github.akiomik.seiun.repository.UserRepository
@@ -18,6 +19,7 @@ class SeiunApplication : Application() {
     var atpService: AtpService? = null
     private lateinit var credentialDataStore: CredentialDataStore
     private lateinit var sessionDataStore: SessionDataStore
+    lateinit var authRepository: AuthRepository
     lateinit var userRepository: UserRepository
     lateinit var timelineRepository: TimelineRepository
     lateinit var notificationRepository: NotificationRepository
@@ -36,9 +38,10 @@ class SeiunApplication : Application() {
 
         credentialDataStore = CredentialDataStore(applicationContext)
         sessionDataStore = SessionDataStore(applicationContext)
-        userRepository = UserRepository(credentialDataStore, sessionDataStore)
-        timelineRepository = TimelineRepository()
-        notificationRepository = NotificationRepository()
+        authRepository = AuthRepository(credentialDataStore, sessionDataStore)
+        userRepository = UserRepository(authRepository)
+        timelineRepository = TimelineRepository(authRepository)
+        notificationRepository = NotificationRepository(authRepository)
         instance = this
     }
 

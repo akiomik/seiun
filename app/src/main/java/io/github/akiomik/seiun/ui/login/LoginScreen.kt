@@ -142,15 +142,15 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
                 // NOTE: Init atpClient here using serviceProvider
                 SeiunApplication.instance!!.setAtpClient(serviceProvider)
 
-                val userRepository = SeiunApplication.instance!!.userRepository
-                userRepository.saveCredential(Credential(serviceProvider, handleOrEmail, password))
+                val authRepository = SeiunApplication.instance!!.authRepository
+                authRepository.saveCredential(Credential(serviceProvider, handleOrEmail, password))
 
                 viewModel.login(
                     handle = handleOrEmail,
                     password = password,
                     onSuccess = { session ->
                         Log.d(SeiunApplication.TAG, "Login successful")
-                        userRepository.saveSession(Session.fromISession(session))
+                        authRepository.saveSession(Session.fromISession(session))
                         onLoginSuccess()
                     },
                     onError = { error ->
