@@ -30,9 +30,14 @@ class NotificationWorker(private val context: Context, workerParams: WorkerParam
         Log.d(SeiunApplication.TAG, "Fetch notifications")
 
         // TODO: Check first that notifications are available
-        val authRepository = SeiunApplication.instance!!.authRepository
         val notificationRepository = SeiunApplication.instance!!.notificationRepository
-        val notifications = notificationRepository.listNotifications(authRepository.getSession())
+        val notifications =
+            try {
+                notificationRepository.listNotifications()
+            } catch (e: Exception) {
+                Log.d(SeiunApplication.TAG, "Failed to fetch notifications: $e")
+                return Result.failure()
+            }
 
         val unreadCount = notifications.notifications.fold(0) { acc, notification ->
             if (notification.isRead) {

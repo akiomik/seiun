@@ -2,7 +2,7 @@ package io.github.akiomik.seiun.repository
 
 import android.util.Log
 import io.github.akiomik.seiun.SeiunApplication
-import io.github.akiomik.seiun.model.ISession
+import io.github.akiomik.seiun.api.RequestHelper
 import io.github.akiomik.seiun.model.app.bsky.blob.UploadBlobOutput
 import io.github.akiomik.seiun.model.app.bsky.embed.Image
 import io.github.akiomik.seiun.model.app.bsky.feed.FeedViewPost
@@ -25,62 +25,60 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.*
 import io.github.akiomik.seiun.model.type.Image as ImageType
 
-class TimelineRepository : ApplicationRepository() {
-    suspend fun getTimeline(session: ISession, before: String? = null): Timeline {
+class TimelineRepository(private val authRepository: AuthRepository) : ApplicationRepository() {
+    suspend fun getTimeline(before: String? = null): Timeline {
         Log.d(SeiunApplication.TAG, "Get timeline: before = $before")
 
-        return handleRequest {
-            getAtpClient().getTimeline("Bearer ${session.accessJwt}", before = before)
+        return RequestHelper.executeWithRetry(authRepository) {
+            getAtpClient().getTimeline("Bearer ${it.accessJwt}", before = before)
         }
     }
 
-    suspend fun upvote(session: ISession, subject: StrongRef): SetVoteOutput {
+    suspend fun upvote(subject: StrongRef): SetVoteOutput {
         Log.d(SeiunApplication.TAG, "Upvote post: uri = ${subject.uri}, cid = ${subject.cid}")
 
         val body = SetVoteInput(subject = subject, direction = VoteDirection.up)
-        return handleRequest {
-            getAtpClient().setVote(authorization = "Bearer ${session.accessJwt}", body = body)
+        return RequestHelper.executeWithRetry(authRepository) {
+            getAtpClient().setVote(authorization = "Bearer ${it.accessJwt}", body = body)
         }
     }
 
-    suspend fun cancelVote(session: ISession, subject: StrongRef): SetVoteOutput {
+    suspend fun cancelVote(subject: StrongRef): SetVoteOutput {
         Log.d(SeiunApplication.TAG, "Cancel vote post: uri = ${subject.uri}, cid = ${subject.cid}")
 
         val body = SetVoteInput(subject = subject, direction = VoteDirection.none)
-        return handleRequest {
-            getAtpClient().setVote(authorization = "Bearer ${session.accessJwt}", body = body)
+        return RequestHelper.executeWithRetry(authRepository) {
+            getAtpClient().setVote(authorization = "Bearer ${it.accessJwt}", body = body)
         }
     }
 
-    suspend fun repost(session: ISession, subject: StrongRef): CreateRecordOutput {
+    suspend fun repost(subject: StrongRef): CreateRecordOutput {
         Log.d(SeiunApplication.TAG, "Repost: uri = ${subject.uri}, cid = ${subject.cid}")
 
-        val record = Repost(subject = subject, Date())
-        val body = CreateRecordInput(
-            did = session.did,
-            record = record,
-            collection = "app.bsky.feed.repost"
-        )
-
-        return handleRequest {
-            getAtpClient().repost(authorization = "Bearer ${session.accessJwt}", body = body)
+        return RequestHelper.executeWithRetry(authRepository) {
+            val record = Repost(subject = subject, Date())
+            val body = CreateRecordInput(
+                did = it.did,
+                record = record,
+                collection = "app.bsky.feed.repost"
+            )
+            getAtpClient().repost(authorization = "Bearer ${it.accessJwt}", body = body)
         }
     }
 
-    suspend fun cancelRepost(session: ISession, uri: String) {
+    suspend fun cancelRepost(uri: String) {
         Log.d(SeiunApplication.TAG, "Cancel repost: $uri")
 
         val rkey = uri.split('/').last()
-        val body =
-            DeleteRecordInput(did = session.did, rkey = rkey, collection = "app.bsky.feed.repost")
 
-        handleRequest {
-            getAtpClient().deleteRecord("Bearer ${session.accessJwt}", body = body)
+        return RequestHelper.executeWithRetry(authRepository) {
+            val body =
+                DeleteRecordInput(did = it.did, rkey = rkey, collection = "app.bsky.feed.repost")
+            getAtpClient().deleteRecord("Bearer ${it.accessJwt}", body = body)
         }
     }
 
     suspend fun createPost(
-        session: ISession,
         content: String,
         imageCid: String?,
         imageMimeType: String?
@@ -95,16 +93,15 @@ class TimelineRepository : ApplicationRepository() {
         }
 
         val record = Post(text = content, createdAt = Date(), embed = embed)
-        val body =
-            CreateRecordInput(did = session.did, record = record, collection = "app.bsky.feed.post")
 
-        return handleRequest {
-            getAtpClient().createPost(authorization = "Bearer ${session.accessJwt}", body = body)
+        return RequestHelper.executeWithRetry(authRepository) {
+            val body =
+                CreateRecordInput(did = it.did, record = record, collection = "app.bsky.feed.post")
+            getAtpClient().createPost(authorization = "Bearer ${it.accessJwt}", body = body)
         }
     }
 
     suspend fun createReply(
-        session: ISession,
         content: String,
         to: PostReplyRef,
         imageCid: String?,
@@ -120,35 +117,31 @@ class TimelineRepository : ApplicationRepository() {
             null
         }
         val record = Post(text = content, createdAt = Date(), reply = to, embed = embed)
-        val body = CreateRecordInput(did = session.did, record = record, collection = "")
 
-        return handleRequest {
-            getAtpClient().createPost(authorization = "Bearer ${session.accessJwt}", body = body)
+        return RequestHelper.executeWithRetry(authRepository) {
+            val body = CreateRecordInput(did = it.did, record = record, collection = "")
+            getAtpClient().createPost(authorization = "Bearer ${it.accessJwt}", body = body)
         }
     }
 
-    suspend fun deletePost(session: ISession, feedViewPost: FeedViewPost) {
+    suspend fun deletePost(feedViewPost: FeedViewPost) {
         Log.d(SeiunApplication.TAG, "Delete post: uri = ${feedViewPost.post.uri}")
 
         val rkey = feedViewPost.post.uri.split('/').last()
-        val body =
-            DeleteRecordInput(did = session.did, collection = "app.bsky.feed.post", rkey = rkey)
 
-        handleRequest {
-            getAtpClient().deleteRecord("Bearer ${session.accessJwt}", body)
+        return RequestHelper.executeWithRetry(authRepository) {
+            val body =
+                DeleteRecordInput(did = it.did, collection = "app.bsky.feed.post", rkey = rkey)
+            getAtpClient().deleteRecord("Bearer ${it.accessJwt}", body)
         }
     }
 
-    suspend fun uploadImage(
-        session: ISession,
-        image: ByteArray,
-        mimeType: String
-    ): UploadBlobOutput {
+    suspend fun uploadImage(image: ByteArray, mimeType: String): UploadBlobOutput {
         Log.d(SeiunApplication.TAG, "Upload image: mimeType = $mimeType")
 
-        return handleRequest {
+        return RequestHelper.executeWithRetry(authRepository) {
             getAtpClient().uploadBlob(
-                authorization = "Bearer ${session.accessJwt}",
+                authorization = "Bearer ${it.accessJwt}",
                 contentType = mimeType,
                 body = image.toRequestBody()
             )
@@ -156,7 +149,6 @@ class TimelineRepository : ApplicationRepository() {
     }
 
     suspend fun reportPost(
-        session: ISession,
         feedViewPost: FeedViewPost,
         reasonType: String,
         reason: String? = null
@@ -176,8 +168,8 @@ class TimelineRepository : ApplicationRepository() {
             reason = reason
         )
 
-        return handleRequest {
-            getAtpClient().createReport(authorization = "Bearer ${session.accessJwt}", body = body)
+        return RequestHelper.executeWithRetry(authRepository) {
+            getAtpClient().createReport(authorization = "Bearer ${it.accessJwt}", body = body)
         }
     }
 }

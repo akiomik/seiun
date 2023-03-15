@@ -30,17 +30,14 @@ class NotificationViewModel : ApplicationViewModel() {
     private var _state = MutableStateFlow<State>(State.Loading)
     val state = _state.asStateFlow()
 
-    private val authRepository = SeiunApplication.instance!!.authRepository
     private val notificationRepository = SeiunApplication.instance!!.notificationRepository
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
             wrapError(run = {
-                withRetry(authRepository) {
-                    val notifications = notificationRepository.listNotifications(it)
-                    notificationRepository.updateNotificationSeen(it, Date())
-                    notifications
-                }
+                val notifications = notificationRepository.listNotifications()
+                notificationRepository.updateNotificationSeen(Date())
+                notifications
             }, onSuccess = {
                     _notifications.postValue(it.notifications)
 
@@ -66,19 +63,16 @@ class NotificationViewModel : ApplicationViewModel() {
         _isRefreshing.postValue(true)
 
         wrapError(run = {
-            val data = withRetry(authRepository) {
-                val notifications = notificationRepository.listNotifications(it)
-                notificationRepository.updateNotificationSeen(it, Date())
-                notifications
-            }
+            val notifications = notificationRepository.listNotifications()
+            notificationRepository.updateNotificationSeen(Date())
 
             if (_cursor.value == null) {
-                _cursor.postValue(data.cursor)
+                _cursor.postValue(notifications.cursor)
             }
 
             // NOTE: Update always for updating isRead
             val newNotifications =
-                mergeNotifications(_notifications.value.orEmpty(), data.notifications)
+                mergeNotifications(_notifications.value.orEmpty(), notifications.notifications)
             _notifications.postValue(newNotifications)
             Log.d(SeiunApplication.TAG, "Notifications are merged")
         }, onComplete = {
@@ -91,15 +85,13 @@ class NotificationViewModel : ApplicationViewModel() {
         Log.d(SeiunApplication.TAG, "Load more notifications")
 
         wrapError(run = {
-            val data = withRetry(authRepository) {
-                notificationRepository.listNotifications(it, before = _cursor.value)
-            }
+            val res = notificationRepository.listNotifications(before = _cursor.value)
 
-            if (data.cursor != _cursor.value) {
-                if (data.notifications.isNotEmpty()) {
-                    val newNotifications = notifications.value.orEmpty() + data.notifications
+            if (res.cursor != _cursor.value) {
+                if (res.notifications.isNotEmpty()) {
+                    val newNotifications = notifications.value.orEmpty() + res.notifications
                     _notifications.postValue(newNotifications)
-                    _cursor.postValue(data.cursor)
+                    _cursor.postValue(res.cursor)
                     _state.value = State.Loaded
                     Log.d(SeiunApplication.TAG, "New notification count: ${newNotifications.size}")
                 } else {
@@ -115,9 +107,9 @@ class NotificationViewModel : ApplicationViewModel() {
         index: Int,
         notification: Notification
     ): List<Notification> {
-        val notifications = notifications.toMutableList()
-        notifications[index] = notification
-        return notifications
+        val mutableNotifications = notifications.toMutableList()
+        mutableNotifications[index] = notification
+        return mutableNotifications
     }
 
     private fun mergeNotifications(

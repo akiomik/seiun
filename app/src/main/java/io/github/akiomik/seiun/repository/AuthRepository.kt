@@ -2,6 +2,7 @@ package io.github.akiomik.seiun.repository
 
 import android.util.Log
 import io.github.akiomik.seiun.SeiunApplication
+import io.github.akiomik.seiun.api.RequestHelper
 import io.github.akiomik.seiun.datastores.Credential
 import io.github.akiomik.seiun.datastores.CredentialDataStore
 import io.github.akiomik.seiun.datastores.Session
@@ -30,13 +31,13 @@ class AuthRepository(
             inviteCode = inviteCode
         )
 
-        return handleRequest { getAtpClient().createAccount(param) }
+        return RequestHelper.execute { getAtpClient().createAccount(param) }
     }
 
     suspend fun login(handleOrEmail: String, password: String): SessionCreateOutput {
         Log.d(SeiunApplication.TAG, "Create session")
 
-        return handleRequest {
+        return RequestHelper.execute {
             getAtpClient().createSession(SessionCreateInput(handleOrEmail, password))
         }
     }
@@ -45,7 +46,7 @@ class AuthRepository(
         Log.d(SeiunApplication.TAG, "Refresh session")
         val oldSession = sessionDataStore.get()
 
-        return handleRequest {
+        return RequestHelper.execute {
             getAtpClient().refreshSession("Bearer ${oldSession.refreshJwt}")
         }
     }

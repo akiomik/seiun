@@ -39,9 +39,9 @@ class SeiunApplication : Application() {
         credentialDataStore = CredentialDataStore(applicationContext)
         sessionDataStore = SessionDataStore(applicationContext)
         authRepository = AuthRepository(credentialDataStore, sessionDataStore)
-        userRepository = UserRepository()
-        timelineRepository = TimelineRepository()
-        notificationRepository = NotificationRepository()
+        userRepository = UserRepository(authRepository)
+        timelineRepository = TimelineRepository(authRepository)
+        notificationRepository = NotificationRepository(authRepository)
         instance = this
     }
 
