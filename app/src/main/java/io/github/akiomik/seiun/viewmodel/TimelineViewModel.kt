@@ -39,14 +39,15 @@ class TimelineViewModel : ApplicationViewModel() {
     private var _state = MutableStateFlow<State>(State.Loading)
     val state = _state.asStateFlow()
 
+    private val authRepository = SeiunApplication.instance!!.authRepository
     private val userRepository = SeiunApplication.instance!!.userRepository
     private val timelineRepository = SeiunApplication.instance!!.timelineRepository
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
             wrapError(run = {
-                val timeline = withRetry(userRepository) { timelineRepository.getTimeline(it) }
-                val profile = withRetry(userRepository) { userRepository.getProfile(it) }
+                val timeline = withRetry(authRepository) { timelineRepository.getTimeline(it) }
+                val profile = withRetry(authRepository) { userRepository.getProfile(it) }
                 Pair(timeline, profile)
             }, onSuccess = { (timeline, profile) ->
                     // NOTE: 50 is default limit of getTimeline
@@ -75,7 +76,7 @@ class TimelineViewModel : ApplicationViewModel() {
         _isRefreshing.postValue(true)
 
         wrapError(run = {
-            val data = withRetry(userRepository) { timelineRepository.getTimeline(it) }
+            val data = withRetry(authRepository) { timelineRepository.getTimeline(it) }
 
             if (_cursor.value == null) {
                 _cursor.postValue(data.cursor)
@@ -97,7 +98,7 @@ class TimelineViewModel : ApplicationViewModel() {
         Log.d(SeiunApplication.TAG, "Load more posts")
 
         wrapError(run = {
-            val data = withRetry(userRepository) {
+            val data = withRetry(authRepository) {
                 timelineRepository.getTimeline(it, before = _cursor.value)
             }
 
@@ -119,7 +120,7 @@ class TimelineViewModel : ApplicationViewModel() {
     fun upvote(post: PostView, onSuccess: () -> Unit = {}, onError: (Throwable) -> Unit = {}) {
         val ref = StrongRef(cid = post.cid, uri = post.uri)
         wrapError(run = {
-            val result = withRetry(userRepository) { timelineRepository.upvote(it, ref) }
+            val result = withRetry(authRepository) { timelineRepository.upvote(it, ref) }
             updateFeedPost(post.cid) { it.upvoted(result.upvote ?: "") }
         }, onSuccess = { onSuccess() }, onError = onError)
     }
@@ -131,7 +132,7 @@ class TimelineViewModel : ApplicationViewModel() {
     ) {
         val ref = StrongRef(cid = post.cid, uri = post.uri)
         wrapError(run = {
-            withRetry(userRepository) { timelineRepository.cancelVote(it, ref) }
+            withRetry(authRepository) { timelineRepository.cancelVote(it, ref) }
             updateFeedPost(post.cid) { it.upvoteCanceled() }
         }, onSuccess = { onSuccess() }, onError = onError)
     }
@@ -139,7 +140,7 @@ class TimelineViewModel : ApplicationViewModel() {
     fun repost(post: PostView, onSuccess: () -> Unit = {}, onError: (Throwable) -> Unit = {}) {
         val ref = StrongRef(cid = post.cid, uri = post.uri)
         wrapError(run = {
-            val response = withRetry(userRepository) { timelineRepository.repost(it, ref) }
+            val response = withRetry(authRepository) { timelineRepository.repost(it, ref) }
             updateFeedPost(post.cid) { it.reposted(response.uri) }
         }, onSuccess = { onSuccess() }, onError = onError)
     }
@@ -154,7 +155,7 @@ class TimelineViewModel : ApplicationViewModel() {
         }
 
         wrapError(run = {
-            withRetry(userRepository) {
+            withRetry(authRepository) {
                 timelineRepository.cancelRepost(it, post.viewer.repost)
             }
             updateFeedPost(post.cid) { it.repostCanceled() }
@@ -169,7 +170,7 @@ class TimelineViewModel : ApplicationViewModel() {
         onError: (Throwable) -> Unit = {}
     ) {
         wrapError(run = {
-            withRetry(userRepository) { session: ISession ->
+            withRetry(authRepository) { session: ISession ->
                 val output = if (image != null && mimeType != null) {
                     timelineRepository.uploadImage(session, image, mimeType)
                 } else {
@@ -199,7 +200,7 @@ class TimelineViewModel : ApplicationViewModel() {
                 PostReplyRef(root = root, parent = parent)
             }
 
-            withRetry(userRepository) { session: ISession ->
+            withRetry(authRepository) { session: ISession ->
                 val output = if (image != null && mimeType != null) {
                     timelineRepository.uploadImage(session, image, mimeType)
                 } else {
@@ -213,7 +214,7 @@ class TimelineViewModel : ApplicationViewModel() {
 
     fun deletePost(viewPost: FeedViewPost, onSuccess: () -> Unit, onError: (Throwable) -> Unit) {
         wrapError(run = {
-            withRetry(userRepository) { session: ISession ->
+            withRetry(authRepository) { session: ISession ->
                 timelineRepository.deletePost(session, viewPost)
                 deleteFeedPost(viewPost.post.cid)
             }
@@ -228,7 +229,7 @@ class TimelineViewModel : ApplicationViewModel() {
         onError: (Throwable) -> Unit
     ) {
         wrapError(run = {
-            withRetry(userRepository) { session: ISession ->
+            withRetry(authRepository) { session: ISession ->
                 timelineRepository.reportPost(session, viewPost, reasonType, reason)
             }
         }, onSuccess = { onSuccess() }, onError = onError)
@@ -236,7 +237,7 @@ class TimelineViewModel : ApplicationViewModel() {
 
     fun mute(did: String, onSuccess: () -> Unit, onError: (Throwable) -> Unit) {
         wrapError(run = {
-            withRetry(userRepository) { session: ISession ->
+            withRetry(authRepository) { session: ISession ->
                 userRepository.mute(session, did)
             }
         }, onSuccess = { onSuccess() }, onError = onError)
@@ -244,7 +245,7 @@ class TimelineViewModel : ApplicationViewModel() {
 
     fun unmute(did: String, onSuccess: () -> Unit, onError: (Throwable) -> Unit) {
         wrapError(run = {
-            withRetry(userRepository) { session: ISession ->
+            withRetry(authRepository) { session: ISession ->
                 userRepository.unmute(session, did)
             }
         }, onSuccess = { onSuccess() }, onError = onError)

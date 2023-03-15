@@ -7,23 +7,23 @@ import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.api.ExpiredTokenException
 import io.github.akiomik.seiun.api.UnauthorizedException
 import io.github.akiomik.seiun.model.ISession
-import io.github.akiomik.seiun.repository.UserRepository
+import io.github.akiomik.seiun.repository.AuthRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 abstract class ApplicationViewModel : ViewModel() {
-    suspend fun <T> withRetry(userRepository: UserRepository, run: suspend (ISession) -> T): T {
+    suspend fun <T> withRetry(authRepository: AuthRepository, run: suspend (ISession) -> T): T {
         return try {
-            val session = userRepository.getSession()
+            val session = authRepository.getSession()
             run(session)
         } catch (e: UnauthorizedException) {
             Log.d(SeiunApplication.TAG, "Retrying request w/ token refresh")
-            val session = userRepository.refresh()
+            val session = authRepository.refresh()
             run(session)
         } catch (e: ExpiredTokenException) {
             Log.d(SeiunApplication.TAG, "Retrying request w/ re-login")
-            val credential = userRepository.getCredential()
-            val session = userRepository.login(credential.handleOrEmail, credential.password)
+            val credential = authRepository.getCredential()
+            val session = authRepository.login(credential.handleOrEmail, credential.password)
             run(session)
         }
     }

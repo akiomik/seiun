@@ -5,7 +5,7 @@ import io.github.akiomik.seiun.datastores.Credential
 import io.github.akiomik.seiun.model.ISession
 
 class LoginViewModel : ApplicationViewModel() {
-    private val userRepository = SeiunApplication.instance!!.userRepository
+    private val authRepository = SeiunApplication.instance!!.authRepository
 
     fun login(
         handle: String,
@@ -14,12 +14,12 @@ class LoginViewModel : ApplicationViewModel() {
         onError: (Throwable) -> Unit
     ) {
         wrapError(run = {
-            userRepository.login(handle, password)
+            authRepository.login(handle, password)
         }, onSuccess = onSuccess, onError = onError)
     }
 
     fun getCredential(): Credential {
-        return userRepository.getCredential()
+        return authRepository.getCredential()
     }
 
     fun isLoginParamValid(serviceProvider: String, handleOrEmail: String, password: String): Boolean {

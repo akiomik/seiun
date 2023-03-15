@@ -4,7 +4,7 @@ import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.model.ISession
 
 class RegistrationViewModel : ApplicationViewModel() {
-    private val userRepository = SeiunApplication.instance!!.userRepository
+    private val authRepository = SeiunApplication.instance!!.authRepository
 
     fun register(
         email: String,
@@ -15,7 +15,7 @@ class RegistrationViewModel : ApplicationViewModel() {
         onError: (Throwable) -> Unit
     ) {
         wrapError(run = {
-            userRepository.createAccount(
+            authRepository.createAccount(
                 email = email,
                 handle = handle,
                 password = password,

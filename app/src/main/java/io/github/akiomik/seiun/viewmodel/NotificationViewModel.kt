@@ -30,13 +30,13 @@ class NotificationViewModel : ApplicationViewModel() {
     private var _state = MutableStateFlow<State>(State.Loading)
     val state = _state.asStateFlow()
 
-    private val userRepository = SeiunApplication.instance!!.userRepository
+    private val authRepository = SeiunApplication.instance!!.authRepository
     private val notificationRepository = SeiunApplication.instance!!.notificationRepository
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
             wrapError(run = {
-                withRetry(userRepository) {
+                withRetry(authRepository) {
                     val notifications = notificationRepository.listNotifications(it)
                     notificationRepository.updateNotificationSeen(it, Date())
                     notifications
@@ -66,7 +66,7 @@ class NotificationViewModel : ApplicationViewModel() {
         _isRefreshing.postValue(true)
 
         wrapError(run = {
-            val data = withRetry(userRepository) {
+            val data = withRetry(authRepository) {
                 val notifications = notificationRepository.listNotifications(it)
                 notificationRepository.updateNotificationSeen(it, Date())
                 notifications
@@ -91,7 +91,7 @@ class NotificationViewModel : ApplicationViewModel() {
         Log.d(SeiunApplication.TAG, "Load more notifications")
 
         wrapError(run = {
-            val data = withRetry(userRepository) {
+            val data = withRetry(authRepository) {
                 notificationRepository.listNotifications(it, before = _cursor.value)
             }
 

@@ -154,8 +154,8 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
                 // NOTE: Init atpClient here using serviceProvider
                 SeiunApplication.instance!!.setAtpClient(serviceProvider)
 
-                val userRepository = SeiunApplication.instance!!.userRepository
-                userRepository.saveCredential(
+                val authRepository = SeiunApplication.instance!!.authRepository
+                authRepository.saveCredential(
                     Credential(
                         serviceProvider,
                         "$handle.$serviceProvider",
@@ -170,7 +170,7 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
                     inviteCode = inviteCode,
                     onSuccess = { session ->
                         Log.d(SeiunApplication.TAG, "Create account successful")
-                        userRepository.saveSession(Session.fromISession(session))
+                        authRepository.saveSession(Session.fromISession(session))
                         onRegistrationSuccess()
                     },
                     onError = { error ->
