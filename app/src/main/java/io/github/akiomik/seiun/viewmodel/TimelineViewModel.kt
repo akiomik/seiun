@@ -5,17 +5,14 @@ import android.graphics.ImageDecoder
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.model.app.bsky.actor.Profile
 import io.github.akiomik.seiun.model.app.bsky.feed.FeedViewPost
 import io.github.akiomik.seiun.model.app.bsky.feed.PostReplyRef
 import io.github.akiomik.seiun.model.app.bsky.feed.PostView
 import io.github.akiomik.seiun.model.com.atproto.repo.StrongRef
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 
 class TimelineViewModel : ApplicationViewModel() {
@@ -42,27 +39,26 @@ class TimelineViewModel : ApplicationViewModel() {
     private val timelineRepository = SeiunApplication.instance!!.timelineRepository
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
-            wrapError(run = {
-                val timeline = timelineRepository.getTimeline()
-                val profile = userRepository.getProfile()
-                Pair(timeline, profile)
-            }, onSuccess = { (timeline, profile) ->
-                    // NOTE: 50 is default limit of getTimeline
-                    if (timeline.feed.size < 50) {
-                        _seenAllFeed.postValue(true)
-                    }
+        wrapError(run = {
+            val timeline = timelineRepository.getTimeline()
+            val profile = userRepository.getProfile()
+            Pair(timeline, profile)
+        }, onSuccess = { (timeline, profile) ->
+                // NOTE: 50 is default limit of getTimeline
+                if (timeline.feed.size < 50) {
+                    _seenAllFeed.postValue(true)
+                }
 
-                    _profile.postValue(profile)
-                    _feedViewPosts.postValue(timeline.feed)
-                    _cursor.postValue(timeline.cursor)
-                    _state.value = State.Loaded
-                }, onError = {
-                    Log.d(SeiunApplication.TAG, "Error occurred: $it")
-                    _feedViewPosts.postValue(emptyList())
-                    _state.value = State.Error
-                })
-        }
+                _profile.postValue(profile)
+                _feedViewPosts.postValue(timeline.feed)
+                _cursor.postValue(timeline.cursor)
+                _state.value = State.Loaded
+                Log.d(SeiunApplication.TAG, "Profile updated: $profile")
+            }, onError = {
+                Log.d(SeiunApplication.TAG, "Failed to init TimelineViewModel: $it")
+                _feedViewPosts.postValue(emptyList())
+                _state.value = State.Error
+            })
     }
 
     fun refreshPosts(onError: (Throwable) -> Unit = {}) {
