@@ -1,7 +1,11 @@
-package io.github.akiomik.seiun.service
+package io.github.akiomik.seiun.api
 
 import com.slack.eithernet.ApiResult
+import com.slack.eithernet.ApiResultCallAdapterFactory
 import com.slack.eithernet.DecodeErrorBody
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import io.github.akiomik.seiun.model.AtpError
 import io.github.akiomik.seiun.model.app.bsky.actor.Profile
 import io.github.akiomik.seiun.model.app.bsky.blob.UploadBlobOutput
@@ -24,13 +28,34 @@ import io.github.akiomik.seiun.model.com.atproto.session.SessionCreateInput
 import io.github.akiomik.seiun.model.com.atproto.session.SessionCreateOutput
 import io.github.akiomik.seiun.model.com.atproto.session.SessionRefreshOutput
 import okhttp3.RequestBody
+import retrofit2.Retrofit
+import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.create
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Query
+import java.util.*
 
 interface AtpService {
+    companion object {
+        private val moshi = Moshi.Builder()
+            .add(KotlinJsonAdapterFactory())
+            .add(Date::class.java, Rfc3339DateJsonAdapter())
+            .build()
+
+        fun create(serviceProvider: String): AtpService {
+            return Retrofit.Builder()
+                .baseUrl("https://$serviceProvider/xrpc/")
+                .addConverterFactory(CustomApiResultConverterFactory)
+                .addConverterFactory(MoshiConverterFactory.create(moshi))
+                .addCallAdapterFactory(ApiResultCallAdapterFactory)
+                .build()
+                .create()
+        }
+    }
+
     @DecodeErrorBody
     @POST("com.atproto.account.create")
     suspend fun createAccount(
