@@ -3,10 +3,12 @@ package io.github.akiomik.seiun.ui.app
 import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,7 +25,7 @@ import io.github.akiomik.seiun.ui.timeline.NewPostFab
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppScaffold(from: String?) {
+fun AppScaffold(from: String?, drawerState: DrawerState) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -32,9 +34,10 @@ fun AppScaffold(from: String?) {
     var topBarState by rememberSaveable { (mutableStateOf(false)) }
     var bottomBarState by rememberSaveable { (mutableStateOf(false)) }
     var fabState by remember { (mutableStateOf<@Composable () -> Unit>({})) }
+    val atpService by SeiunApplication.instance!!.atpService.collectAsState()
 
     val startDestination =
-        if (from == "notification" && SeiunApplication.instance!!.isAtpServiceInitialized()) {
+        if (from == "notification" && atpService != null) {
             "notification"
         } else {
             "login"
@@ -62,7 +65,7 @@ fun AppScaffold(from: String?) {
     }
 
     Scaffold(
-        topBar = { AppTopBar(scrollBehavior, visible = topBarState) },
+        topBar = { AppTopBar(scrollBehavior, visible = topBarState, drawerState = drawerState) },
         bottomBar = {
             AppBottomBar(
                 navController = navController,

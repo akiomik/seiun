@@ -5,6 +5,6 @@ import io.github.akiomik.seiun.api.AtpService
 
 abstract class ApplicationRepository {
     protected fun getAtpClient(): AtpService {
-        return SeiunApplication.instance!!.atpService!!
+        return SeiunApplication.instance!!.atpService.value!!
     }
 }

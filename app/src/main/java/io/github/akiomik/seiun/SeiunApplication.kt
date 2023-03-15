@@ -13,10 +13,14 @@ import io.github.akiomik.seiun.repository.AuthRepository
 import io.github.akiomik.seiun.repository.NotificationRepository
 import io.github.akiomik.seiun.repository.TimelineRepository
 import io.github.akiomik.seiun.repository.UserRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.time.Duration
 
 class SeiunApplication : Application() {
-    var atpService: AtpService? = null
+    private var _atpService = MutableStateFlow<AtpService?>(null)
+    val atpService = _atpService as StateFlow<AtpService?>
+
     private lateinit var credentialDataStore: CredentialDataStore
     private lateinit var sessionDataStore: SessionDataStore
     lateinit var authRepository: AuthRepository
@@ -45,10 +49,6 @@ class SeiunApplication : Application() {
         instance = this
     }
 
-    fun isAtpServiceInitialized(): Boolean {
-        return atpService != null
-    }
-
     fun setAtpClient() {
         setAtpClient(credentialDataStore.get().serviceProvider)
     }
@@ -56,7 +56,7 @@ class SeiunApplication : Application() {
     fun setAtpClient(serviceProvider: String) {
         Log.d(TAG, "Change serviceProvider to $serviceProvider")
 
-        atpService = AtpService.create(serviceProvider)
+        _atpService.value = AtpService.create(serviceProvider)
     }
 
     fun registerNotificationWorker() {

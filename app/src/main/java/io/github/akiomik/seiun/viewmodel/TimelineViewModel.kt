@@ -6,7 +6,6 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.github.akiomik.seiun.SeiunApplication
-import io.github.akiomik.seiun.model.app.bsky.actor.Profile
 import io.github.akiomik.seiun.model.app.bsky.feed.FeedViewPost
 import io.github.akiomik.seiun.model.app.bsky.feed.PostReplyRef
 import io.github.akiomik.seiun.model.app.bsky.feed.PostView
@@ -26,11 +25,9 @@ class TimelineViewModel : ApplicationViewModel() {
     private var _isRefreshing = MutableLiveData(false)
     private var _feedViewPosts = MutableLiveData<List<FeedViewPost>>()
     private var _seenAllFeed = MutableLiveData(false)
-    private var _profile = MutableLiveData<Profile>()
     val isRefreshing = _isRefreshing as LiveData<Boolean>
     val feedViewPosts = _feedViewPosts as LiveData<List<FeedViewPost>>
     val seenAllFeed = _seenAllFeed as LiveData<Boolean>
-    val profile = _profile as LiveData<Profile>
 
     private var _state = MutableStateFlow<State>(State.Loading)
     val state = _state.asStateFlow()
@@ -40,20 +37,16 @@ class TimelineViewModel : ApplicationViewModel() {
 
     init {
         wrapError(run = {
-            val timeline = timelineRepository.getTimeline()
-            val profile = userRepository.getProfile()
-            Pair(timeline, profile)
-        }, onSuccess = { (timeline, profile) ->
+            timelineRepository.getTimeline()
+        }, onSuccess = {
                 // NOTE: 50 is default limit of getTimeline
-                if (timeline.feed.size < 50) {
+                if (it.feed.size < 50) {
                     _seenAllFeed.postValue(true)
                 }
 
-                _profile.postValue(profile)
-                _feedViewPosts.postValue(timeline.feed)
-                _cursor.postValue(timeline.cursor)
+                _feedViewPosts.postValue(it.feed)
+                _cursor.postValue(it.cursor)
                 _state.value = State.Loaded
-                Log.d(SeiunApplication.TAG, "Profile updated: $profile")
             }, onError = {
                 Log.d(SeiunApplication.TAG, "Failed to init TimelineViewModel: $it")
                 _feedViewPosts.postValue(emptyList())

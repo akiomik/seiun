@@ -8,6 +8,8 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
@@ -29,6 +31,7 @@ fun AppNavigation(
     startDestination: String
 ) {
     val application = SeiunApplication.instance!!
+    val atpService by application.atpService.collectAsState()
     val context = LocalContext.current
 
     val isNotificationGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -52,7 +55,7 @@ fun AppNavigation(
         modifier = modifier
     ) {
         composable("timeline") {
-            if (!application.isAtpServiceInitialized()) {
+            if (atpService == null) {
                 application.setAtpClient()
             }
 
@@ -65,7 +68,7 @@ fun AppNavigation(
             TimelineScreen(timelineListState)
         }
         composable("notification") {
-            if (!application.isAtpServiceInitialized()) {
+            if (atpService == null) {
                 application.setAtpClient()
             }
 

@@ -65,6 +65,7 @@ import io.github.akiomik.seiun.ui.dialog.MuteDialog
 import io.github.akiomik.seiun.ui.dialog.ReportDialog
 import io.github.akiomik.seiun.ui.theme.Green700
 import io.github.akiomik.seiun.ui.theme.Red700
+import io.github.akiomik.seiun.viewmodel.AppViewModel
 import io.github.akiomik.seiun.viewmodel.TimelineViewModel
 
 @Composable
@@ -254,7 +255,7 @@ private fun UpvoteIndicator(viewPost: FeedViewPost) {
 
 @Composable
 fun MenuButton(viewPost: FeedViewPost) {
-    val viewModel: TimelineViewModel = viewModel()
+    val viewModel: AppViewModel = viewModel()
 
     var showMenu by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
