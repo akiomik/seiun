@@ -1,4 +1,4 @@
-package io.github.akiomik.seiun.service
+package io.github.akiomik.seiun.api
 
 import com.slack.eithernet.ApiResult
 import com.slack.eithernet.DecodeErrorBody

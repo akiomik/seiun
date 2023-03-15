@@ -1,4 +1,4 @@
-package io.github.akiomik.seiun.service
+package io.github.akiomik.seiun.api
 
 import okhttp3.ResponseBody
 import retrofit2.Converter

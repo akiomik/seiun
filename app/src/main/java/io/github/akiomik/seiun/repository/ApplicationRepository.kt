@@ -2,9 +2,9 @@ package io.github.akiomik.seiun.repository
 
 import com.slack.eithernet.ApiResult
 import io.github.akiomik.seiun.SeiunApplication
+import io.github.akiomik.seiun.api.AtpService
+import io.github.akiomik.seiun.api.UnauthorizedException
 import io.github.akiomik.seiun.model.AtpError
-import io.github.akiomik.seiun.service.AtpService
-import io.github.akiomik.seiun.service.UnauthorizedException
 
 abstract class ApplicationRepository {
     protected fun getAtpClient(): AtpService {

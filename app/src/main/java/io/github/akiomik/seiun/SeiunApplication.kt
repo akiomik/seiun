@@ -10,11 +10,11 @@ import com.slack.eithernet.ApiResultCallAdapterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import io.github.akiomik.seiun.api.AtpService
+import io.github.akiomik.seiun.api.CustomApiResultConverterFactory
 import io.github.akiomik.seiun.repository.NotificationRepository
 import io.github.akiomik.seiun.repository.TimelineRepository
 import io.github.akiomik.seiun.repository.UserRepository
-import io.github.akiomik.seiun.service.AtpService
-import io.github.akiomik.seiun.service.CustomApiResultConverterFactory
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.create

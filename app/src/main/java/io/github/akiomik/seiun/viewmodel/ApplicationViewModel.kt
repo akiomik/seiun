@@ -4,9 +4,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.akiomik.seiun.SeiunApplication
+import io.github.akiomik.seiun.api.UnauthorizedException
 import io.github.akiomik.seiun.model.ISession
 import io.github.akiomik.seiun.repository.UserRepository
-import io.github.akiomik.seiun.service.UnauthorizedException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
