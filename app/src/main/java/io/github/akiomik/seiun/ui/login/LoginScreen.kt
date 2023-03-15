@@ -87,7 +87,7 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
             label = { Text(stringResource(id = R.string.service_provider)) },
             placeholder = { Text("bsky.social") },
             maxLines = 1,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
             modifier = Modifier
                 .padding(20.dp)
                 .fillMaxWidth(),

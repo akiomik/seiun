@@ -74,7 +74,7 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
             label = { Text(stringResource(id = R.string.service_provider)) },
             placeholder = { Text("bsky.social") },
             maxLines = 1,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
             modifier = Modifier
                 .padding(20.dp)
                 .fillMaxWidth(),
