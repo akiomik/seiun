@@ -46,15 +46,6 @@ private fun AppName() {
 }
 
 @Composable
-private fun AppDescription() {
-    Text(
-        text = stringResource(id = R.string.login_app_description),
-        fontSize = 33.sp,
-        modifier = Modifier.padding(top = 8.dp, end = 20.dp, bottom = 8.dp, start = 20.dp)
-    )
-}
-
-@Composable
 private fun LoginTitle() {
     Text(
         text = stringResource(id = R.string.login_title),
@@ -194,7 +185,6 @@ fun LoginScreen(onLoginSuccess: () -> Unit, onCreateAccountClick: () -> Unit) {
     ) {
         Column {
             AppName()
-            AppDescription()
             LoginTitle()
             LoginForm(onLoginSuccess)
             Spacer(modifier = Modifier.size(16.dp))
