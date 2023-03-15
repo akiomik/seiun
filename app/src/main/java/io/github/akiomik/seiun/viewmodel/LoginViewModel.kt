@@ -1,6 +1,7 @@
 package io.github.akiomik.seiun.viewmodel
 
 import io.github.akiomik.seiun.SeiunApplication
+import io.github.akiomik.seiun.datastores.Credential
 import io.github.akiomik.seiun.model.ISession
 
 class LoginViewModel : ApplicationViewModel() {
@@ -17,8 +18,8 @@ class LoginViewModel : ApplicationViewModel() {
         }, onSuccess = onSuccess, onError = onError)
     }
 
-    fun getLoginParam(): Triple<String, String, String> {
-        return userRepository.getLoginParam()
+    fun getCredential(): Credential {
+        return userRepository.getCredential()
     }
 
     fun isLoginParamValid(serviceProvider: String, handleOrEmail: String, password: String): Boolean {

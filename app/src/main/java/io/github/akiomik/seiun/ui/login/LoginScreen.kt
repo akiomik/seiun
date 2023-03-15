@@ -31,6 +31,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.SeiunApplication
+import io.github.akiomik.seiun.datastores.Credential
+import io.github.akiomik.seiun.datastores.Session
 import io.github.akiomik.seiun.ui.theme.Red700
 import io.github.akiomik.seiun.viewmodel.LoginViewModel
 
@@ -64,10 +66,10 @@ private fun LoginTitle() {
 @Composable
 private fun LoginForm(onLoginSuccess: () -> Unit) {
     val viewModel: LoginViewModel = viewModel()
-    val (savedServiceProvider, savedHandleOrEmail, savedPassword) = viewModel.getLoginParam()
-    var serviceProvider by remember { mutableStateOf(savedServiceProvider) }
-    var handleOrEmail by remember { mutableStateOf(savedHandleOrEmail) }
-    var password by remember { mutableStateOf(savedPassword) }
+    val savedCredential = viewModel.getCredential()
+    var serviceProvider by remember { mutableStateOf(savedCredential.serviceProvider) }
+    var handleOrEmail by remember { mutableStateOf(savedCredential.handleOrEmail) }
+    var password by remember { mutableStateOf(savedCredential.password) }
     var valid by remember {
         mutableStateOf(
             viewModel.isLoginParamValid(
@@ -141,14 +143,14 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
                 SeiunApplication.instance!!.setAtpClient(serviceProvider)
 
                 val userRepository = SeiunApplication.instance!!.userRepository
-                userRepository.saveLoginParam(serviceProvider, handleOrEmail, password)
+                userRepository.saveCredential(Credential(serviceProvider, handleOrEmail, password))
 
                 viewModel.login(
                     handle = handleOrEmail,
                     password = password,
                     onSuccess = { session ->
                         Log.d(SeiunApplication.TAG, "Login successful")
-                        userRepository.saveSession(session)
+                        userRepository.saveSession(Session.fromISession(session))
                         onLoginSuccess()
                     },
                     onError = { error ->

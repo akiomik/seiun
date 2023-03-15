@@ -26,6 +26,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.SeiunApplication
+import io.github.akiomik.seiun.datastores.Credential
+import io.github.akiomik.seiun.datastores.Session
 import io.github.akiomik.seiun.ui.theme.Red700
 import io.github.akiomik.seiun.viewmodel.RegistrationViewModel
 
@@ -153,10 +155,12 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
                 SeiunApplication.instance!!.setAtpClient(serviceProvider)
 
                 val userRepository = SeiunApplication.instance!!.userRepository
-                userRepository.saveLoginParam(
-                    serviceProvider,
-                    "$handle.$serviceProvider",
-                    password
+                userRepository.saveCredential(
+                    Credential(
+                        serviceProvider,
+                        "$handle.$serviceProvider",
+                        password
+                    )
                 )
 
                 viewModel.register(
@@ -166,7 +170,7 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
                     inviteCode = inviteCode,
                     onSuccess = { session ->
                         Log.d(SeiunApplication.TAG, "Create account successful")
-                        userRepository.saveSession(session)
+                        userRepository.saveSession(Session.fromISession(session))
                         onRegistrationSuccess()
                     },
                     onError = { error ->
