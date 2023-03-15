@@ -1,10 +1,11 @@
 package io.github.akiomik.seiun.repository
 
-import android.content.Context
 import android.util.Log
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
 import io.github.akiomik.seiun.SeiunApplication
+import io.github.akiomik.seiun.datastores.Credential
+import io.github.akiomik.seiun.datastores.CredentialDataStore
+import io.github.akiomik.seiun.datastores.Session
+import io.github.akiomik.seiun.datastores.SessionDataStore
 import io.github.akiomik.seiun.model.ISession
 import io.github.akiomik.seiun.model.app.bsky.actor.Profile
 import io.github.akiomik.seiun.model.app.bsky.graph.MuteInput
@@ -15,62 +16,10 @@ import io.github.akiomik.seiun.model.com.atproto.session.SessionCreateInput
 import io.github.akiomik.seiun.model.com.atproto.session.SessionCreateOutput
 import io.github.akiomik.seiun.model.com.atproto.session.SessionRefreshOutput
 
-class UserRepository(context: Context) : ApplicationRepository() {
-    private val key = MasterKey.Builder(context)
-        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-        .build()
-
-    private val sharedPreferences = EncryptedSharedPreferences.create(
-        context,
-        "seiun",
-        key,
-        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-    )
-
-    fun getSession(): ISession {
-        val accessJwt = sharedPreferences.getString("accessJwt", "") ?: ""
-        val refreshJwt = sharedPreferences.getString("refreshJwt", "") ?: ""
-        val handle = sharedPreferences.getString("handle", "") ?: ""
-        val did = sharedPreferences.getString("did", "") ?: ""
-
-        return SessionCreateOutput(
-            accessJwt = accessJwt,
-            refreshJwt = refreshJwt,
-            handle = handle,
-            did = did
-        )
-    }
-
-    fun saveSession(session: ISession) {
-        with(sharedPreferences.edit()) {
-            putString("handle", session.handle)
-            putString("did", session.did)
-            putString("accessJwt", session.accessJwt)
-            putString("refreshJwt", session.refreshJwt)
-            apply()
-        }
-    }
-
-    fun getLoginParam(): Triple<String, String, String> {
-        val serviceProvider = sharedPreferences.getString("serviceProvider", "bsky.social") ?: ""
-        var handleOrEmail = sharedPreferences.getString("handleOrEmail", "") ?: ""
-        if (handleOrEmail.isEmpty()) {
-            handleOrEmail = sharedPreferences.getString("handle", "") ?: ""
-        }
-        val password = sharedPreferences.getString("password", "") ?: ""
-        return Triple(serviceProvider, handleOrEmail, password)
-    }
-
-    fun saveLoginParam(serviceProvider: String, handleOrEmail: String, password: String) {
-        with(sharedPreferences.edit()) {
-            putString("serviceProvider", serviceProvider)
-            putString("handleOrEmail", handleOrEmail)
-            putString("password", password)
-            apply()
-        }
-    }
-
+class UserRepository(
+    private val credentialDataStore: CredentialDataStore,
+    private val sessionDataStore: SessionDataStore
+) : ApplicationRepository() {
     suspend fun createAccount(
         email: String,
         handle: String,
@@ -98,7 +47,7 @@ class UserRepository(context: Context) : ApplicationRepository() {
 
     suspend fun refresh(): SessionRefreshOutput {
         Log.d(SeiunApplication.TAG, "Refresh session")
-        val oldSession = getSession()
+        val oldSession = sessionDataStore.get()
 
         return handleRequest {
             getAtpClient().refreshSession("Bearer ${oldSession.refreshJwt}")
@@ -130,4 +79,12 @@ class UserRepository(context: Context) : ApplicationRepository() {
             getAtpClient().unmute("Bearer ${session.accessJwt}", body = body)
         }
     }
+
+    fun getSession(): Session = sessionDataStore.get()
+
+    fun saveSession(session: Session) = sessionDataStore.save(session)
+
+    fun getCredential(): Credential = credentialDataStore.get()
+
+    fun saveCredential(credential: Credential) = credentialDataStore.save(credential)
 }

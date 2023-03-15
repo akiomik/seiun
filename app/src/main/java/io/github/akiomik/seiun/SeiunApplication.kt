@@ -7,6 +7,8 @@ import android.util.Log
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import io.github.akiomik.seiun.api.AtpService
+import io.github.akiomik.seiun.datastores.CredentialDataStore
+import io.github.akiomik.seiun.datastores.SessionDataStore
 import io.github.akiomik.seiun.repository.NotificationRepository
 import io.github.akiomik.seiun.repository.TimelineRepository
 import io.github.akiomik.seiun.repository.UserRepository
@@ -14,6 +16,8 @@ import java.time.Duration
 
 class SeiunApplication : Application() {
     var atpService: AtpService? = null
+    private lateinit var credentialDataStore: CredentialDataStore
+    private lateinit var sessionDataStore: SessionDataStore
     lateinit var userRepository: UserRepository
     lateinit var timelineRepository: TimelineRepository
     lateinit var notificationRepository: NotificationRepository
@@ -30,7 +34,9 @@ class SeiunApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        userRepository = UserRepository(applicationContext)
+        credentialDataStore = CredentialDataStore(applicationContext)
+        sessionDataStore = SessionDataStore(applicationContext)
+        userRepository = UserRepository(credentialDataStore, sessionDataStore)
         timelineRepository = TimelineRepository()
         notificationRepository = NotificationRepository()
         instance = this
@@ -41,7 +47,7 @@ class SeiunApplication : Application() {
     }
 
     fun setAtpClient() {
-        setAtpClient(userRepository.getLoginParam().first)
+        setAtpClient(credentialDataStore.get().serviceProvider)
     }
 
     fun setAtpClient(serviceProvider: String) {

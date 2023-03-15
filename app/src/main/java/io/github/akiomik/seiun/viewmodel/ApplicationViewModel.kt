@@ -22,8 +22,8 @@ abstract class ApplicationViewModel : ViewModel() {
             run(session)
         } catch (e: ExpiredTokenException) {
             Log.d(SeiunApplication.TAG, "Retrying request w/ re-login")
-            val (_, handleOrEmail, password) = userRepository.getLoginParam()
-            val session = userRepository.login(handleOrEmail, password)
+            val credential = userRepository.getCredential()
+            val session = userRepository.login(credential.handleOrEmail, credential.password)
             run(session)
         }
     }
