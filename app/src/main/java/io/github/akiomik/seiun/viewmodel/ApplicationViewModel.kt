@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.akiomik.seiun.SeiunApplication
+import io.github.akiomik.seiun.api.ExpiredTokenException
 import io.github.akiomik.seiun.api.UnauthorizedException
 import io.github.akiomik.seiun.model.ISession
 import io.github.akiomik.seiun.repository.UserRepository
@@ -16,8 +17,13 @@ abstract class ApplicationViewModel : ViewModel() {
             val session = userRepository.getSession()
             run(session)
         } catch (e: UnauthorizedException) {
-            Log.d(SeiunApplication.TAG, "Retrying request")
+            Log.d(SeiunApplication.TAG, "Retrying request w/ token refresh")
             val session = userRepository.refresh()
+            run(session)
+        } catch (e: ExpiredTokenException) {
+            Log.d(SeiunApplication.TAG, "Retrying request w/ re-login")
+            val (_, handleOrEmail, password) = userRepository.getLoginParam()
+            val session = userRepository.login(handleOrEmail, password)
             run(session)
         }
     }
