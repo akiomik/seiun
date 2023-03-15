@@ -6,20 +6,11 @@ import android.content.Context
 import android.util.Log
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.slack.eithernet.ApiResultCallAdapterFactory
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import io.github.akiomik.seiun.api.AtpService
-import io.github.akiomik.seiun.api.CustomApiResultConverterFactory
 import io.github.akiomik.seiun.repository.NotificationRepository
 import io.github.akiomik.seiun.repository.TimelineRepository
 import io.github.akiomik.seiun.repository.UserRepository
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
-import retrofit2.create
 import java.time.Duration
-import java.util.*
 
 class SeiunApplication : Application() {
     var atpService: AtpService? = null
@@ -56,17 +47,7 @@ class SeiunApplication : Application() {
     fun setAtpClient(serviceProvider: String) {
         Log.d(TAG, "Change serviceProvider to $serviceProvider")
 
-        val moshi = Moshi.Builder()
-            .add(KotlinJsonAdapterFactory())
-            .add(Date::class.java, Rfc3339DateJsonAdapter())
-            .build()
-        atpService = Retrofit.Builder()
-            .baseUrl("https://$serviceProvider/xrpc/")
-            .addConverterFactory(CustomApiResultConverterFactory)
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .addCallAdapterFactory(ApiResultCallAdapterFactory)
-            .build()
-            .create()
+        atpService = AtpService.create(serviceProvider)
     }
 
     fun registerNotificationWorker() {
