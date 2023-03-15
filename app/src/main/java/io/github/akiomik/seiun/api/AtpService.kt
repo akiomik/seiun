@@ -27,7 +27,9 @@ import io.github.akiomik.seiun.model.com.atproto.repo.DeleteRecordInput
 import io.github.akiomik.seiun.model.com.atproto.session.SessionCreateInput
 import io.github.akiomik.seiun.model.com.atproto.session.SessionCreateOutput
 import io.github.akiomik.seiun.model.com.atproto.session.SessionRefreshOutput
+import okhttp3.OkHttpClient
 import okhttp3.RequestBody
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.create
@@ -44,10 +46,13 @@ interface AtpService {
             .add(KotlinJsonAdapterFactory())
             .add(Date::class.java, Rfc3339DateJsonAdapter())
             .build()
+        private val logging = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC)
+        private val client = OkHttpClient.Builder().addInterceptor(logging).build()
 
         fun create(serviceProvider: String): AtpService {
             return Retrofit.Builder()
                 .baseUrl("https://$serviceProvider/xrpc/")
+                .client(client)
                 .addConverterFactory(CustomApiResultConverterFactory)
                 .addConverterFactory(MoshiConverterFactory.create(moshi))
                 .addCallAdapterFactory(ApiResultCallAdapterFactory)
