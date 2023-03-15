@@ -3,6 +3,7 @@ package io.github.akiomik.seiun.viewmodel
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.datastores.Credential
 import io.github.akiomik.seiun.model.ISession
+import io.github.akiomik.seiun.utilities.ServiceProviderValidator
 
 class LoginViewModel : ApplicationViewModel() {
     private val authRepository = SeiunApplication.instance!!.authRepository
@@ -22,7 +23,11 @@ class LoginViewModel : ApplicationViewModel() {
         return authRepository.getCredential()
     }
 
-    fun isLoginParamValid(serviceProvider: String, handleOrEmail: String, password: String): Boolean {
-        return serviceProvider.isNotEmpty() && handleOrEmail.isNotEmpty() && password.isNotEmpty()
+    fun isLoginParamValid(
+        serviceProvider: String,
+        handleOrEmail: String,
+        password: String
+    ): Boolean {
+        return ServiceProviderValidator.validate(serviceProvider) && handleOrEmail.isNotEmpty() && password.isNotEmpty()
     }
 }
