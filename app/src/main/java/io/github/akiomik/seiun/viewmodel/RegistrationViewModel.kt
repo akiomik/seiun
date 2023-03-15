@@ -2,6 +2,7 @@ package io.github.akiomik.seiun.viewmodel
 
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.model.ISession
+import io.github.akiomik.seiun.utilities.ServiceProviderValidator
 
 class RegistrationViewModel : ApplicationViewModel() {
     private val authRepository = SeiunApplication.instance!!.authRepository
@@ -30,6 +31,6 @@ class RegistrationViewModel : ApplicationViewModel() {
         handle: String,
         password: String
     ): Boolean {
-        return serviceProvider.isNotEmpty() && email.isNotEmpty() && handle.isNotEmpty() && password.isNotEmpty()
+        return ServiceProviderValidator.validate(serviceProvider) && email.isNotEmpty() && handle.isNotEmpty() && password.isNotEmpty()
     }
 }
