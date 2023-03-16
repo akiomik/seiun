@@ -106,8 +106,14 @@ private fun UserModalContent(profile: Profile) {
 
     Column {
         UserBanner(profile)
-        Profile(profile)
-        Divider(modifier = Modifier.padding(top = 8.dp, bottom = 8.dp))
+        Box(
+            modifier = Modifier
+                .background(color = MaterialTheme.colorScheme.surfaceVariant)
+                .fillMaxWidth()
+        ) {
+            Profile(profile)
+        }
+        Divider()
         UserFeed(profile)
     }
 }

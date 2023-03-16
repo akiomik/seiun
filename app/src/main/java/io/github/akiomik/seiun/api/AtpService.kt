@@ -9,6 +9,7 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import io.github.akiomik.seiun.model.AtpError
 import io.github.akiomik.seiun.model.app.bsky.actor.Profile
 import io.github.akiomik.seiun.model.app.bsky.blob.UploadBlobOutput
+import io.github.akiomik.seiun.model.app.bsky.feed.AuthorFeed
 import io.github.akiomik.seiun.model.app.bsky.feed.Post
 import io.github.akiomik.seiun.model.app.bsky.feed.Repost
 import io.github.akiomik.seiun.model.app.bsky.feed.SetVoteInput
@@ -94,6 +95,15 @@ interface AtpService {
         @Query("limit") limit: Int? = null,
         @Query("before") before: String? = null
     ): ApiResult<Timeline, AtpError>
+
+    @DecodeErrorBody
+    @GET("app.bsky.feed.getAuthorFeed")
+    suspend fun getAuthorFeed(
+        @Header("Authorization") authorization: String,
+        @Query("author") author: String,
+        @Query("limit") limit: Int? = null,
+        @Query("before") before: String? = null
+    ): ApiResult<AuthorFeed, AtpError>
 
     @DecodeErrorBody
     @POST("com.atproto.repo.createRecord")
