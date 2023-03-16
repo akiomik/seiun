@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id "org.jlleitschuh.gradle.ktlint" version "11.3.1"
+    id 'com.google.android.gms.oss-licenses-plugin'
 }
 
 android {
@@ -97,8 +98,12 @@ dependencies {
     implementation("com.slack.eithernet:eithernet:1.3.1")
 
     def coil_version = '2.2.2'
+    implementation("androidx.appcompat:appcompat:1.4.2")
+    implementation("io.coil-kt:coil-base:${coil_version}")
     implementation("io.coil-kt:coil:${coil_version}")
     implementation("io.coil-kt:coil-compose:${coil_version}")
     implementation("io.coil-kt:coil-gif:${coil_version}")
     implementation("io.coil-kt:coil-svg:${coil_version}")
+
+    implementation('com.google.android.gms:play-services-oss-licenses:17.0.0')
 }

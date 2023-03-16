@@ -12,6 +12,7 @@
     <string name="spam">スパム</string>
     <string name="others">その他</string>
     <string name="mute">ミュート</string>
+    <string name="license">ライセンス</string>
     <string name="login_title">ログイン</string>
     <string name="service_provider">サービスプロバイダ</string>
     <string name="login_handle_or_email">ハンドルネーム または メールアドレス</string>
