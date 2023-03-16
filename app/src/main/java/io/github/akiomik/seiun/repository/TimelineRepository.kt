@@ -119,7 +119,7 @@ class TimelineRepository(private val authRepository: AuthRepository) : Applicati
         val record = Post(text = content, createdAt = Date(), reply = to, embed = embed)
 
         return RequestHelper.executeWithRetry(authRepository) {
-            val body = CreateRecordInput(did = it.did, record = record, collection = "")
+            val body = CreateRecordInput(did = it.did, record = record, collection = "app.bsky.feed.post")
             getAtpClient().createPost(authorization = "Bearer ${it.accessJwt}", body = body)
         }
     }
