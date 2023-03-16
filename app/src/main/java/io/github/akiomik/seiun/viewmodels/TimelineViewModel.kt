@@ -1,4 +1,4 @@
-package io.github.akiomik.seiun.viewmodel
+package io.github.akiomik.seiun.viewmodels
 
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder

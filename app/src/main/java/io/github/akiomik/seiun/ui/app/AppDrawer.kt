@@ -33,7 +33,7 @@ import coil.compose.AsyncImage
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.model.app.bsky.actor.Profile
-import io.github.akiomik.seiun.viewmodel.AppViewModel
+import io.github.akiomik.seiun.viewmodels.AppViewModel
 import kotlinx.coroutines.launch
 
 @Composable

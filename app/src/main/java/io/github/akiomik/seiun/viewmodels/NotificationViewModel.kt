@@ -1,4 +1,4 @@
-package io.github.akiomik.seiun.viewmodel
+package io.github.akiomik.seiun.viewmodels
 
 import android.util.Log
 import androidx.lifecycle.LiveData

@@ -66,8 +66,8 @@ import io.github.akiomik.seiun.ui.dialog.ReportDialog
 import io.github.akiomik.seiun.ui.theme.Green700
 import io.github.akiomik.seiun.ui.theme.Red700
 import io.github.akiomik.seiun.utilities.NumberFormatter
-import io.github.akiomik.seiun.viewmodel.AppViewModel
-import io.github.akiomik.seiun.viewmodel.TimelineViewModel
+import io.github.akiomik.seiun.viewmodels.AppViewModel
+import io.github.akiomik.seiun.viewmodels.TimelineViewModel
 
 @Composable
 private fun RepostText(viewPost: FeedViewPost) {

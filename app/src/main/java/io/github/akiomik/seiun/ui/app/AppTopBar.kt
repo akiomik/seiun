@@ -24,7 +24,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.SeiunApplication
-import io.github.akiomik.seiun.viewmodel.AppViewModel
+import io.github.akiomik.seiun.viewmodels.AppViewModel
 import kotlinx.coroutines.launch
 
 @Composable

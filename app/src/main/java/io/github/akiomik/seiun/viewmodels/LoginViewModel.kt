@@ -1,4 +1,4 @@
-package io.github.akiomik.seiun.viewmodel
+package io.github.akiomik.seiun.viewmodels
 
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.datastores.Credential

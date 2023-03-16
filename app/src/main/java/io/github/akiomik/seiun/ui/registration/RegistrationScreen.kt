@@ -29,7 +29,7 @@ import io.github.akiomik.seiun.datastores.Credential
 import io.github.akiomik.seiun.datastores.Session
 import io.github.akiomik.seiun.ui.components.SingleLineTextField
 import io.github.akiomik.seiun.ui.theme.Red700
-import io.github.akiomik.seiun.viewmodel.RegistrationViewModel
+import io.github.akiomik.seiun.viewmodels.RegistrationViewModel
 
 @Composable
 fun RegistrationTitle() {

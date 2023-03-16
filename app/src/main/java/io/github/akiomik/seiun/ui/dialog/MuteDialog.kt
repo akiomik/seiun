@@ -11,7 +11,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.model.app.bsky.actor.RefWithInfo
-import io.github.akiomik.seiun.viewmodel.TimelineViewModel
+import io.github.akiomik.seiun.viewmodels.TimelineViewModel
 
 @Composable
 fun MuteDialog(actor: RefWithInfo, onDismissRequest: () -> Unit) {

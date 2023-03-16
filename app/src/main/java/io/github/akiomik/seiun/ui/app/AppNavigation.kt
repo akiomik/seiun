@@ -23,7 +23,7 @@ import io.github.akiomik.seiun.ui.login.LoginScreen
 import io.github.akiomik.seiun.ui.notification.NotificationScreen
 import io.github.akiomik.seiun.ui.registration.RegistrationScreen
 import io.github.akiomik.seiun.ui.timeline.TimelineScreen
-import io.github.akiomik.seiun.viewmodel.AppViewModel
+import io.github.akiomik.seiun.viewmodels.AppViewModel
 
 @Composable
 fun AppNavigation(

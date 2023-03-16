@@ -32,7 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.akiomik.seiun.R
-import io.github.akiomik.seiun.viewmodel.TimelineViewModel
+import io.github.akiomik.seiun.viewmodels.TimelineViewModel
 
 @Composable
 private fun LoadingText() {

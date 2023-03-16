@@ -45,7 +45,7 @@ import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.model.app.bsky.feed.FeedViewPost
 import io.github.akiomik.seiun.ui.embed.EmbedPost
-import io.github.akiomik.seiun.viewmodel.TimelineViewModel
+import io.github.akiomik.seiun.viewmodels.TimelineViewModel
 
 @Composable
 private fun PostButton(

@@ -9,7 +9,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.ui.theme.SeiunTheme
-import io.github.akiomik.seiun.viewmodel.AppViewModel
+import io.github.akiomik.seiun.viewmodels.AppViewModel
 
 @Composable
 fun App(from: String?) {
