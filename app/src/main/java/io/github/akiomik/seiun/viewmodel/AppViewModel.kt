@@ -12,7 +12,7 @@ class AppViewModel : ApplicationViewModel() {
 
     private val userRepository = SeiunApplication.instance!!.userRepository
 
-    init {
+    fun updateProfile() {
         wrapError(
             run = { userRepository.getProfile() },
             onSuccess = { _profile.postValue(it) },
