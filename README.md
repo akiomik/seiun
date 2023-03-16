@@ -25,3 +25,5 @@ Seiun (青雲: means blue cloud or clear sky in Japanese) is an experimental ATP
 <a href='https://play.google.com/store/apps/details?id=io.github.akiomik.seiun&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img width="260" alt='Get it on Google Play' src='https://play.google.com/intl/ja/badges/static/images/badges/en_badge_web_generic.png'/></a>
 
 Seiun can be downloaded from google play store.
+
+Google Play and the Google Play logo are trademarks of Google LLC.
