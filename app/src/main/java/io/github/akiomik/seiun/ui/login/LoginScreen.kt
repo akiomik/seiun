@@ -15,7 +15,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,6 +32,7 @@ import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.datastores.Credential
 import io.github.akiomik.seiun.datastores.Session
+import io.github.akiomik.seiun.ui.components.SingleLineTextField
 import io.github.akiomik.seiun.ui.theme.Red700
 import io.github.akiomik.seiun.viewmodel.LoginViewModel
 
@@ -78,52 +78,40 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
             Text(errorMessage, color = Red700, modifier = Modifier.padding(20.dp))
         }
 
-        TextField(
+        SingleLineTextField(
             value = serviceProvider,
             onValueChange = {
-                serviceProvider = it.replace("\n", "")
+                serviceProvider = it
                 valid = viewModel.isLoginParamValid(serviceProvider, handleOrEmail, password)
             },
             label = { Text(stringResource(id = R.string.service_provider)) },
             placeholder = { Text("bsky.social") },
-            maxLines = 1,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
-            modifier = Modifier
-                .padding(20.dp)
-                .fillMaxWidth(),
-            singleLine = true
+            modifier = Modifier.padding(20.dp).fillMaxWidth()
         )
 
-        TextField(
+        SingleLineTextField(
             value = handleOrEmail,
             onValueChange = {
-                handleOrEmail = it.replace("\n", "")
+                handleOrEmail = it
                 valid = viewModel.isLoginParamValid(serviceProvider, handleOrEmail, password)
             },
             label = { Text(stringResource(id = R.string.login_handle_or_email)) },
             placeholder = { Text(text = stringResource(id = R.string.login_handle_or_email_placeholder)) },
-            maxLines = 1,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
-            modifier = Modifier
-                .padding(20.dp)
-                .fillMaxWidth(),
-            singleLine = true
+            modifier = Modifier.padding(20.dp).fillMaxWidth()
         )
 
-        TextField(
+        SingleLineTextField(
             value = password,
             onValueChange = {
-                password = it.replace("\n", "")
+                password = it
                 valid = viewModel.isLoginParamValid(serviceProvider, handleOrEmail, password)
             },
             label = { Text(stringResource(id = R.string.login_password)) },
-            maxLines = 1,
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            modifier = Modifier
-                .padding(20.dp)
-                .fillMaxWidth(),
-            singleLine = true
+            modifier = Modifier.padding(20.dp).fillMaxWidth()
         )
 
         ElevatedButton(

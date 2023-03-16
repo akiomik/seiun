@@ -10,7 +10,6 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,6 +27,7 @@ import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.datastores.Credential
 import io.github.akiomik.seiun.datastores.Session
+import io.github.akiomik.seiun.ui.components.SingleLineTextField
 import io.github.akiomik.seiun.ui.theme.Red700
 import io.github.akiomik.seiun.viewmodel.RegistrationViewModel
 
@@ -65,42 +65,34 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
             Text(errorMessage, color = Red700, modifier = Modifier.padding(20.dp))
         }
 
-        TextField(
+        SingleLineTextField(
             value = serviceProvider,
             onValueChange = {
-                serviceProvider = it.replace("\n", "")
+                serviceProvider = it
                 valid = viewModel.isRegisterParamValid(serviceProvider, email, handle, password)
             },
             label = { Text(stringResource(id = R.string.service_provider)) },
             placeholder = { Text("bsky.social") },
-            maxLines = 1,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
-            modifier = Modifier
-                .padding(20.dp)
-                .fillMaxWidth(),
-            singleLine = true
+            modifier = Modifier.padding(20.dp).fillMaxWidth()
         )
 
-        TextField(
+        SingleLineTextField(
             value = email,
             onValueChange = {
-                email = it.replace("\n", "")
+                email = it
                 valid = viewModel.isRegisterParamValid(serviceProvider, email, handle, password)
             },
             label = { Text(stringResource(id = R.string.registration_email)) },
             placeholder = { Text(text = stringResource(id = R.string.registration_email_placeholder)) },
-            maxLines = 1,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            modifier = Modifier
-                .padding(20.dp)
-                .fillMaxWidth(),
-            singleLine = true
+            modifier = Modifier.padding(20.dp).fillMaxWidth()
         )
 
-        TextField(
+        SingleLineTextField(
             value = handle,
             onValueChange = {
-                handle = it.replace("\n", "")
+                handle = it
                 valid = viewModel.isRegisterParamValid(serviceProvider, email, handle, password)
             },
             label = { Text(stringResource(id = R.string.registration_handle)) },
@@ -108,43 +100,31 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
             prefix = { Text(text = "@") },
             suffix = { Text(text = ".$serviceProvider") },
-            maxLines = 1,
-            modifier = Modifier
-                .padding(20.dp)
-                .fillMaxWidth(),
-            singleLine = true
+            modifier = Modifier.padding(20.dp).fillMaxWidth()
         )
 
-        TextField(
+        SingleLineTextField(
             value = password,
             onValueChange = {
-                password = it.replace("\n", "")
+                password = it
                 valid = viewModel.isRegisterParamValid(serviceProvider, email, handle, password)
             },
             label = { Text(stringResource(id = R.string.registration_password)) },
-            maxLines = 1,
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            modifier = Modifier
-                .padding(20.dp)
-                .fillMaxWidth(),
-            singleLine = true
+            modifier = Modifier.padding(20.dp).fillMaxWidth()
         )
 
-        TextField(
+        SingleLineTextField(
             value = inviteCode,
             onValueChange = {
-                inviteCode = it.replace("\n", "")
+                inviteCode = it
                 valid = viewModel.isRegisterParamValid(serviceProvider, email, handle, password)
             },
             label = { Text(stringResource(id = R.string.registration_invite_code)) },
             placeholder = { Text(text = "bsky.social-XXXXXX") },
-            maxLines = 1,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
-            modifier = Modifier
-                .padding(20.dp)
-                .fillMaxWidth(),
-            singleLine = true
+            modifier = Modifier.padding(20.dp).fillMaxWidth()
         )
 
         ElevatedButton(
