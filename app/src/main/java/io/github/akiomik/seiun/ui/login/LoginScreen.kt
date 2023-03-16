@@ -81,7 +81,7 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
         TextField(
             value = serviceProvider,
             onValueChange = {
-                serviceProvider = it
+                serviceProvider = it.replace("\n", "")
                 valid = viewModel.isLoginParamValid(serviceProvider, handleOrEmail, password)
             },
             label = { Text(stringResource(id = R.string.service_provider)) },
@@ -97,7 +97,7 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
         TextField(
             value = handleOrEmail,
             onValueChange = {
-                handleOrEmail = it
+                handleOrEmail = it.replace("\n", "")
                 valid = viewModel.isLoginParamValid(serviceProvider, handleOrEmail, password)
             },
             label = { Text(stringResource(id = R.string.login_handle_or_email)) },
@@ -113,7 +113,7 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
         TextField(
             value = password,
             onValueChange = {
-                password = it
+                password = it.replace("\n", "")
                 valid = viewModel.isLoginParamValid(serviceProvider, handleOrEmail, password)
             },
             label = { Text(stringResource(id = R.string.login_password)) },

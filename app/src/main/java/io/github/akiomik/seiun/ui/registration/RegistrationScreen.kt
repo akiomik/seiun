@@ -68,7 +68,7 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
         TextField(
             value = serviceProvider,
             onValueChange = {
-                serviceProvider = it
+                serviceProvider = it.replace("\n", "")
                 valid = viewModel.isRegisterParamValid(serviceProvider, email, handle, password)
             },
             label = { Text(stringResource(id = R.string.service_provider)) },
@@ -84,7 +84,7 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
         TextField(
             value = email,
             onValueChange = {
-                email = it
+                email = it.replace("\n", "")
                 valid = viewModel.isRegisterParamValid(serviceProvider, email, handle, password)
             },
             label = { Text(stringResource(id = R.string.registration_email)) },
@@ -100,7 +100,7 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
         TextField(
             value = handle,
             onValueChange = {
-                handle = it
+                handle = it.replace("\n", "")
                 valid = viewModel.isRegisterParamValid(serviceProvider, email, handle, password)
             },
             label = { Text(stringResource(id = R.string.registration_handle)) },
@@ -118,7 +118,7 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
         TextField(
             value = password,
             onValueChange = {
-                password = it
+                password = it.replace("\n", "")
                 valid = viewModel.isRegisterParamValid(serviceProvider, email, handle, password)
             },
             label = { Text(stringResource(id = R.string.registration_password)) },
@@ -134,7 +134,7 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
         TextField(
             value = inviteCode,
             onValueChange = {
-                inviteCode = it
+                inviteCode = it.replace("\n", "")
                 valid = viewModel.isRegisterParamValid(serviceProvider, email, handle, password)
             },
             label = { Text(stringResource(id = R.string.registration_invite_code)) },
