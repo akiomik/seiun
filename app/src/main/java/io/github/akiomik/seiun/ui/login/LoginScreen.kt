@@ -72,6 +72,7 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
     }
     var errorMessage by remember { mutableStateOf("") }
     val loginErrorMessage = stringResource(id = R.string.login_error)
+    var isSubmitting by remember { mutableStateOf(false) }
 
     Column {
         if (errorMessage.isNotEmpty()) {
@@ -87,7 +88,9 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
             label = { Text(stringResource(id = R.string.service_provider)) },
             placeholder = { Text("bsky.social") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
-            modifier = Modifier.padding(20.dp).fillMaxWidth()
+            modifier = Modifier
+                .padding(20.dp)
+                .fillMaxWidth()
         )
 
         SingleLineTextField(
@@ -99,7 +102,9 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
             label = { Text(stringResource(id = R.string.login_handle_or_email)) },
             placeholder = { Text(text = stringResource(id = R.string.login_handle_or_email_placeholder)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
-            modifier = Modifier.padding(20.dp).fillMaxWidth()
+            modifier = Modifier
+                .padding(20.dp)
+                .fillMaxWidth()
         )
 
         SingleLineTextField(
@@ -111,12 +116,15 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
             label = { Text(stringResource(id = R.string.login_password)) },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            modifier = Modifier.padding(20.dp).fillMaxWidth()
+            modifier = Modifier
+                .padding(20.dp)
+                .fillMaxWidth()
         )
 
         ElevatedButton(
             onClick = {
                 Log.d(SeiunApplication.TAG, "Login as $handleOrEmail on $serviceProvider")
+                isSubmitting = true
 
                 // NOTE: Init atpClient here using serviceProvider
                 SeiunApplication.instance!!.setAtpClient(serviceProvider)
@@ -129,16 +137,18 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
                     password = password,
                     onSuccess = { session ->
                         Log.d(SeiunApplication.TAG, "Login successful")
+                        isSubmitting = false
                         authRepository.saveSession(Session.fromISession(session))
                         onLoginSuccess()
                     },
                     onError = { error ->
                         Log.d(SeiunApplication.TAG, "Login failure: $error")
+                        isSubmitting = false
                         errorMessage = error.message ?: loginErrorMessage
                     }
                 )
             },
-            enabled = valid,
+            enabled = valid && !isSubmitting,
             modifier = Modifier
                 .padding(20.dp)
                 .align(alignment = Alignment.End)
@@ -152,9 +162,7 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
 @Composable
 private fun CreateAccountButton(onClick: () -> Unit) {
     Row(
-        modifier = Modifier
-            .padding(20.dp)
-            .fillMaxWidth(),
+        modifier = Modifier.padding(20.dp).fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.End
     ) {
