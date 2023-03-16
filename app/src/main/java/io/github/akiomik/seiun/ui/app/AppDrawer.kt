@@ -1,6 +1,7 @@
 package io.github.akiomik.seiun.ui.app
 
 import android.content.Intent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,7 +20,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,11 +37,12 @@ import coil.compose.AsyncImage
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.model.app.bsky.actor.Profile
+import io.github.akiomik.seiun.ui.user.UserModal
 import io.github.akiomik.seiun.viewmodels.AppViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-private fun Profile() {
+private fun Profile(drawerState: DrawerState) {
     val viewModel: AppViewModel = viewModel()
     val profile by viewModel.profile.collectAsState()
 
@@ -46,13 +51,22 @@ private fun Profile() {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Avatar(profile)
+        Avatar(profile = profile, drawerState = drawerState)
         NameAndHandle(profile)
     }
 }
 
 @Composable
-private fun Avatar(profile: Profile?) {
+private fun Avatar(profile: Profile?, drawerState: DrawerState) {
+    var showUserModal by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+
+    if (showUserModal && profile != null) {
+        UserModal(profile = profile) {
+            showUserModal = false
+        }
+    }
+
     AsyncImage(
         model = profile?.avatar,
         contentDescription = null,
@@ -60,6 +74,10 @@ private fun Avatar(profile: Profile?) {
             .width(48.dp)
             .height(48.dp)
             .clip(CircleShape)
+            .clickable {
+                scope.launch { drawerState.close() }
+                showUserModal = true
+            }
     )
 }
 
@@ -90,7 +108,7 @@ fun AppDrawer(state: DrawerState, enabled: Boolean, content: @Composable () -> U
         drawerContent = {
             ModalDrawerSheet {
                 if (enabled) {
-                    Profile()
+                    Profile(state)
                     Divider()
                 }
 
