@@ -14,7 +14,6 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,14 +23,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.SeiunApplication
-import io.github.akiomik.seiun.viewmodel.AppViewModel
+import io.github.akiomik.seiun.viewmodels.AppViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 private fun Avatar(drawerState: DrawerState) {
     val scope = rememberCoroutineScope()
     val viewModel: AppViewModel = viewModel()
-    val profile by viewModel.profile.observeAsState()
+    val profile by viewModel.profile.collectAsState()
 
     AsyncImage(
         model = profile?.avatar,
@@ -51,7 +50,7 @@ private fun Avatar(drawerState: DrawerState) {
 }
 
 @Composable
-private fun AppName(drawerState: DrawerState) {
+private fun AppName() {
     Text(text = stringResource(R.string.app_name))
 }
 
@@ -62,7 +61,7 @@ fun AppTopBar(scrollBehavior: TopAppBarScrollBehavior, visible: Boolean, drawerS
 
     AnimatedVisibility(visible = visible) {
         CenterAlignedTopAppBar(
-            title = { AppName(drawerState) },
+            title = { AppName() },
             navigationIcon = {
                 if (atpService != null) {
                     Avatar(drawerState)

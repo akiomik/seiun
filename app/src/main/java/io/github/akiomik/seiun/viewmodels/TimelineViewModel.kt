@@ -1,10 +1,8 @@
-package io.github.akiomik.seiun.viewmodel
+package io.github.akiomik.seiun.viewmodels
 
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.model.app.bsky.feed.FeedViewPost
 import io.github.akiomik.seiun.model.app.bsky.feed.PostReplyRef
@@ -21,15 +19,14 @@ class TimelineViewModel : ApplicationViewModel() {
         object Error : State()
     }
 
-    private var _cursor = MutableLiveData<String>()
-    private var _isRefreshing = MutableLiveData(false)
-    private var _feedViewPosts = MutableLiveData<List<FeedViewPost>>()
-    private var _seenAllFeed = MutableLiveData(false)
-    val isRefreshing = _isRefreshing as LiveData<Boolean>
-    val feedViewPosts = _feedViewPosts as LiveData<List<FeedViewPost>>
-    val seenAllFeed = _seenAllFeed as LiveData<Boolean>
-
+    private var _cursor = MutableStateFlow<String?>(null)
+    private var _isRefreshing = MutableStateFlow(false)
+    private var _feedViewPosts = MutableStateFlow<List<FeedViewPost>>(emptyList())
+    private var _seenAllFeed = MutableStateFlow(false)
     private var _state = MutableStateFlow<State>(State.Loading)
+    val isRefreshing = _isRefreshing.asStateFlow()
+    val feedViewPosts = _feedViewPosts.asStateFlow()
+    val seenAllFeed = _seenAllFeed.asStateFlow()
     val state = _state.asStateFlow()
 
     private val userRepository = SeiunApplication.instance!!.userRepository
@@ -41,43 +38,42 @@ class TimelineViewModel : ApplicationViewModel() {
         }, onSuccess = {
                 // NOTE: 50 is default limit of getTimeline
                 if (it.feed.size < 50) {
-                    _seenAllFeed.postValue(true)
+                    _seenAllFeed.value = true
                 }
 
-                _feedViewPosts.postValue(it.feed)
-                _cursor.postValue(it.cursor)
+                _feedViewPosts.value = it.feed
+                _cursor.value = it.cursor
                 _state.value = State.Loaded
             }, onError = {
                 Log.d(SeiunApplication.TAG, "Failed to init TimelineViewModel: $it")
-                _feedViewPosts.postValue(emptyList())
                 _state.value = State.Error
             })
     }
 
     fun refreshPosts(onError: (Throwable) -> Unit = {}) {
-        if (_isRefreshing.value == true) {
+        if (_isRefreshing.value) {
             return
         }
 
         Log.d(SeiunApplication.TAG, "Refresh timeline")
-        _isRefreshing.postValue(true)
+        _isRefreshing.value = true
 
         wrapError(run = {
             val data = timelineRepository.getTimeline()
 
             if (_cursor.value == null) {
-                _cursor.postValue(data.cursor)
+                _cursor.value = data.cursor
             }
 
             if (data.cursor != _cursor.value) {
-                val newFeedPosts = mergeFeedViewPosts(_feedViewPosts.value.orEmpty(), data.feed)
-                _feedViewPosts.postValue(newFeedPosts)
+                val newFeedPosts = mergeFeedViewPosts(_feedViewPosts.value, data.feed)
+                _feedViewPosts.value = newFeedPosts
                 Log.d(SeiunApplication.TAG, "Feed posts are merged")
             } else {
                 Log.d(SeiunApplication.TAG, "Skip merge because cursor is unchanged")
             }
         }, onComplete = {
-                _isRefreshing.postValue(false)
+                _isRefreshing.value = false
             }, onError = onError)
     }
 
@@ -89,14 +85,14 @@ class TimelineViewModel : ApplicationViewModel() {
 
             if (data.cursor != _cursor.value) {
                 if (data.feed.isNotEmpty()) {
-                    val newFeedPosts = feedViewPosts.value.orEmpty() + data.feed
-                    _feedViewPosts.postValue(newFeedPosts)
-                    _cursor.postValue(data.cursor)
+                    val newFeedPosts = feedViewPosts.value + data.feed
+                    _feedViewPosts.value = newFeedPosts
+                    _cursor.value = data.cursor
                     _state.value = State.Loaded
                     Log.d(SeiunApplication.TAG, "New feed count: ${newFeedPosts.size}")
                 } else {
                     Log.d(SeiunApplication.TAG, "No new feed posts")
-                    _seenAllFeed.postValue(true)
+                    _seenAllFeed.value = true
                 }
             }
         }, onError = onError)
@@ -252,10 +248,10 @@ class TimelineViewModel : ApplicationViewModel() {
     }
 
     private fun deleteFeedPost(cid: String) {
-        val index = feedViewPosts.value?.indexOfFirst { it.post.cid == cid } ?: -1
-        val target = feedViewPosts.value?.get(index)?.post
+        val index = feedViewPosts.value.indexOfFirst { it.post.cid == cid }
+        val target = feedViewPosts.value.getOrNull(index)?.post
         if (index >= 0 && target != null) {
-            _feedViewPosts.postValue(deleteFeedPostAt(feedViewPosts.value.orEmpty(), index))
+            _feedViewPosts.value = deleteFeedPostAt(feedViewPosts.value, index)
         }
     }
 
@@ -270,10 +266,10 @@ class TimelineViewModel : ApplicationViewModel() {
 
     // To avoid race conditions, we must use current feedPost instead of arguments (#7)
     private fun updateFeedPost(cid: String, run: (PostView) -> PostView) {
-        val index = feedViewPosts.value?.indexOfFirst { it.post.cid == cid } ?: -1
-        val target = feedViewPosts.value?.get(index)?.post
+        val index = feedViewPosts.value.indexOfFirst { it.post.cid == cid }
+        val target = feedViewPosts.value.getOrNull(index)?.post
         if (index >= 0 && target != null) {
-            _feedViewPosts.postValue(updateFeedPostOf(feedViewPosts.value.orEmpty(), run(target)))
+            _feedViewPosts.value = updateFeedPostOf(feedViewPosts.value, run(target))
         }
     }
 

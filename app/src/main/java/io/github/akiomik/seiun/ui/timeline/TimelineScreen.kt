@@ -23,7 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,7 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.akiomik.seiun.R
-import io.github.akiomik.seiun.viewmodel.TimelineViewModel
+import io.github.akiomik.seiun.viewmodels.TimelineViewModel
 
 @Composable
 private fun LoadingText() {
@@ -95,10 +94,10 @@ fun ErrorMessage() {
 private fun Timeline(listState: LazyListState) {
     val context = LocalContext.current
     val viewModel: TimelineViewModel = viewModel()
-    val feedViewPosts by viewModel.feedViewPosts.observeAsState(emptyList())
-    val isRefreshing by viewModel.isRefreshing.observeAsState(false)
+    val feedViewPosts by viewModel.feedViewPosts.collectAsState()
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
     val errored by viewModel.state.collectAsState()
-    val seenAllFeed by viewModel.seenAllFeed.observeAsState(false)
+    val seenAllFeed by viewModel.seenAllFeed.collectAsState()
     val refreshState =
         rememberPullRefreshState(refreshing = isRefreshing, onRefresh = {
             viewModel.refreshPosts(onError = {

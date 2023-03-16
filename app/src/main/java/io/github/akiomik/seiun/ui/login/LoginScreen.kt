@@ -34,7 +34,7 @@ import io.github.akiomik.seiun.datastores.Credential
 import io.github.akiomik.seiun.datastores.Session
 import io.github.akiomik.seiun.ui.components.SingleLineTextField
 import io.github.akiomik.seiun.ui.theme.Red700
-import io.github.akiomik.seiun.viewmodel.LoginViewModel
+import io.github.akiomik.seiun.viewmodels.LoginViewModel
 
 @Composable
 private fun AppName() {
