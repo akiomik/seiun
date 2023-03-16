@@ -65,6 +65,7 @@ import io.github.akiomik.seiun.ui.dialog.MuteDialog
 import io.github.akiomik.seiun.ui.dialog.ReportDialog
 import io.github.akiomik.seiun.ui.theme.Green700
 import io.github.akiomik.seiun.ui.theme.Red700
+import io.github.akiomik.seiun.utilities.NumberFormatter
 import io.github.akiomik.seiun.viewmodel.AppViewModel
 import io.github.akiomik.seiun.viewmodel.TimelineViewModel
 
@@ -149,10 +150,7 @@ private fun ReplyIndicator(viewPost: FeedViewPost) {
         NewPostFormModal(viewPost) { showPostForm = false }
     }
 
-    TextButton(
-        modifier = Modifier.width(64.dp),
-        onClick = { showPostForm = true; }
-    ) {
+    TextButton(onClick = { showPostForm = true; }) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -163,7 +161,11 @@ private fun ReplyIndicator(viewPost: FeedViewPost) {
                 modifier = Modifier.size(16.dp),
                 tint = Color.Gray
             )
-            Text(text = viewPost.post.replyCount.toString(), color = Color.Gray)
+            Text(
+                text = NumberFormatter.compact(viewPost.post.replyCount),
+                color = Color.Gray,
+                style = MaterialTheme.typography.labelLarge
+            )
         }
     }
 }
@@ -180,7 +182,6 @@ private fun RepostIndicator(viewPost: FeedViewPost) {
     val context = LocalContext.current
 
     TextButton(
-        modifier = Modifier.width(64.dp),
         onClick = {
             if (reposted) {
                 viewModel.cancelRepost(viewPost.post, onError = {
@@ -203,7 +204,11 @@ private fun RepostIndicator(viewPost: FeedViewPost) {
                 modifier = Modifier.size(16.dp),
                 tint = color
             )
-            Text(text = viewPost.post.repostCount.toString(), color = color)
+            Text(
+                text = NumberFormatter.compact(viewPost.post.repostCount),
+                style = MaterialTheme.typography.labelLarge,
+                color = color
+            )
         }
     }
 }
@@ -225,7 +230,6 @@ private fun UpvoteIndicator(viewPost: FeedViewPost) {
     val context = LocalContext.current
 
     TextButton(
-        modifier = Modifier.width(64.dp),
         onClick = {
             if (upvoted) {
                 viewModel.cancelVote(post = viewPost.post, onError = {
@@ -248,7 +252,11 @@ private fun UpvoteIndicator(viewPost: FeedViewPost) {
                 modifier = Modifier.size(16.dp),
                 tint = color
             )
-            Text(text = viewPost.post.upvoteCount.toString(), color = color)
+            Text(
+                text = NumberFormatter.compact(viewPost.post.upvoteCount),
+                style = MaterialTheme.typography.labelLarge,
+                color = color
+            )
         }
     }
 }
@@ -354,9 +362,9 @@ private fun FeedPostContent(viewPost: FeedViewPost) {
         ImageTile(viewPost)
 
         Row(
-            modifier = Modifier.padding(top = 8.dp, bottom = 4.dp),
+            modifier = Modifier.padding(top = 8.dp, bottom = 4.dp).fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             ReplyIndicator(viewPost = viewPost)
             RepostIndicator(viewPost = viewPost)
