@@ -59,6 +59,7 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
         )
     }
     var errorMessage by remember { mutableStateOf("") }
+    var isSubmitting by remember { mutableStateOf(false) }
 
     Column {
         if (errorMessage.isNotEmpty()) {
@@ -130,6 +131,7 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
         ElevatedButton(
             onClick = {
                 Log.d(SeiunApplication.TAG, "Create account for $handle on $serviceProvider")
+                isSubmitting = true
 
                 // NOTE: Init atpClient here using serviceProvider
                 SeiunApplication.instance!!.setAtpClient(serviceProvider)
@@ -150,19 +152,19 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
                     inviteCode = inviteCode,
                     onSuccess = { session ->
                         Log.d(SeiunApplication.TAG, "Create account successful")
+                        isSubmitting = false
                         authRepository.saveSession(Session.fromISession(session))
                         onRegistrationSuccess()
                     },
                     onError = { error ->
                         Log.d(SeiunApplication.TAG, "Login failure: $error")
+                        isSubmitting = false
                         errorMessage = error.message ?: "Failed to create account"
                     }
                 )
             },
-            enabled = valid,
-            modifier = Modifier
-                .padding(20.dp)
-                .align(alignment = Alignment.End)
+            enabled = valid && !isSubmitting,
+            modifier = Modifier.padding(20.dp).align(alignment = Alignment.End)
         ) {
             Text(stringResource(id = R.string.registration_button))
         }
