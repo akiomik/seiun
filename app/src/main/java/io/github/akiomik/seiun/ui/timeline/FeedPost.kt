@@ -39,8 +39,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -269,7 +269,7 @@ fun MenuButton(viewPost: FeedViewPost) {
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showReportDialog by remember { mutableStateOf(false) }
     var showMuteDialog by remember { mutableStateOf(false) }
-    val profile by viewModel.profile.observeAsState()
+    val profile by viewModel.profile.collectAsState()
 
     TextButton(onClick = { showMenu = true }) {
         Icon(

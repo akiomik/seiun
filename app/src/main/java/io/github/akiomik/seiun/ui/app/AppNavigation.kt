@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
@@ -36,7 +35,7 @@ fun AppNavigation(
     val application = SeiunApplication.instance!!
     val atpService by application.atpService.collectAsState()
     val viewModel: AppViewModel = viewModel()
-    val profile by viewModel.profile.observeAsState()
+    val profile by viewModel.profile.collectAsState()
     val context = LocalContext.current
 
     val isNotificationGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

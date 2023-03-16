@@ -17,8 +17,8 @@ import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,7 +39,7 @@ import kotlinx.coroutines.launch
 @Composable
 private fun Profile() {
     val viewModel: AppViewModel = viewModel()
-    val profile by viewModel.profile.observeAsState()
+    val profile by viewModel.profile.collectAsState()
 
     Row(
         modifier = Modifier.padding(16.dp),

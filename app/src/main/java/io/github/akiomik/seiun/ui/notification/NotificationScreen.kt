@@ -22,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -94,10 +93,10 @@ private fun ErrorMessage() {
 private fun NotificationList(listState: LazyListState) {
     val context = LocalContext.current
     val viewModel: NotificationViewModel = viewModel()
-    val notifications by viewModel.notifications.observeAsState(emptyList())
-    val isRefreshing by viewModel.isRefreshing.observeAsState(false)
+    val notifications by viewModel.notifications.collectAsState()
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
     val notificationStatus by viewModel.state.collectAsState()
-    val seenAllNotifications by viewModel.seenAllNotifications.observeAsState(false)
+    val seenAllNotifications by viewModel.seenAllNotifications.collectAsState()
     val refreshState =
         rememberPullRefreshState(refreshing = isRefreshing, onRefresh = {
             viewModel.refreshNotifications(onError = {
