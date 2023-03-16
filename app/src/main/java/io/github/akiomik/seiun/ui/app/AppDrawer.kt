@@ -1,5 +1,6 @@
 package io.github.akiomik.seiun.ui.app
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,19 +13,28 @@ import androidx.compose.material3.DrawerState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
+import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.model.app.bsky.actor.Profile
 import io.github.akiomik.seiun.viewmodel.AppViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 private fun Profile() {
@@ -70,6 +80,10 @@ private fun NameAndHandle(profile: Profile?) {
 
 @Composable
 fun AppDrawer(state: DrawerState, enabled: Boolean, content: @Composable () -> Unit) {
+//    var selected by remember { mutableStateOf("") }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
     ModalNavigationDrawer(
         drawerState = state,
         gesturesEnabled = enabled,
@@ -79,6 +93,21 @@ fun AppDrawer(state: DrawerState, enabled: Boolean, content: @Composable () -> U
                     Profile()
                     Divider()
                 }
+
+                NavigationDrawerItem(
+//                    selected = selected == "license",
+                    selected = false,
+                    onClick = {
+                        scope.launch { state.close() }
+
+                        val intent = Intent(context, OssLicensesMenuActivity::class.java)
+                        startActivity(context, intent, null)
+
+                        // NOTE: Do NOT update selected for license
+                    },
+                    label = { Text(stringResource(R.string.license)) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
             }
         },
         content = content
