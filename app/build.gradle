@@ -106,4 +106,7 @@ dependencies {
     implementation("io.coil-kt:coil-svg:${coil_version}")
 
     implementation('com.google.android.gms:play-services-oss-licenses:17.0.0')
+
+    // collapsing toolbar for user page
+    implementation "me.onebone:toolbar-compose:2.3.5"
 }

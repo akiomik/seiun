@@ -1,6 +1,5 @@
 package io.github.akiomik.seiun.ui.user
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,7 +16,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,9 +26,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
-import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.model.app.bsky.actor.Profile
 import io.github.akiomik.seiun.ui.theme.Indigo800
+import me.onebone.toolbar.CollapsingToolbarScaffold
+import me.onebone.toolbar.ScrollStrategy
+import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 
 @Composable
 private fun UserBanner(profile: Profile, height: Dp = 128.dp) {
@@ -100,20 +100,26 @@ fun Profile(profile: Profile) {
 
 @Composable
 private fun UserModalContent(profile: Profile) {
-    SideEffect {
-        Log.d(SeiunApplication.TAG, profile.toString())
-    }
-
-    Column {
-        UserBanner(profile)
-        Box(
-            modifier = Modifier
-                .background(color = MaterialTheme.colorScheme.surfaceVariant)
-                .fillMaxWidth()
-        ) {
-            Profile(profile)
-        }
-        Divider()
+    // TODO: Use ExitUntilCollapsed
+    CollapsingToolbarScaffold(
+        state = rememberCollapsingToolbarScaffoldState(),
+        toolbar = {
+            Column {
+                UserBanner(profile)
+                Box(
+                    modifier = Modifier
+                        .background(color = MaterialTheme.colorScheme.surfaceVariant)
+                        .fillMaxWidth()
+                ) {
+                    Profile(profile)
+                }
+                Divider()
+            }
+        },
+        scrollStrategy = ScrollStrategy.EnterAlways,
+        enabled = true,
+        modifier = Modifier.fillMaxSize()
+    ) {
         UserFeed(profile)
     }
 }
