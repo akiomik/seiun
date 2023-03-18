@@ -45,28 +45,32 @@ import kotlinx.coroutines.launch
 private fun Profile(drawerState: DrawerState) {
     val viewModel: AppViewModel = viewModel()
     val profile by viewModel.profile.collectAsState()
+    var showUserModal by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+
+    if (showUserModal) {
+        profile?.let {
+            UserModal(profile = it) {
+                showUserModal = false
+            }
+        }
+    }
 
     Row(
-        modifier = Modifier.padding(16.dp),
+        modifier = Modifier.padding(16.dp).clickable {
+            scope.launch { drawerState.close() }
+            showUserModal = true
+        },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Avatar(profile = profile, drawerState = drawerState)
+        Avatar(profile = profile)
         NameAndHandle(profile)
     }
 }
 
 @Composable
-private fun Avatar(profile: Profile?, drawerState: DrawerState) {
-    var showUserModal by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
-
-    if (showUserModal && profile != null) {
-        UserModal(profile = profile) {
-            showUserModal = false
-        }
-    }
-
+private fun Avatar(profile: Profile?) {
     AsyncImage(
         model = profile?.avatar,
         contentDescription = null,
@@ -74,10 +78,6 @@ private fun Avatar(profile: Profile?, drawerState: DrawerState) {
             .width(48.dp)
             .height(48.dp)
             .clip(CircleShape)
-            .clickable {
-                scope.launch { drawerState.close() }
-                showUserModal = true
-            }
     )
 }
 
