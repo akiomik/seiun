@@ -185,11 +185,11 @@ private fun RepostIndicator(viewPost: FeedViewPost) {
     TextButton(
         onClick = {
             if (reposted) {
-                viewModel.cancelRepost(viewPost.post, onError = {
+                viewModel.cancelRepost(viewPost, onError = {
                     Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
                 })
             } else {
-                viewModel.repost(viewPost.post, onError = {
+                viewModel.repost(viewPost, onError = {
                     Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
                 })
             }
@@ -234,11 +234,11 @@ private fun UpvoteIndicator(viewPost: FeedViewPost) {
     TextButton(
         onClick = {
             if (upvoted) {
-                viewModel.cancelVote(post = viewPost.post, onError = {
+                viewModel.cancelVote(feedPost = viewPost, onError = {
                     Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
                 })
             } else {
-                viewModel.upvote(post = viewPost.post, onError = {
+                viewModel.upvote(feedPost = viewPost, onError = {
                     Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
                 })
             }

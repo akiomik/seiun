@@ -12,7 +12,6 @@ import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Divider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -46,10 +45,6 @@ fun UserFeed(profile: Profile) {
                 onError = { Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show() }
             )
         })
-
-    SideEffect {
-        Log.d(SeiunApplication.TAG, feedViewPosts.toString())
-    }
 
     if (author?.did != profile.did) {
         viewModel.setFeed(profile, onSuccess = {

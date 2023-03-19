@@ -11,6 +11,7 @@ import io.github.akiomik.seiun.datastores.CredentialDataStore
 import io.github.akiomik.seiun.datastores.SessionDataStore
 import io.github.akiomik.seiun.repository.AuthRepository
 import io.github.akiomik.seiun.repository.NotificationRepository
+import io.github.akiomik.seiun.repository.PostFeedRepository
 import io.github.akiomik.seiun.repository.TimelineRepository
 import io.github.akiomik.seiun.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,6 +28,7 @@ class SeiunApplication : Application() {
     lateinit var userRepository: UserRepository
     lateinit var timelineRepository: TimelineRepository
     lateinit var notificationRepository: NotificationRepository
+    lateinit var postFeedRepository: PostFeedRepository
 
     companion object {
         @get:Synchronized
@@ -46,6 +48,7 @@ class SeiunApplication : Application() {
         userRepository = UserRepository(authRepository)
         timelineRepository = TimelineRepository(authRepository)
         notificationRepository = NotificationRepository(authRepository)
+        postFeedRepository = PostFeedRepository(authRepository)
         instance = this
     }
 
