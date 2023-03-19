@@ -3,8 +3,10 @@ package io.github.akiomik.seiun.repository
 import android.util.Log
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.api.RequestHelper
+import io.github.akiomik.seiun.model.app.bsky.actor.Profile
 import io.github.akiomik.seiun.model.app.bsky.blob.UploadBlobOutput
 import io.github.akiomik.seiun.model.app.bsky.embed.Image
+import io.github.akiomik.seiun.model.app.bsky.feed.AuthorFeed
 import io.github.akiomik.seiun.model.app.bsky.feed.FeedViewPost
 import io.github.akiomik.seiun.model.app.bsky.feed.ImagesOrExternal
 import io.github.akiomik.seiun.model.app.bsky.feed.Post
@@ -31,6 +33,14 @@ class TimelineRepository(private val authRepository: AuthRepository) : Applicati
 
         return RequestHelper.executeWithRetry(authRepository) {
             getAtpClient().getTimeline("Bearer ${it.accessJwt}", before = before)
+        }
+    }
+
+    suspend fun getAuthorFeed(author: Profile, before: String? = null): AuthorFeed {
+        Log.d(SeiunApplication.TAG, "Get author feed: before = $before")
+
+        return RequestHelper.executeWithRetry(authRepository) {
+            getAtpClient().getAuthorFeed("Bearer ${it.accessJwt}", author = author.handle, before = before)
         }
     }
 
