@@ -11,12 +11,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.model.app.bsky.feed.FeedViewPost
-import io.github.akiomik.seiun.viewmodels.TimelineViewModel
+import io.github.akiomik.seiun.viewmodels.PostViewModel
 
 @Composable
 fun DeleteDialog(feedViewPost: FeedViewPost, onDismissRequest: () -> Unit) {
-    // TODO: Do not use TimelineViewModel here as it is also called from user feed
-    val viewModel: TimelineViewModel = viewModel()
+    val viewModel: PostViewModel = viewModel()
     val context = LocalContext.current
 
     ConfirmDialog(

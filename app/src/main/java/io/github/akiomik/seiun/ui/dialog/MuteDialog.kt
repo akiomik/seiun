@@ -11,12 +11,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.model.app.bsky.actor.RefWithInfo
-import io.github.akiomik.seiun.viewmodels.TimelineViewModel
+import io.github.akiomik.seiun.viewmodels.PostViewModel
 
 @Composable
 fun MuteDialog(actor: RefWithInfo, onDismissRequest: () -> Unit) {
-    // TODO: Do not use TimelineViewModel here as it is also called from user feed
-    val viewModel: TimelineViewModel = viewModel()
+    val viewModel: PostViewModel = viewModel()
     val context = LocalContext.current
     val mutedMessage = stringResource(id = R.string.dialog_muted)
 

@@ -38,6 +38,7 @@
     <string name="notification_invited">%1$s invited you</string>
     <string name="notification_mentioned">%1$s mentioned you</string>
     <string name="notification_replied">%1$s replied to you</string>
+    <string name="feed_posted">Your post has been published</string>
     <string name="feed_reposted">Reposted by %1$s</string>
     <string name="feed_replying">Replying to %1$s</string>
     <string name="feed_no_more_posts">No more posts</string>

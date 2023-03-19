@@ -39,6 +39,7 @@
     <string name="notification_invited">%1$s があなたを招待しました</string>
     <string name="notification_mentioned">%1$s があなたにメンションしました</string>
     <string name="notification_replied">%1$s があなたに返信しました</string>
+    <string name="feed_posted">投稿しました</string>
     <string name="feed_reposted">%1$s がリポスト</string>
     <string name="feed_replying">%1$s への返信</string>
     <string name="feed_no_more_posts">これ以上投稿はありません</string>

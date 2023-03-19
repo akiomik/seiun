@@ -67,7 +67,7 @@ import io.github.akiomik.seiun.ui.theme.Green700
 import io.github.akiomik.seiun.ui.theme.Red700
 import io.github.akiomik.seiun.utilities.NumberFormatter
 import io.github.akiomik.seiun.viewmodels.AppViewModel
-import io.github.akiomik.seiun.viewmodels.TimelineViewModel
+import io.github.akiomik.seiun.viewmodels.PostViewModel
 
 @Composable
 private fun RepostText(viewPost: FeedViewPost) {
@@ -172,8 +172,7 @@ private fun ReplyIndicator(viewPost: FeedViewPost) {
 
 @Composable
 private fun RepostIndicator(viewPost: FeedViewPost) {
-    // TODO: Do not use TimelineViewModel here as it is also called from user feed
-    val viewModel: TimelineViewModel = viewModel()
+    val viewModel: PostViewModel = viewModel()
     val reposted = viewPost.post.viewer.repost != null
     val color: Color = if (reposted) {
         Green700
@@ -216,8 +215,7 @@ private fun RepostIndicator(viewPost: FeedViewPost) {
 
 @Composable
 private fun UpvoteIndicator(viewPost: FeedViewPost) {
-    // TODO: Do not use TimelineViewModel here as it is also called from user feed
-    val viewModel: TimelineViewModel = viewModel()
+    val viewModel: PostViewModel = viewModel()
     val upvoted = viewPost.post.viewer.upvote != null
     val color = if (upvoted) {
         Red700
