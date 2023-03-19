@@ -26,7 +26,7 @@ import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.model.app.bsky.feed.FeedViewPost
 import io.github.akiomik.seiun.ui.embed.EmbedPost
-import io.github.akiomik.seiun.viewmodels.TimelineViewModel
+import io.github.akiomik.seiun.viewmodels.PostViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,8 +77,7 @@ private fun TypeDropdownMenu(onChange: (String) -> Unit) {
 
 @Composable
 fun ReportDialog(feedViewPost: FeedViewPost, onDismissRequest: () -> Unit) {
-    // TODO: Do not use TimelineViewModel here as it is also called from user feed
-    val viewModel: TimelineViewModel = viewModel()
+    val viewModel: PostViewModel = viewModel()
     val context = LocalContext.current
     val reportedMessage = stringResource(id = R.string.dialog_reported)
 

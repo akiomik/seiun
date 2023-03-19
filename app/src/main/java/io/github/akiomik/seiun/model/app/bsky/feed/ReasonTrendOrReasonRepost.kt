@@ -9,4 +9,6 @@ data class ReasonTrendOrReasonRepost(
     val type: String,
     val by: RefWithInfo,
     val indexedAt: Date
-)
+) {
+    fun id(): String = "$type-${by.did}-${indexedAt.time}"
+}

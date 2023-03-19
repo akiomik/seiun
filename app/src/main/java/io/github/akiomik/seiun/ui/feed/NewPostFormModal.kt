@@ -45,7 +45,7 @@ import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.model.app.bsky.feed.FeedViewPost
 import io.github.akiomik.seiun.ui.embed.EmbedPost
-import io.github.akiomik.seiun.viewmodels.TimelineViewModel
+import io.github.akiomik.seiun.viewmodels.PostViewModel
 
 @Composable
 private fun PostButton(
@@ -55,9 +55,8 @@ private fun PostButton(
     imageUri: Uri?,
     onSuccess: () -> Unit
 ) {
-    // TODO: Do not use TimelineViewModel here as it is also called from user feed
     var isUploading by remember { mutableStateOf(false) }
-    val viewModel: TimelineViewModel = viewModel()
+    val viewModel: PostViewModel = viewModel()
     val context = LocalContext.current
 
     Button(onClick = {
@@ -171,6 +170,8 @@ private fun ImagePreview(uri: Uri, onDelete: () -> Unit) {
 
 @Composable
 fun NewPostForm(feedViewPost: FeedViewPost?, onClose: () -> Unit) {
+    val context = LocalContext.current
+    val postedMessage = stringResource(R.string.feed_posted)
     var content by remember { mutableStateOf("") }
     var valid by remember { mutableStateOf(false) }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
@@ -192,7 +193,10 @@ fun NewPostForm(feedViewPost: FeedViewPost?, onClose: () -> Unit) {
                 enabled = valid,
                 feedViewPost = feedViewPost,
                 imageUri = imageUri
-            ) { onClose() }
+            ) {
+                onClose()
+                Toast.makeText(context, postedMessage, Toast.LENGTH_LONG).show()
+            }
         }
 
         Spacer(modifier = Modifier.size(8.dp))

@@ -52,7 +52,7 @@ private fun LoadingText() {
 private fun Timeline(listState: LazyListState) {
     val context = LocalContext.current
     val viewModel: TimelineViewModel = viewModel()
-    val feedViewPosts by viewModel.feedViewPosts.collectAsState()
+    val feedViewPosts by viewModel.feedPosts.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     val errored by viewModel.state.collectAsState()
     val seenAllFeed by viewModel.seenAllFeed.collectAsState()

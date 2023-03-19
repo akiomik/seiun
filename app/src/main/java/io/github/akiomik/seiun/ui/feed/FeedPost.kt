@@ -67,7 +67,7 @@ import io.github.akiomik.seiun.ui.theme.Green700
 import io.github.akiomik.seiun.ui.theme.Red700
 import io.github.akiomik.seiun.utilities.NumberFormatter
 import io.github.akiomik.seiun.viewmodels.AppViewModel
-import io.github.akiomik.seiun.viewmodels.TimelineViewModel
+import io.github.akiomik.seiun.viewmodels.PostViewModel
 
 @Composable
 private fun RepostText(viewPost: FeedViewPost) {
@@ -172,8 +172,7 @@ private fun ReplyIndicator(viewPost: FeedViewPost) {
 
 @Composable
 private fun RepostIndicator(viewPost: FeedViewPost) {
-    // TODO: Do not use TimelineViewModel here as it is also called from user feed
-    val viewModel: TimelineViewModel = viewModel()
+    val viewModel: PostViewModel = viewModel()
     val reposted = viewPost.post.viewer.repost != null
     val color: Color = if (reposted) {
         Green700
@@ -185,11 +184,11 @@ private fun RepostIndicator(viewPost: FeedViewPost) {
     TextButton(
         onClick = {
             if (reposted) {
-                viewModel.cancelRepost(viewPost.post, onError = {
+                viewModel.cancelRepost(viewPost, onError = {
                     Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
                 })
             } else {
-                viewModel.repost(viewPost.post, onError = {
+                viewModel.repost(viewPost, onError = {
                     Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
                 })
             }
@@ -216,8 +215,7 @@ private fun RepostIndicator(viewPost: FeedViewPost) {
 
 @Composable
 private fun UpvoteIndicator(viewPost: FeedViewPost) {
-    // TODO: Do not use TimelineViewModel here as it is also called from user feed
-    val viewModel: TimelineViewModel = viewModel()
+    val viewModel: PostViewModel = viewModel()
     val upvoted = viewPost.post.viewer.upvote != null
     val color = if (upvoted) {
         Red700
@@ -234,11 +232,11 @@ private fun UpvoteIndicator(viewPost: FeedViewPost) {
     TextButton(
         onClick = {
             if (upvoted) {
-                viewModel.cancelVote(post = viewPost.post, onError = {
+                viewModel.cancelVote(feedPost = viewPost, onError = {
                     Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
                 })
             } else {
-                viewModel.upvote(post = viewPost.post, onError = {
+                viewModel.upvote(feedPost = viewPost, onError = {
                     Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
                 })
             }
