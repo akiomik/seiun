@@ -16,6 +16,14 @@ class UserRepository(private val authRepository: AuthRepository) : ApplicationRe
         }
     }
 
+    suspend fun getProfileOf(did: String): Profile {
+        Log.d(SeiunApplication.TAG, "Get profile of $did")
+
+        return RequestHelper.executeWithRetry(authRepository) {
+            getAtpClient().getProfile("Bearer ${it.accessJwt}", did)
+        }
+    }
+
     suspend fun mute(did: String) {
         Log.d(SeiunApplication.TAG, "Mute user: $did")
         val body = MuteInput(user = did)

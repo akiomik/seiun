@@ -13,12 +13,15 @@ import kotlinx.coroutines.flow.stateIn
 class UserFeedViewModel : ApplicationViewModel() {
     sealed class State {
         object Init : State()
-        object Loading : State()
-        object Loaded : State()
+        object ProfileLoading : State()
+        object ProfileLoaded : State()
+        object FeedLoading : State()
+        object FeedLoaded : State()
         object Error : State()
     }
 
     private val postFeedRepository = SeiunApplication.instance!!.postFeedRepository
+    private val userRepository = SeiunApplication.instance!!.userRepository
     private var _cursor: String? = null
 
     private val _feedPostIds: MutableStateFlow<Set<String>> = MutableStateFlow(emptySet())
@@ -34,15 +37,36 @@ class UserFeedViewModel : ApplicationViewModel() {
         feedPosts.filter { post -> feedPostIds.contains(post.id()) }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    fun setFeed(profile: Profile, onSuccess: () -> Unit, onError: (Throwable) -> Unit) {
-        resetState()
+    fun setProfile(profile: Profile) {
         _profile.value = profile
-        _state.value = State.Loading
+        _state.value = State.ProfileLoaded
+    }
+
+    fun setProfileOf(did: String, onSuccess: () -> Unit, onError: (Throwable) -> Unit) {
+        resetState()
+        _state.value = State.ProfileLoading
+
+        wrapError(
+            run = { userRepository.getProfileOf(did) },
+            onSuccess = {
+                _profile.value = it
+                _state.value = State.ProfileLoaded
+                onSuccess()
+            },
+            onError = {
+                _state.value = State.Error
+                onError(it)
+            }
+        )
+    }
+
+    fun setFeed(profile: Profile, onSuccess: () -> Unit, onError: (Throwable) -> Unit) {
+        _state.value = State.FeedLoading
 
         wrapError(
             run = { postFeedRepository.getAuthorFeed(author = profile) },
             onSuccess = {
-                _state.value = State.Loaded
+                _state.value = State.FeedLoaded
                 _feedPostIds.value = it.feed.map { post -> post.id() }.toSet()
                 _cursor = it.cursor
                 onSuccess()

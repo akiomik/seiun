@@ -16,6 +16,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,9 +30,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.model.app.bsky.actor.Profile
 import io.github.akiomik.seiun.ui.theme.Indigo800
+import io.github.akiomik.seiun.viewmodels.UserFeedViewModel
 import me.onebone.toolbar.CollapsingToolbarScaffold
 import me.onebone.toolbar.ScrollStrategy
 import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
@@ -126,6 +133,9 @@ private fun UserModalContent(profile: Profile) {
 
 @Composable
 fun UserModal(profile: Profile, onDismissRequest: () -> Unit) {
+    val userFeedViewModel: UserFeedViewModel = viewModel()
+    userFeedViewModel.setProfile(profile)
+
     Dialog(
         onDismissRequest = onDismissRequest,
         properties = DialogProperties(usePlatformDefaultWidth = false)
@@ -133,5 +143,24 @@ fun UserModal(profile: Profile, onDismissRequest: () -> Unit) {
         Surface(modifier = Modifier.fillMaxSize()) {
             UserModalContent(profile = profile)
         }
+    }
+}
+
+@Composable
+fun UserModal(did: String, onDismissRequest: () -> Unit) {
+    val userFeedViewModel: UserFeedViewModel = viewModel()
+    var profileRequested by remember { mutableStateOf(false) }
+    val profile by userFeedViewModel.profile.collectAsState()
+
+    if (!profileRequested) {
+        userFeedViewModel.setProfileOf(
+            did = did,
+            onSuccess = { profileRequested = true },
+            onError = { profileRequested = true }
+        )
+    }
+
+    profile?.let {
+        UserModal(profile = it, onDismissRequest = onDismissRequest)
     }
 }
