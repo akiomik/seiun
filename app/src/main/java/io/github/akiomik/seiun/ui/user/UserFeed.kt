@@ -22,10 +22,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.model.app.bsky.actor.Profile
-import io.github.akiomik.seiun.ui.timeline.ErrorMessage
-import io.github.akiomik.seiun.ui.timeline.FeedPost
-import io.github.akiomik.seiun.ui.timeline.NoMorePostsMessage
-import io.github.akiomik.seiun.ui.timeline.NoPostsYetMessage
+import io.github.akiomik.seiun.ui.feed.FeedPost
+import io.github.akiomik.seiun.ui.feed.LoadingErrorMessage
+import io.github.akiomik.seiun.ui.feed.NoMorePostsMessage
+import io.github.akiomik.seiun.ui.feed.NoPostsYetMessage
 import io.github.akiomik.seiun.viewmodels.UserFeedViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -69,7 +69,7 @@ fun UserFeed(profile: Profile) {
             }
 
             if (errored == UserFeedViewModel.State.Error) {
-                item { ErrorMessage() }
+                item { LoadingErrorMessage() }
             } else if (feedViewPosts.isEmpty()) {
                 item { NoPostsYetMessage() }
             } else if (seenAllFeed) {

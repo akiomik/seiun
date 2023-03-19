@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -28,6 +27,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.akiomik.seiun.R
+import io.github.akiomik.seiun.ui.feed.FeedPost
+import io.github.akiomik.seiun.ui.feed.LoadingErrorMessage
+import io.github.akiomik.seiun.ui.feed.NoMorePostsMessage
+import io.github.akiomik.seiun.ui.feed.NoPostsYetMessage
 import io.github.akiomik.seiun.viewmodels.TimelineViewModel
 
 @Composable
@@ -41,27 +44,6 @@ private fun LoadingText() {
             Text(stringResource(id = R.string.loading))
             CircularProgressIndicator()
         }
-    }
-}
-
-@Composable
-fun NoPostsYetMessage() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(stringResource(id = R.string.timeline_no_posts_yet))
-    }
-}
-
-@Composable
-fun NoMorePostsMessage() {
-    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        Text(stringResource(id = R.string.timeline_no_more_posts))
-    }
-}
-
-@Composable
-fun ErrorMessage() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(stringResource(id = R.string.timeline_error))
     }
 }
 
@@ -91,7 +73,7 @@ private fun Timeline(listState: LazyListState) {
             }
 
             if (errored == TimelineViewModel.State.Error) {
-                item { ErrorMessage() }
+                item { LoadingErrorMessage() }
             } else if (feedViewPosts.isEmpty()) {
                 item { NoPostsYetMessage() }
             } else if (seenAllFeed) {

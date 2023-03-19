@@ -1,4 +1,4 @@
-package io.github.akiomik.seiun.ui.timeline
+package io.github.akiomik.seiun.ui.feed
 
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
@@ -55,6 +55,7 @@ private fun PostButton(
     imageUri: Uri?,
     onSuccess: () -> Unit
 ) {
+    // TODO: Do not use TimelineViewModel here as it is also called from user feed
     var isUploading by remember { mutableStateOf(false) }
     val viewModel: TimelineViewModel = viewModel()
     val context = LocalContext.current

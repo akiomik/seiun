@@ -45,7 +45,7 @@ private fun TypeDropdownMenu(onChange: (String) -> Unit) {
         TextField(
             readOnly = true,
             value = typeText,
-            label = { Text(stringResource(R.string.timeline_report_type)) },
+            label = { Text(stringResource(R.string.dialog_report_type)) },
             modifier = Modifier.menuAnchor(),
             onValueChange = {},
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = typeExpanded) },
@@ -77,15 +77,16 @@ private fun TypeDropdownMenu(onChange: (String) -> Unit) {
 
 @Composable
 fun ReportDialog(feedViewPost: FeedViewPost, onDismissRequest: () -> Unit) {
+    // TODO: Do not use TimelineViewModel here as it is also called from user feed
     val viewModel: TimelineViewModel = viewModel()
     val context = LocalContext.current
-    val reportedMessage = stringResource(id = R.string.timeline_reported)
+    val reportedMessage = stringResource(id = R.string.dialog_reported)
 
     var reason by remember { mutableStateOf("") }
     var type by remember { mutableStateOf("com.atproto.report.reasonType#spam") }
 
     ConfirmDialog(body = {
-        Text(text = stringResource(id = R.string.timeline_report_message))
+        Text(text = stringResource(id = R.string.dialog_report_message))
         Spacer(modifier = Modifier.height(24.dp))
         EmbedPost(viewPost = feedViewPost)
         Spacer(modifier = Modifier.height(24.dp))
@@ -93,7 +94,7 @@ fun ReportDialog(feedViewPost: FeedViewPost, onDismissRequest: () -> Unit) {
         TextField(
             value = reason,
             onValueChange = { reason = it },
-            label = { Text(stringResource(id = R.string.timeline_report_reason)) },
+            label = { Text(stringResource(id = R.string.dialog_report_reason)) },
             placeholder = { Text(text = stringResource(id = R.string.optional)) },
             maxLines = 8,
             modifier = Modifier

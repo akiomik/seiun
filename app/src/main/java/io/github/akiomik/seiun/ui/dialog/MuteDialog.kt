@@ -15,12 +15,13 @@ import io.github.akiomik.seiun.viewmodels.TimelineViewModel
 
 @Composable
 fun MuteDialog(actor: RefWithInfo, onDismissRequest: () -> Unit) {
+    // TODO: Do not use TimelineViewModel here as it is also called from user feed
     val viewModel: TimelineViewModel = viewModel()
     val context = LocalContext.current
-    val mutedMessage = stringResource(id = R.string.timeline_muted)
+    val mutedMessage = stringResource(id = R.string.dialog_muted)
 
     ConfirmDialog(body = {
-        Text(stringResource(R.string.timeline_mute_confirmation, actor.handle))
+        Text(stringResource(R.string.dialog_mute_confirmation, actor.handle))
     }, action = {
             TextButton(onClick = {
                 viewModel.mute(actor.did, onSuccess = {

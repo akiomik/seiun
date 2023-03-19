@@ -15,12 +15,13 @@ import io.github.akiomik.seiun.viewmodels.TimelineViewModel
 
 @Composable
 fun DeleteDialog(feedViewPost: FeedViewPost, onDismissRequest: () -> Unit) {
+    // TODO: Do not use TimelineViewModel here as it is also called from user feed
     val viewModel: TimelineViewModel = viewModel()
     val context = LocalContext.current
 
     ConfirmDialog(
         body = {
-            Text(stringResource(id = R.string.timeline_delete_confirmation))
+            Text(stringResource(id = R.string.dialog_delete_confirmation))
         },
         action = {
             TextButton(onClick = {

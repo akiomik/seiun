@@ -1,4 +1,4 @@
-package io.github.akiomik.seiun.ui.timeline
+package io.github.akiomik.seiun.ui.feed
 
 import android.text.format.DateFormat
 import android.widget.Toast
@@ -74,7 +74,7 @@ private fun RepostText(viewPost: FeedViewPost) {
     Box(modifier = Modifier.padding(bottom = 8.dp)) {
         Text(
             text = stringResource(
-                id = R.string.timeline_reposted,
+                id = R.string.feed_reposted,
                 viewPost.reason?.by?.displayName ?: viewPost.reason?.by?.handle ?: ""
             ),
             fontWeight = FontWeight.Bold,
@@ -89,7 +89,7 @@ private fun ReplyText(viewPost: FeedViewPost) {
     Box(modifier = Modifier.padding(bottom = 8.dp)) {
         Text(
             text = stringResource(
-                id = R.string.timeline_replying,
+                id = R.string.feed_replying,
                 viewPost.reply?.parent?.author?.displayName
                     ?: viewPost.reply?.parent?.author?.handle ?: ""
             ),
@@ -172,6 +172,7 @@ private fun ReplyIndicator(viewPost: FeedViewPost) {
 
 @Composable
 private fun RepostIndicator(viewPost: FeedViewPost) {
+    // TODO: Do not use TimelineViewModel here as it is also called from user feed
     val viewModel: TimelineViewModel = viewModel()
     val reposted = viewPost.post.viewer.repost != null
     val color: Color = if (reposted) {
@@ -215,6 +216,7 @@ private fun RepostIndicator(viewPost: FeedViewPost) {
 
 @Composable
 private fun UpvoteIndicator(viewPost: FeedViewPost) {
+    // TODO: Do not use TimelineViewModel here as it is also called from user feed
     val viewModel: TimelineViewModel = viewModel()
     val upvoted = viewPost.post.viewer.upvote != null
     val color = if (upvoted) {
