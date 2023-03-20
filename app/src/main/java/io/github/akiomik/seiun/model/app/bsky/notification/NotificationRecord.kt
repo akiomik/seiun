@@ -1,11 +1,13 @@
 package io.github.akiomik.seiun.model.app.bsky.notification
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 import io.github.akiomik.seiun.model.app.bsky.feed.PostReplyRef
 import io.github.akiomik.seiun.model.app.bsky.feed.VoteDirection
 import java.util.*
 
 // NOTE: app.bsky.graph.follow or app.bsky.feed.vote or app.bsky.feed.repost
+@JsonClass(generateAdapter = true)
 data class NotificationRecord(
     @Json(name = "\$type")
     val type: String,

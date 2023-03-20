@@ -1,7 +1,9 @@
 package io.github.akiomik.seiun.model.com.atproto.session
 
+import com.squareup.moshi.JsonClass
 import io.github.akiomik.seiun.model.ISession
 
+@JsonClass(generateAdapter = true)
 data class SessionRefreshOutput(
     override val accessJwt: String,
     override val refreshJwt: String,
