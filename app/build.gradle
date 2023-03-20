@@ -63,15 +63,22 @@ android {
 }
 
 dependencies {
-
-    implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.0'
     implementation 'androidx.activity:activity-compose:1.6.1'
     implementation "androidx.compose.ui:ui:$compose_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
     implementation "androidx.compose.material3:material3:$material3_version"
-    implementation "androidx.compose.material:material:1.3.1"
+    implementation "androidx.compose.material:material-icons-extended:$compose_material_version"
+    implementation "androidx.compose.material:material:$compose_material_version"
     implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.0'
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0"
+    implementation "androidx.navigation:navigation-compose:2.5.3"
+    implementation "androidx.security:security-crypto:1.1.0-alpha05"
+    implementation "androidx.work:work-runtime-ktx:2.8.0"
+
+    // Since coil and play-services-oss-licenses conflict, specify the version on which coil depends.
+    implementation 'androidx.appcompat:appcompat:1.4.2'
+
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
@@ -79,35 +86,27 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
 
-    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0"
-    implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
-    implementation "androidx.security:security-crypto:1.1.0-alpha05"
-    implementation 'androidx.compose.material:material-icons-extended:1.3.1'
-    implementation "androidx.navigation:navigation-compose:2.5.3"
-    implementation "androidx.work:work-runtime-ktx:2.8.0"
-
-    def retrofit_version = '2.9.0'
+    // API request
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-moshi:$retrofit_version"
-    implementation "com.squareup.okhttp3:logging-interceptor:4.10.0"
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.10.0'
+    implementation 'com.slack.eithernet:eithernet:1.3.1'
 
-    def moshi_version = '1.14.0'
+    // JSON serializer
     implementation "com.squareup.moshi:moshi:$moshi_version"
     implementation "com.squareup.moshi:moshi-kotlin:$moshi_version"
     implementation "com.squareup.moshi:moshi-adapters:$moshi_version"
     ksp "com.squareup.moshi:moshi-kotlin-codegen:$moshi_version"
 
-    implementation("com.slack.eithernet:eithernet:1.3.1")
+    // Image loading
+    implementation "io.coil-kt:coil-base:${coil_version}"
+    implementation "io.coil-kt:coil:${coil_version}"
+    implementation "io.coil-kt:coil-compose:${coil_version}"
+    implementation "io.coil-kt:coil-gif:${coil_version}"
+    implementation "io.coil-kt:coil-svg:${coil_version}"
 
-    def coil_version = '2.2.2'
-    implementation("androidx.appcompat:appcompat:1.4.2")
-    implementation("io.coil-kt:coil-base:${coil_version}")
-    implementation("io.coil-kt:coil:${coil_version}")
-    implementation("io.coil-kt:coil-compose:${coil_version}")
-    implementation("io.coil-kt:coil-gif:${coil_version}")
-    implementation("io.coil-kt:coil-svg:${coil_version}")
-
-    implementation('com.google.android.gms:play-services-oss-licenses:17.0.0')
+    // OSS License viewer
+    implementation 'com.google.android.gms:play-services-oss-licenses:17.0.0'
 
     // collapsing toolbar for user page
     implementation "me.onebone:toolbar-compose:2.3.5"
