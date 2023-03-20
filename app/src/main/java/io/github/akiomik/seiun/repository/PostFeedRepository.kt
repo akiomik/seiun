@@ -23,6 +23,7 @@ import io.github.akiomik.seiun.model.com.atproto.repo.CreateRecordInput
 import io.github.akiomik.seiun.model.com.atproto.repo.CreateRecordOutput
 import io.github.akiomik.seiun.model.com.atproto.repo.DeleteRecordInput
 import io.github.akiomik.seiun.model.type.Image
+import io.github.akiomik.seiun.utilities.UriConverter
 import kotlinx.coroutines.flow.Flow
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.*
@@ -110,7 +111,7 @@ class PostFeedRepository(private val authRepository: AuthRepository) : Applicati
 
         Log.d(SeiunApplication.TAG, "Cancel repost: $uri")
 
-        val rkey = uri.split('/').last()
+        val rkey = UriConverter.toRkey(uri)
         RequestHelper.executeWithRetry(authRepository) {
             val body =
                 DeleteRecordInput(did = it.did, rkey = rkey, collection = "app.bsky.feed.repost")
@@ -190,8 +191,7 @@ class PostFeedRepository(private val authRepository: AuthRepository) : Applicati
     suspend fun deletePost(feedViewPost: FeedViewPost) {
         Log.d(SeiunApplication.TAG, "Delete post: uri = ${feedViewPost.post.uri}")
 
-        val rkey = feedViewPost.post.uri.split('/').last()
-
+        val rkey = UriConverter.toRkey(feedViewPost.post.uri)
         RequestHelper.executeWithRetry(authRepository) {
             val body =
                 DeleteRecordInput(did = it.did, collection = "app.bsky.feed.post", rkey = rkey)
