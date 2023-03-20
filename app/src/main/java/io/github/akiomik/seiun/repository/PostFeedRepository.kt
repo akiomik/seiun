@@ -106,20 +106,18 @@ class PostFeedRepository(private val authRepository: AuthRepository) : Applicati
     }
 
     suspend fun cancelRepost(feedPost: FeedViewPost) {
-        val maybeUri = feedPost.post.viewer.repost
-        Log.d(SeiunApplication.TAG, "Cancel repost: $maybeUri")
+        val uri = feedPost.post.viewer.repost ?: return
 
-        maybeUri?.let { uri ->
-            val rkey = uri.split('/').last()
+        Log.d(SeiunApplication.TAG, "Cancel repost: $uri")
 
-            RequestHelper.executeWithRetry(authRepository) {
-                val body =
-                    DeleteRecordInput(did = it.did, rkey = rkey, collection = "app.bsky.feed.repost")
-                getAtpClient().deleteRecord("Bearer ${it.accessJwt}", body = body)
-            }
-
-            PostFeedCacheDataSource.putFeedPost(feedPost.copy(post = feedPost.post.repostCanceled()))
+        val rkey = uri.split('/').last()
+        RequestHelper.executeWithRetry(authRepository) {
+            val body =
+                DeleteRecordInput(did = it.did, rkey = rkey, collection = "app.bsky.feed.repost")
+            getAtpClient().deleteRecord("Bearer ${it.accessJwt}", body = body)
         }
+
+        PostFeedCacheDataSource.putFeedPost(feedPost.copy(post = feedPost.post.repostCanceled()))
     }
 
     suspend fun createPost(
