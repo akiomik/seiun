@@ -106,20 +106,20 @@ class PostFeedRepository(private val authRepository: AuthRepository) : Applicati
     }
 
     suspend fun cancelRepost(feedPost: FeedViewPost) {
-        val uri = feedPost.post.uri
-        Log.d(SeiunApplication.TAG, "Cancel repost: $uri")
+        val maybeUri = feedPost.post.viewer.repost
+        Log.d(SeiunApplication.TAG, "Cancel repost: $maybeUri")
 
-        val rkey = uri.split('/').last()
+        maybeUri?.let { uri ->
+            val rkey = uri.split('/').last()
 
-        val res = RequestHelper.executeWithRetry(authRepository) {
-            val body =
-                DeleteRecordInput(did = it.did, rkey = rkey, collection = "app.bsky.feed.repost")
-            getAtpClient().deleteRecord("Bearer ${it.accessJwt}", body = body)
+            RequestHelper.executeWithRetry(authRepository) {
+                val body =
+                    DeleteRecordInput(did = it.did, rkey = rkey, collection = "app.bsky.feed.repost")
+                getAtpClient().deleteRecord("Bearer ${it.accessJwt}", body = body)
+            }
+
+            PostFeedCacheDataSource.putFeedPost(feedPost.copy(post = feedPost.post.repostCanceled()))
         }
-
-        PostFeedCacheDataSource.putFeedPost(feedPost.copy(post = feedPost.post.repostCanceled()))
-
-        return res
     }
 
     suspend fun createPost(
@@ -194,15 +194,13 @@ class PostFeedRepository(private val authRepository: AuthRepository) : Applicati
 
         val rkey = feedViewPost.post.uri.split('/').last()
 
-        val res = RequestHelper.executeWithRetry(authRepository) {
+        RequestHelper.executeWithRetry(authRepository) {
             val body =
                 DeleteRecordInput(did = it.did, collection = "app.bsky.feed.post", rkey = rkey)
             getAtpClient().deleteRecord("Bearer ${it.accessJwt}", body)
         }
 
         PostFeedCacheDataSource.removeFeedPost(feedViewPost.id())
-
-        return res
     }
 
     suspend fun uploadImage(image: ByteArray, mimeType: String): UploadBlobOutput {
