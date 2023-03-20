@@ -90,7 +90,7 @@ private fun ErrorMessage() {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun NotificationList(listState: LazyListState) {
+private fun NotificationList(listState: LazyListState, onProfileClick: (String) -> Unit) {
     val context = LocalContext.current
     val viewModel: NotificationViewModel = viewModel()
     val notifications by viewModel.notifications.collectAsState()
@@ -107,7 +107,7 @@ private fun NotificationList(listState: LazyListState) {
     Box(modifier = Modifier.pullRefresh(state = refreshState)) {
         LazyColumn(state = listState) {
             items(notifications) {
-                NotificationListItem(it)
+                NotificationListItem(it, onProfileClick)
                 Divider(color = Color.Gray)
             }
 
@@ -131,7 +131,7 @@ private fun NotificationList(listState: LazyListState) {
 }
 
 @Composable
-fun NotificationScreen(listState: LazyListState) {
+fun NotificationScreen(listState: LazyListState, onProfileClick: (String) -> Unit) {
     val viewModel: NotificationViewModel = viewModel()
     val notificationStatus by viewModel.state.collectAsState()
 
@@ -141,8 +141,8 @@ fun NotificationScreen(listState: LazyListState) {
     ) {
         when (notificationStatus) {
             is NotificationViewModel.State.Loading -> LoadingText()
-            is NotificationViewModel.State.Loaded -> NotificationList(listState)
-            is NotificationViewModel.State.Error -> NotificationList(listState)
+            is NotificationViewModel.State.Loaded -> NotificationList(listState, onProfileClick)
+            is NotificationViewModel.State.Error -> NotificationList(listState, onProfileClick)
         }
     }
 }

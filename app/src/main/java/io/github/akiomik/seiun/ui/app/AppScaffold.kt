@@ -17,16 +17,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import androidx.work.WorkManager
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.ui.timeline.NewPostFab
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppScaffold(from: String?, drawerState: DrawerState) {
-    val navController = rememberNavController()
+fun AppScaffold(from: String?, drawerState: DrawerState, navController: NavHostController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val timelineListState = rememberLazyListState()
@@ -43,14 +42,21 @@ fun AppScaffold(from: String?, drawerState: DrawerState) {
             "login"
         }
 
-    when (navBackStackEntry?.destination?.route) {
-        "timeline" -> {
+    val route = navBackStackEntry?.destination?.route
+    val matchUser = route?.startsWith("user/", true) ?: false
+    when {
+        route == "timeline" -> {
             topBarState = true
             bottomBarState = true
             fabState = { NewPostFab() }
         }
-        "notification" -> {
+        route == "notification" -> {
             topBarState = true
+            bottomBarState = true
+            fabState = {}
+        }
+        matchUser -> {
+            topBarState = false
             bottomBarState = true
             fabState = {}
         }

@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.rememberNavController
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.ui.theme.SeiunTheme
 import io.github.akiomik.seiun.viewmodels.AppViewModel
@@ -13,14 +14,17 @@ import io.github.akiomik.seiun.viewmodels.AppViewModel
 @Composable
 fun App(from: String?) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val navController = rememberNavController()
     val viewModel: AppViewModel = viewModel()
     val profile by viewModel.profile.collectAsState()
     val atpService by SeiunApplication.instance!!.atpService.collectAsState()
     val drawerEnabled = atpService != null && profile != null
 
     SeiunTheme {
-        AppDrawer(drawerState, enabled = drawerEnabled) {
-            AppScaffold(from = from, drawerState = drawerState)
+        AppDrawer(drawerState, enabled = drawerEnabled, onProfileClick = { profile ->
+            navController.navigate("user/${profile.did}")
+        }) {
+            AppScaffold(from = from, drawerState = drawerState, navController = navController)
         }
     }
 }

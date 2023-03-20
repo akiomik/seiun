@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -28,8 +29,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.model.app.bsky.actor.Profile
@@ -106,7 +105,7 @@ fun Profile(profile: Profile) {
 }
 
 @Composable
-private fun UserModalContent(profile: Profile) {
+private fun UserModalContent(profile: Profile, onProfileClick: (String) -> Unit) {
     // TODO: Use ExitUntilCollapsed
     CollapsingToolbarScaffold(
         state = rememberCollapsingToolbarScaffoldState(),
@@ -127,27 +126,12 @@ private fun UserModalContent(profile: Profile) {
         enabled = true,
         modifier = Modifier.fillMaxSize()
     ) {
-        UserFeed(profile)
+        UserFeed(profile, onProfileClick)
     }
 }
 
 @Composable
-fun UserModal(profile: Profile, onDismissRequest: () -> Unit) {
-    val userFeedViewModel: UserFeedViewModel = viewModel()
-    userFeedViewModel.setProfile(profile)
-
-    Dialog(
-        onDismissRequest = onDismissRequest,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
-    ) {
-        Surface(modifier = Modifier.fillMaxSize()) {
-            UserModalContent(profile = profile)
-        }
-    }
-}
-
-@Composable
-fun UserModal(did: String, onDismissRequest: () -> Unit) {
+fun UserScreen(did: String, onProfileClick: (String) -> Unit) {
     val userFeedViewModel: UserFeedViewModel = viewModel()
     var profileRequested by remember { mutableStateOf(false) }
     val profile by userFeedViewModel.profile.collectAsState()
@@ -160,7 +144,13 @@ fun UserModal(did: String, onDismissRequest: () -> Unit) {
         )
     }
 
-    profile?.let {
-        UserModal(profile = it, onDismissRequest = onDismissRequest)
+    Surface(modifier = Modifier.fillMaxSize()) {
+        if (profile == null) {
+            Box(contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        } else {
+            UserModalContent(profile = profile!!, onProfileClick = onProfileClick)
+        }
     }
 }
