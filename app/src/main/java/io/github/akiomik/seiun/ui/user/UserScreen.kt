@@ -8,9 +8,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
@@ -31,11 +33,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.model.app.bsky.actor.Profile
 import io.github.akiomik.seiun.ui.theme.Indigo800
+import io.github.akiomik.seiun.viewmodels.AppViewModel
 import io.github.akiomik.seiun.viewmodels.UserFeedViewModel
 import me.onebone.toolbar.CollapsingToolbarScaffold
 import me.onebone.toolbar.ScrollStrategy
@@ -62,13 +66,12 @@ private fun UserBanner(profile: Profile, height: Dp = 128.dp) {
 }
 
 @Composable
-private fun Avatar(profile: Profile) {
+private fun Avatar(profile: Profile, modifier: Modifier = Modifier, size: Dp = 64.dp) {
     AsyncImage(
         model = profile.avatar,
         contentDescription = null,
-        modifier = Modifier
-            .width(60.dp)
-            .height(60.dp)
+        modifier = modifier
+            .size(size)
             .clip(CircleShape)
     )
 }
@@ -128,17 +131,26 @@ private fun StatRow(profile: Profile) {
 
 @Composable
 private fun Profile(profile: Profile) {
+    val viewModel: AppViewModel = viewModel()
+    val viewer by viewModel.profile.collectAsState()
+
     Column(
-        modifier = Modifier.padding(16.dp),
+        modifier = Modifier.padding(top = 8.dp, end = 16.dp, bottom = 16.dp, start = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Avatar(profile = profile)
-            NameAndHandle(profile = profile)
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            if (profile.did == viewer?.did) {
+                Button(onClick = {}) {
+                    Text(stringResource(R.string.edit))
+                }
+            } else {
+                Button(onClick = {}) {
+                    Text(stringResource(R.string.follow))
+                }
+            }
         }
+
+        NameAndHandle(profile = profile)
 
         Text(profile.description.orEmpty())
 
@@ -148,12 +160,22 @@ private fun Profile(profile: Profile) {
 
 @Composable
 private fun UserModalContent(profile: Profile, onProfileClick: (String) -> Unit) {
+    val bannerHeight = 128.dp
+    val avatarSize = 96.dp
+
     // TODO: Use ExitUntilCollapsed
     CollapsingToolbarScaffold(
         state = rememberCollapsingToolbarScaffoldState(),
         toolbar = {
             Column {
-                UserBanner(profile)
+                Box(modifier = Modifier.zIndex(2f)) {
+                    UserBanner(profile, height = bannerHeight)
+                    Avatar(
+                        profile = profile,
+                        modifier = Modifier.offset(x = 16.dp, y = bannerHeight - (avatarSize / 2)),
+                        size = avatarSize
+                    )
+                }
                 Box(
                     modifier = Modifier
                         .background(color = MaterialTheme.colorScheme.surfaceVariant)
