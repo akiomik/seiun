@@ -147,8 +147,12 @@ private fun FollowOrUnfollowButton(profile: Profile) {
             Text(stringResource(R.string.follow))
         }
     } else {
-        // TODO
-        Button(onClick = {}, enabled = false) {
+        Button(onClick = {
+            viewModel.unfollow(
+                onSuccess = {},
+                onError = { Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show() }
+            )
+        }) {
             Text(stringResource(R.string.unfollow))
         }
     }

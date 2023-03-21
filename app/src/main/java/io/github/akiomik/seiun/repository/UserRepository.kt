@@ -11,6 +11,8 @@ import io.github.akiomik.seiun.model.app.bsky.graph.UnmuteInput
 import io.github.akiomik.seiun.model.app.bsky.system.DeclRef
 import io.github.akiomik.seiun.model.com.atproto.repo.CreateRecordInput
 import io.github.akiomik.seiun.model.com.atproto.repo.CreateRecordOutput
+import io.github.akiomik.seiun.model.com.atproto.repo.DeleteRecordInput
+import io.github.akiomik.seiun.utilities.UriConverter
 import java.util.*
 
 class UserRepository(private val authRepository: AuthRepository) : ApplicationRepository() {
@@ -41,6 +43,19 @@ class UserRepository(private val authRepository: AuthRepository) : ApplicationRe
                 collection = "app.bsky.graph.follow"
             )
             getAtpClient().follow("Bearer ${it.accessJwt}", body)
+        }
+    }
+
+    suspend fun unfollow(uri: String) {
+        Log.d(SeiunApplication.TAG, "Unfollow $uri")
+
+        return RequestHelper.executeWithRetry(authRepository) {
+            val body = DeleteRecordInput(
+                did = it.did,
+                collection = "app.bsky.graph.follow",
+                rkey = UriConverter.toRkey(uri)
+            )
+            getAtpClient().unfollow("Bearer ${it.accessJwt}", body)
         }
     }
 

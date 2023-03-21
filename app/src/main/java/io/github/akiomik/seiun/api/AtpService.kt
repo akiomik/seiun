@@ -172,6 +172,13 @@ interface AtpService {
     ): ApiResult<CreateRecordOutput, AtpError>
 
     @DecodeErrorBody
+    @POST("com.atproto.repo.deleteRecord")
+    suspend fun unfollow(
+        @Header("Authorization") authorization: String,
+        @Body body: DeleteRecordInput
+    ): ApiResult<Unit, AtpError>
+
+    @DecodeErrorBody
     @POST("app.bsky.graph.mute")
     suspend fun mute(
         @Header("Authorization") authorization: String,
