@@ -10,30 +10,29 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.work.WorkManager
 import io.github.akiomik.seiun.SeiunApplication
-import io.github.akiomik.seiun.ui.timeline.NewPostFab
+import io.github.akiomik.seiun.viewmodels.AppViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppScaffold(from: String?, drawerState: DrawerState, navController: NavHostController) {
+    val viewModel: AppViewModel = viewModel()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val timelineListState = rememberLazyListState()
     val notificationListState = rememberLazyListState()
-    var topBarState by rememberSaveable { (mutableStateOf(false)) }
-    var bottomBarState by rememberSaveable { (mutableStateOf(false)) }
-    var fabState by remember { (mutableStateOf<@Composable () -> Unit>({})) }
     val atpService by SeiunApplication.instance!!.atpService.collectAsState()
+    val showTopBar by viewModel.showTopBar.collectAsState()
+    val showBottomBar by viewModel.showBottomBar.collectAsState()
+    val fab by viewModel.fab.collectAsState()
 
     val startDestination =
         if (from == "notification" && atpService != null) {
@@ -46,41 +45,33 @@ fun AppScaffold(from: String?, drawerState: DrawerState, navController: NavHostC
     val matchUser = route?.startsWith("user/", true) ?: false
     when {
         route == "timeline" -> {
-            topBarState = true
-            bottomBarState = true
-            fabState = { NewPostFab() }
+            viewModel.onTimeline()
         }
         route == "notification" -> {
-            topBarState = true
-            bottomBarState = true
-            fabState = {}
+            viewModel.onNotification()
         }
         matchUser -> {
-            topBarState = false
-            bottomBarState = true
-            fabState = {}
+            viewModel.onUser()
         }
         else -> {
             Log.d(SeiunApplication.TAG, "Cancel all work")
             WorkManager.getInstance(LocalContext.current).cancelAllWork()
 
-            topBarState = false
-            bottomBarState = false
-            fabState = {}
+            viewModel.onLoginOrRegistration()
         }
     }
 
     Scaffold(
-        topBar = { AppTopBar(scrollBehavior, visible = topBarState, drawerState = drawerState) },
+        topBar = { AppTopBar(scrollBehavior, visible = showTopBar, drawerState = drawerState) },
         bottomBar = {
             AppBottomBar(
                 navController = navController,
-                visible = bottomBarState,
+                visible = showBottomBar,
                 timelineListState = timelineListState,
                 notificationListState = notificationListState
             )
         },
-        floatingActionButton = fabState,
+        floatingActionButton = fab,
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         content = {
             AppNavigation(
