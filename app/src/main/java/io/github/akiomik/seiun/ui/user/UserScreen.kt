@@ -27,10 +27,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.model.app.bsky.actor.Profile
 import io.github.akiomik.seiun.ui.theme.Indigo800
 import io.github.akiomik.seiun.viewmodels.UserFeedViewModel
@@ -88,7 +91,43 @@ private fun NameAndHandle(profile: Profile) {
 }
 
 @Composable
-fun Profile(profile: Profile) {
+private fun StatRow(profile: Profile) {
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = profile.followsCount.toString(),
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = stringResource(R.string.follows),
+                style = MaterialTheme.typography.labelMedium
+            )
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = profile.followersCount.toString(),
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = stringResource(R.string.followers),
+                style = MaterialTheme.typography.labelMedium
+            )
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = profile.postsCount.toString(),
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = stringResource(R.string.posts),
+                style = MaterialTheme.typography.labelMedium
+            )
+        }
+    }
+}
+
+@Composable
+private fun Profile(profile: Profile) {
     Column(
         modifier = Modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -102,6 +141,8 @@ fun Profile(profile: Profile) {
         }
 
         Text(profile.description.orEmpty())
+
+        StatRow(profile = profile)
     }
 }
 
