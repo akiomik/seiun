@@ -40,14 +40,15 @@ import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 
 @Composable
 private fun UserBanner(profile: Profile, height: Dp = 128.dp) {
-    if (profile.banner == null) {
+    Box {
+        // fallback
         Box(
             modifier = Modifier
                 .background(color = Indigo800)
                 .height(height)
                 .fillMaxWidth()
-        ) {}
-    } else {
+        )
+
         AsyncImage(
             model = profile.banner,
             contentDescription = null,
