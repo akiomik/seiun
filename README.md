@@ -24,6 +24,7 @@ Google Play and the Google Play logo are trademarks of Google LLC.
 - Report post as spam
 - Upload an image
 - Image preview
+- Follow / Unfollow user
 - Mute user
 - Push notification (experimental)
 - Custom service provider
