@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -12,7 +13,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
@@ -139,15 +139,17 @@ private fun Profile(profile: Profile) {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            if (profile.did == viewer?.did) {
-                Button(onClick = {}) {
-                    Text(stringResource(R.string.edit))
-                }
-            } else {
-                Button(onClick = {}) {
-                    Text(stringResource(R.string.follow))
-                }
-            }
+            // TODO: Implement edit and follow
+            Spacer(modifier = Modifier.height(32.dp))
+//            if (profile.did == viewer?.did) {
+//                Button(onClick = {}) {
+//                    Text(stringResource(R.string.edit))
+//                }
+//            } else {
+//                Button(onClick = {}) {
+//                    Text(stringResource(R.string.follow))
+//                }
+//            }
         }
 
         NameAndHandle(profile = profile)
