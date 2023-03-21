@@ -39,15 +39,23 @@ fun AppBottomBar(
                     selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                     onClick = {
                         navController.navigate(screen.route) {
-                            if (screen.route == "timeline" && screen.route == currentDestination?.route) {
-                                coroutineScope.launch {
-                                    timelineListState.animateScrollToItem(0)
+                            if (screen.route == "timeline") {
+                                navController.popBackStack("timeline", false)
+
+                                if (screen.route == currentDestination?.route) {
+                                    coroutineScope.launch {
+                                        timelineListState.animateScrollToItem(0)
+                                    }
                                 }
                             }
 
-                            if (screen.route == "notification" && screen.route == currentDestination?.route) {
-                                coroutineScope.launch {
-                                    notificationListState.animateScrollToItem(0)
+                            if (screen.route == "notification") {
+                                navController.popBackStack("notification", false)
+
+                                if (screen.route == currentDestination?.route) {
+                                    coroutineScope.launch {
+                                        notificationListState.animateScrollToItem(0)
+                                    }
                                 }
                             }
 
