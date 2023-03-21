@@ -123,10 +123,13 @@ class UserFeedViewModel : ApplicationViewModel() {
     }
 
     fun follow(onSuccess: () -> Unit, onError: (Throwable) -> Unit) {
-        _profile.value?.let {
+        _profile.value?.let { profile ->
             wrapError(
-                run = { userRepository.follow(it.did, it.declaration) },
-                onSuccess = { onSuccess() },
+                run = { userRepository.follow(profile.did, profile.declaration) },
+                onSuccess = {
+                    _profile.value = profile.copy(myState = profile.myState?.copy(follow = it.uri))
+                    onSuccess()
+                },
                 onError = onError
             )
         }
