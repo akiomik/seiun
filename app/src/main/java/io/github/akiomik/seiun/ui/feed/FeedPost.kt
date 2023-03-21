@@ -65,7 +65,6 @@ import io.github.akiomik.seiun.ui.dialog.MuteDialog
 import io.github.akiomik.seiun.ui.dialog.ReportDialog
 import io.github.akiomik.seiun.ui.theme.Green700
 import io.github.akiomik.seiun.ui.theme.Red700
-import io.github.akiomik.seiun.ui.user.UserModal
 import io.github.akiomik.seiun.utilities.NumberFormatter
 import io.github.akiomik.seiun.viewmodels.AppViewModel
 import io.github.akiomik.seiun.viewmodels.PostViewModel
@@ -102,15 +101,7 @@ private fun ReplyText(viewPost: FeedViewPost) {
 }
 
 @Composable
-private fun Avatar(viewPost: FeedViewPost) {
-    var showUserModal by remember { mutableStateOf(false) }
-
-    if (showUserModal) {
-        UserModal(did = viewPost.post.author.did) {
-            showUserModal = false
-        }
-    }
-
+private fun Avatar(viewPost: FeedViewPost, onClick: (String) -> Unit) {
     AsyncImage(
         model = viewPost.post.author.avatar,
         contentDescription = null,
@@ -118,7 +109,7 @@ private fun Avatar(viewPost: FeedViewPost) {
             .width(50.dp)
             .height(50.dp)
             .clip(CircleShape)
-            .clickable { showUserModal = true }
+            .clickable { onClick(viewPost.post.author.did) }
     )
 }
 
@@ -483,7 +474,7 @@ fun ImagePager(images: List<PresentedImage>, initialIndex: Int, onDismissRequest
 }
 
 @Composable
-fun FeedPost(viewPost: FeedViewPost) {
+fun FeedPost(viewPost: FeedViewPost, onProfileClick: (String) -> Unit) {
     Column(modifier = Modifier.padding(14.dp)) {
         if (viewPost.reason?.type == "app.bsky.feed.feedViewPost#reasonRepost") {
             RepostText(viewPost = viewPost)
@@ -492,7 +483,7 @@ fun FeedPost(viewPost: FeedViewPost) {
         }
 
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            Avatar(viewPost = viewPost)
+            Avatar(viewPost = viewPost, onClick = onProfileClick)
             FeedPostContent(viewPost = viewPost)
         }
     }

@@ -49,7 +49,7 @@ private fun LoadingText() {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun Timeline(listState: LazyListState) {
+private fun Timeline(listState: LazyListState, onProfileClick: (String) -> Unit) {
     val context = LocalContext.current
     val viewModel: TimelineViewModel = viewModel()
     val feedViewPosts by viewModel.feedPosts.collectAsState()
@@ -67,7 +67,7 @@ private fun Timeline(listState: LazyListState) {
         LazyColumn(state = listState) {
             items(feedViewPosts) { feedViewPost ->
                 if (feedViewPost.post.viewer.muted != true) {
-                    FeedPost(viewPost = feedViewPost)
+                    FeedPost(viewPost = feedViewPost, onProfileClick = onProfileClick)
                     Divider(color = Color.Gray)
                 }
             }
@@ -92,7 +92,7 @@ private fun Timeline(listState: LazyListState) {
 }
 
 @Composable
-fun TimelineScreen(listState: LazyListState) {
+fun TimelineScreen(listState: LazyListState, onProfileClick: (String) -> Unit) {
     val viewModel: TimelineViewModel = viewModel()
     val timelineState by viewModel.state.collectAsState()
 
@@ -102,8 +102,8 @@ fun TimelineScreen(listState: LazyListState) {
     ) {
         when (timelineState) {
             is TimelineViewModel.State.Loading -> LoadingText()
-            is TimelineViewModel.State.Loaded -> Timeline(listState)
-            is TimelineViewModel.State.Error -> Timeline(listState)
+            is TimelineViewModel.State.Loaded -> Timeline(listState, onProfileClick)
+            is TimelineViewModel.State.Error -> Timeline(listState, onProfileClick)
         }
     }
 }

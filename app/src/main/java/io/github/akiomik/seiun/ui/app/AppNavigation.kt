@@ -15,13 +15,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.ui.login.LoginScreen
 import io.github.akiomik.seiun.ui.notification.NotificationScreen
 import io.github.akiomik.seiun.ui.registration.RegistrationScreen
 import io.github.akiomik.seiun.ui.timeline.TimelineScreen
+import io.github.akiomik.seiun.ui.user.UserScreen
 import io.github.akiomik.seiun.viewmodels.AppViewModel
 
 @Composable
@@ -73,7 +76,10 @@ fun AppNavigation(
                 application.registerNotificationWorker()
             }
 
-            TimelineScreen(timelineListState)
+            TimelineScreen(
+                timelineListState,
+                onProfileClick = { navController.navigate("user/$it") }
+            )
         }
         composable("notification") {
             if (atpService == null) {
@@ -94,7 +100,19 @@ fun AppNavigation(
                 application.registerNotificationWorker()
             }
 
-            NotificationScreen(notificationListState)
+            NotificationScreen(
+                notificationListState,
+                onProfileClick = { navController.navigate("user/$it") }
+            )
+        }
+        composable(
+            "user/{did}",
+            arguments = listOf(navArgument("did") { type = NavType.StringType })
+        ) {
+            UserScreen(
+                it.arguments?.getString("did")!!,
+                onProfileClick = { did -> navController.navigate("user/$did") }
+            )
         }
         composable("login") {
             LoginScreen(onLoginSuccess = {

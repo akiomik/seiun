@@ -31,7 +31,7 @@ import io.github.akiomik.seiun.viewmodels.UserFeedViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun UserFeedContent() {
+fun UserFeedContent(onProfileClick: (String) -> Unit) {
     val context = LocalContext.current
     val viewModel: UserFeedViewModel = viewModel()
     val feedViewPosts by viewModel.feedViewPosts.collectAsState()
@@ -51,7 +51,7 @@ fun UserFeedContent() {
         LazyColumn(state = listState) {
             items(feedViewPosts) { feedViewPost ->
                 if (feedViewPost.post.viewer.muted != true) {
-                    FeedPost(viewPost = feedViewPost)
+                    FeedPost(viewPost = feedViewPost, onProfileClick = onProfileClick)
                     Divider(color = Color.Gray)
                 }
             }
@@ -76,7 +76,7 @@ fun UserFeedContent() {
 }
 
 @Composable
-fun UserFeed(profile: Profile) {
+fun UserFeed(profile: Profile, onProfileClick: (String) -> Unit) {
     val viewModel: UserFeedViewModel = viewModel()
     val state by viewModel.state.collectAsState()
 
@@ -89,7 +89,7 @@ fun UserFeed(profile: Profile) {
     }
 
     if (state == UserFeedViewModel.State.FeedLoaded) {
-        UserFeedContent()
+        UserFeedContent(onProfileClick = onProfileClick)
     } else {
         Box(
             modifier = Modifier.fillMaxWidth(),
