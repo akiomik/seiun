@@ -168,12 +168,12 @@ private fun Profile(profile: Profile) {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            // TODO: Implement edit and follow
-            Spacer(modifier = Modifier.height(32.dp))
             if (profile.did == viewer?.did) {
-                Button(onClick = {}) {
-                    Text(stringResource(R.string.edit))
-                }
+                // TODO: Implement edit button
+                Spacer(modifier = Modifier.height(32.dp))
+//                Button(onClick = {}) {
+//                    Text(stringResource(R.string.edit))
+//                }
             } else {
                 FollowOrUnfollowButton(profile = profile)
             }
