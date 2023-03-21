@@ -17,6 +17,7 @@ Google Play and the Google Play logo are trademarks of Google LLC.
 - Login / User registration
 - Home feed (Timeline)
 - Notifications feed
+- Author feed (Profile viewer)
 - Upvote / Repost
 - Send Post / Reply
 - Delete post
