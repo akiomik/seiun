@@ -5,11 +5,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
@@ -27,12 +29,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.model.app.bsky.actor.Profile
 import io.github.akiomik.seiun.ui.theme.Indigo800
+import io.github.akiomik.seiun.viewmodels.AppViewModel
 import io.github.akiomik.seiun.viewmodels.UserFeedViewModel
 import me.onebone.toolbar.CollapsingToolbarScaffold
 import me.onebone.toolbar.ScrollStrategy
@@ -40,14 +47,15 @@ import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 
 @Composable
 private fun UserBanner(profile: Profile, height: Dp = 128.dp) {
-    if (profile.banner == null) {
+    Box {
+        // fallback
         Box(
             modifier = Modifier
                 .background(color = Indigo800)
                 .height(height)
                 .fillMaxWidth()
-        ) {}
-    } else {
+        )
+
         AsyncImage(
             model = profile.banner,
             contentDescription = null,
@@ -58,13 +66,12 @@ private fun UserBanner(profile: Profile, height: Dp = 128.dp) {
 }
 
 @Composable
-private fun Avatar(profile: Profile) {
+private fun Avatar(profile: Profile, modifier: Modifier = Modifier, size: Dp = 64.dp) {
     AsyncImage(
         model = profile.avatar,
         contentDescription = null,
-        modifier = Modifier
-            .width(60.dp)
-            .height(60.dp)
+        modifier = modifier
+            .size(size)
             .clip(CircleShape)
     )
 }
@@ -87,31 +94,90 @@ private fun NameAndHandle(profile: Profile) {
 }
 
 @Composable
-fun Profile(profile: Profile) {
+private fun StatRow(profile: Profile) {
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = profile.followsCount.toString(),
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = stringResource(R.string.follows),
+                style = MaterialTheme.typography.labelMedium
+            )
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = profile.followersCount.toString(),
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = stringResource(R.string.followers),
+                style = MaterialTheme.typography.labelMedium
+            )
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = profile.postsCount.toString(),
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = stringResource(R.string.posts),
+                style = MaterialTheme.typography.labelMedium
+            )
+        }
+    }
+}
+
+@Composable
+private fun Profile(profile: Profile) {
+    val viewModel: AppViewModel = viewModel()
+    val viewer by viewModel.profile.collectAsState()
+
     Column(
-        modifier = Modifier.padding(16.dp),
+        modifier = Modifier.padding(top = 8.dp, end = 16.dp, bottom = 16.dp, start = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Avatar(profile = profile)
-            NameAndHandle(profile = profile)
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            // TODO: Implement edit and follow
+            Spacer(modifier = Modifier.height(32.dp))
+//            if (profile.did == viewer?.did) {
+//                Button(onClick = {}) {
+//                    Text(stringResource(R.string.edit))
+//                }
+//            } else {
+//                Button(onClick = {}) {
+//                    Text(stringResource(R.string.follow))
+//                }
+//            }
         }
 
+        NameAndHandle(profile = profile)
+
         Text(profile.description.orEmpty())
+
+        StatRow(profile = profile)
     }
 }
 
 @Composable
 private fun UserModalContent(profile: Profile, onProfileClick: (String) -> Unit) {
+    val bannerHeight = 128.dp
+    val avatarSize = 96.dp
+
     // TODO: Use ExitUntilCollapsed
     CollapsingToolbarScaffold(
         state = rememberCollapsingToolbarScaffoldState(),
         toolbar = {
             Column {
-                UserBanner(profile)
+                Box(modifier = Modifier.zIndex(2f)) {
+                    UserBanner(profile, height = bannerHeight)
+                    Avatar(
+                        profile = profile,
+                        modifier = Modifier.offset(x = 16.dp, y = bannerHeight - (avatarSize / 2)),
+                        size = avatarSize
+                    )
+                }
                 Box(
                     modifier = Modifier
                         .background(color = MaterialTheme.colorScheme.surfaceVariant)

@@ -15,6 +15,12 @@
     <string name="license">ライセンス</string>
     <string name="login_title">ログイン</string>
     <string name="service_provider">サービスプロバイダ</string>
+    <string name="follows">フォロー中</string>
+    <string name="followers">フォロワー</string>
+    <string name="posts">投稿</string>
+    <string name="edit">編集</string>
+    <string name="follow">フォロー</string>
+    <string name="unfollow">フォロー解除</string>
     <string name="login_handle_or_email">ハンドルネーム または メールアドレス</string>
     <string name="login_handle_or_email_placeholder">jack.bsky.social または jack@example.com</string>
     <string name="login_password">パスワード</string>
