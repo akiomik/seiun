@@ -1,5 +1,6 @@
 package io.github.akiomik.seiun.ui.user
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
@@ -29,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -130,6 +133,32 @@ private fun StatRow(profile: Profile) {
 }
 
 @Composable
+private fun FollowOrUnfollowButton(profile: Profile) {
+    val context = LocalContext.current
+    val viewModel: UserFeedViewModel = viewModel()
+
+    if (profile.myState?.follow == null) {
+        Button(onClick = {
+            viewModel.follow(
+                onSuccess = {},
+                onError = { Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show() }
+            )
+        }) {
+            Text(stringResource(R.string.follow))
+        }
+    } else {
+        Button(onClick = {
+            viewModel.unfollow(
+                onSuccess = {},
+                onError = { Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show() }
+            )
+        }) {
+            Text(stringResource(R.string.unfollow))
+        }
+    }
+}
+
+@Composable
 private fun Profile(profile: Profile) {
     val viewModel: AppViewModel = viewModel()
     val viewer by viewModel.profile.collectAsState()
@@ -139,17 +168,15 @@ private fun Profile(profile: Profile) {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            // TODO: Implement edit and follow
-            Spacer(modifier = Modifier.height(32.dp))
-//            if (profile.did == viewer?.did) {
+            if (profile.did == viewer?.did) {
+                // TODO: Implement edit button
+                Spacer(modifier = Modifier.height(32.dp))
 //                Button(onClick = {}) {
 //                    Text(stringResource(R.string.edit))
 //                }
-//            } else {
-//                Button(onClick = {}) {
-//                    Text(stringResource(R.string.follow))
-//                }
-//            }
+            } else {
+                FollowOrUnfollowButton(profile = profile)
+            }
         }
 
         NameAndHandle(profile = profile)

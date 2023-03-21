@@ -122,6 +122,36 @@ class UserFeedViewModel : ApplicationViewModel() {
         }
     }
 
+    fun follow(onSuccess: () -> Unit, onError: (Throwable) -> Unit) {
+        _profile.value?.let { profile ->
+            wrapError(
+                run = { userRepository.follow(profile.did, profile.declaration) },
+                onSuccess = {
+                    _profile.value = profile.copy(myState = profile.myState?.copy(follow = it.uri))
+                    onSuccess()
+                },
+                onError = onError
+            )
+        }
+    }
+
+    fun unfollow(onSuccess: () -> Unit, onError: (Throwable) -> Unit) {
+        _profile.value?.let { profile ->
+            if (profile.myState?.follow == null) {
+                return
+            }
+
+            wrapError(
+                run = { userRepository.unfollow(profile.myState.follow) },
+                onSuccess = {
+                    _profile.value = profile.copy(myState = profile.myState.copy(follow = null))
+                    onSuccess()
+                },
+                onError = onError
+            )
+        }
+    }
+
     private fun resetState() {
         _profile.value = null
         _cursor = null
