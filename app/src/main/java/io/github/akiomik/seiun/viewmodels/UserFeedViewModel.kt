@@ -122,6 +122,16 @@ class UserFeedViewModel : ApplicationViewModel() {
         }
     }
 
+    fun follow(onSuccess: () -> Unit, onError: (Throwable) -> Unit) {
+        _profile.value?.let {
+            wrapError(
+                run = { userRepository.follow(it.did, it.declaration) },
+                onSuccess = { onSuccess() },
+                onError = onError
+            )
+        }
+    }
+
     private fun resetState() {
         _profile.value = null
         _cursor = null
