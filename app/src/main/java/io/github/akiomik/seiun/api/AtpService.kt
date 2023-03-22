@@ -8,6 +8,8 @@ import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import io.github.akiomik.seiun.model.AtpError
 import io.github.akiomik.seiun.model.app.bsky.actor.ProfileDetail
+import io.github.akiomik.seiun.model.app.bsky.actor.UpdateProfileInput
+import io.github.akiomik.seiun.model.app.bsky.actor.UpdateProfileOutput
 import io.github.akiomik.seiun.model.app.bsky.blob.UploadBlobOutput
 import io.github.akiomik.seiun.model.app.bsky.feed.AuthorFeed
 import io.github.akiomik.seiun.model.app.bsky.feed.Post
@@ -87,6 +89,13 @@ interface AtpService {
         @Header("Authorization") authorization: String,
         @Query("actor") actor: String
     ): ApiResult<ProfileDetail, AtpError>
+
+    @DecodeErrorBody
+    @POST("app.bsky.actor.updateProfile")
+    suspend fun updateProfile(
+        @Header("Authorization") authorization: String,
+        @Body body: UpdateProfileInput
+    ): ApiResult<UpdateProfileOutput, AtpError>
 
     @DecodeErrorBody
     @GET("app.bsky.feed.getTimeline")
