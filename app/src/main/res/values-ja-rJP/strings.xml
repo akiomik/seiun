@@ -21,6 +21,9 @@
     <string name="edit">編集</string>
     <string name="follow">フォロー</string>
     <string name="unfollow">フォロー解除</string>
+    <string name="update">更新</string>
+    <string name="display_name">名前</string>
+    <string name="description">自己紹介</string>
     <string name="login_handle_or_email">ハンドルネーム または メールアドレス</string>
     <string name="login_handle_or_email_placeholder">jack.bsky.social または jack@example.com</string>
     <string name="login_password">パスワード</string>
@@ -64,6 +67,9 @@
     <string name="dialog_report_type">種類</string>
     <string name="dialog_report_reason">通報理由</string>
     <string name="dialog_reported">通報しました</string>
+    <string name="dialog_uploading_image">画像アップロード中…</string>
+    <string name="dialog_display_name_placeholder">田中太郎</string>
+    <string name="dialog_updated">更新しました</string>
     <string name="notification_name">投稿とアクティビティ</string>
     <string name="notification_title">新しい通知が %1$d 件あります</string>
 </resources>

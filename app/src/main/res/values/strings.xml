@@ -19,6 +19,9 @@
     <string name="edit">Edit</string>
     <string name="follow">Follow</string>
     <string name="unfollow">Unfollow</string>
+    <string name="update">Update</string>
+    <string name="display_name">Display Name</string>
+    <string name="description">About me</string>
     <string name="login_title">Login</string>
     <string name="login_handle_or_email">Handle or Email</string>
     <string name="login_handle_or_email_placeholder">jack.bsky.social or jack@example.com</string>
@@ -63,6 +66,9 @@
     <string name="dialog_report_type">Type</string>
     <string name="dialog_report_reason">Report reason</string>
     <string name="dialog_reported">Reported this post</string>
+    <string name="dialog_uploading_image">Uploading your image…</string>
+    <string name="dialog_display_name_placeholder">John Doe</string>
+    <string name="dialog_updated">Updated</string>
     <string name="notification_name">Post and activities</string>
     <string name="notification_title">You\'ve got %1$d recent notifications</string>
 </resources>
