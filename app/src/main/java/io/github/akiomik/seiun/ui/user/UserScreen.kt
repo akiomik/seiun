@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -162,6 +161,13 @@ private fun FollowOrUnfollowButton(profile: ProfileDetail) {
 private fun Profile(profile: ProfileDetail) {
     val viewModel: AppViewModel = viewModel()
     val viewer by viewModel.profile.collectAsState()
+    var showEditProfile by remember { mutableStateOf(false) }
+
+    if (showEditProfile) {
+        ProfileEditModal(currentProfile = profile) {
+            showEditProfile = false
+        }
+    }
 
     Column(
         modifier = Modifier.padding(top = 8.dp, end = 16.dp, bottom = 16.dp, start = 16.dp),
@@ -169,11 +175,11 @@ private fun Profile(profile: ProfileDetail) {
     ) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             if (profile.did == viewer?.did) {
-                // TODO: Implement edit button
-                Spacer(modifier = Modifier.height(32.dp))
-//                Button(onClick = {}) {
-//                    Text(stringResource(R.string.edit))
-//                }
+                Button(onClick = {
+                    showEditProfile = true
+                }) {
+                    Text(stringResource(R.string.edit))
+                }
             } else {
                 FollowOrUnfollowButton(profile = profile)
             }

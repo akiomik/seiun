@@ -3,6 +3,7 @@ package io.github.akiomik.seiun.viewmodels
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import io.github.akiomik.seiun.SeiunApplication
+import io.github.akiomik.seiun.model.app.bsky.actor.Profile
 import io.github.akiomik.seiun.model.app.bsky.actor.ProfileDetail
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -150,6 +151,22 @@ class UserFeedViewModel : ApplicationViewModel() {
                 onError = onError
             )
         }
+    }
+
+    fun updateProfile(profile: Profile, onSuccess: () -> Unit, onError: (Throwable) -> Unit) {
+        wrapError(
+            run = { userRepository.updateProfile(profile) },
+            onSuccess = {
+                _profile.value = _profile.value?.copy(
+                    displayName = it.record.displayName,
+                    description = it.record.description,
+                    avatar = it.record.avatar?.cid,
+                    banner = it.record.banner?.cid
+                )
+                onSuccess()
+            },
+            onError = onError
+        )
     }
 
     private fun resetState() {
