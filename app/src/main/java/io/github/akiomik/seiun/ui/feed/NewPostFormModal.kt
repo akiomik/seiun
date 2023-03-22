@@ -8,18 +8,18 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.sharp.Image
 import androidx.compose.material3.Button
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -38,12 +38,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.model.app.bsky.feed.FeedViewPost
+import io.github.akiomik.seiun.ui.dialog.FullScreenDialog
 import io.github.akiomik.seiun.ui.embed.EmbedPost
 import io.github.akiomik.seiun.viewmodels.PostViewModel
 
@@ -59,7 +58,7 @@ private fun PostButton(
     val viewModel: PostViewModel = viewModel()
     val context = LocalContext.current
 
-    Button(onClick = {
+    TextButton(onClick = {
         isUploading = true
 
         val image = imageUri?.let { uri ->
@@ -103,16 +102,19 @@ private fun PostButton(
 }
 
 @Composable
-fun ImageSelectButton(onSelect: (Uri?) -> Unit) {
+private fun ImageSelectButton(onSelect: (Uri?) -> Unit) {
     val launcher = rememberLauncherForActivityResult(
         contract =
         ActivityResultContracts.GetContent()
     ) { onSelect(it) }
 
-    Button(onClick = {
+    TextButton(onClick = {
         launcher.launch("image/*")
     }) {
-        Text(stringResource(id = R.string.timeline_new_post_image_upload_button))
+        Icon(
+            Icons.Sharp.Image,
+            contentDescription = stringResource(R.string.timeline_new_post_image_upload_button)
+        )
     }
 }
 
@@ -169,38 +171,14 @@ private fun ImagePreview(uri: Uri, onDelete: () -> Unit) {
 }
 
 @Composable
-fun NewPostForm(feedViewPost: FeedViewPost?, onClose: () -> Unit) {
-    val context = LocalContext.current
-    val postedMessage = stringResource(R.string.feed_posted)
-    var content by remember { mutableStateOf("") }
-    var valid by remember { mutableStateOf(false) }
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
-
+private fun NewPostForm(
+    feedViewPost: FeedViewPost?,
+    content: String,
+    imageUri: Uri?,
+    onContentChange: (String) -> Unit,
+    onImageRemove: () -> Unit
+) {
     Column(modifier = Modifier.padding(8.dp)) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            TextButton(onClick = onClose) {
-                Text(stringResource(id = R.string.timeline_new_post_cancel_button))
-            }
-            ImageSelectButton {
-                imageUri = it
-                valid = true
-            }
-            PostButton(
-                content = content,
-                enabled = valid,
-                feedViewPost = feedViewPost,
-                imageUri = imageUri
-            ) {
-                onClose()
-                Toast.makeText(context, postedMessage, Toast.LENGTH_LONG).show()
-            }
-        }
-
-        Spacer(modifier = Modifier.size(8.dp))
-
         if (feedViewPost != null) {
             Box(
                 modifier = Modifier
@@ -211,28 +189,55 @@ fun NewPostForm(feedViewPost: FeedViewPost?, onClose: () -> Unit) {
             }
         }
 
-        PostContentField(content = content) {
-            content = it
-            valid = content.isNotEmpty() && content.length <= 256 || imageUri != null
-        }
+        PostContentField(content = content) { onContentChange(it) }
 
         imageUri?.let {
-            ImagePreview(uri = it) {
-                imageUri = null
-                valid = content.isNotEmpty() && content.length <= 256
-            }
+            ImagePreview(uri = it) { onImageRemove() }
         }
     }
 }
 
 @Composable
-fun NewPostFormModal(feedViewPost: FeedViewPost? = null, onClose: () -> Unit = {}) {
-    Dialog(
-        onDismissRequest = onClose,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
-    ) {
-        Surface(modifier = Modifier.fillMaxSize()) {
-            NewPostForm(feedViewPost = feedViewPost, onClose = onClose)
+fun NewPostFormModal(feedViewPost: FeedViewPost? = null, onClose: () -> Unit) {
+    val context = LocalContext.current
+    val postedMessage = stringResource(R.string.feed_posted)
+    var valid by remember { mutableStateOf(false) }
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+    var content by remember { mutableStateOf("") }
+
+    FullScreenDialog(
+        onClose = onClose,
+        actions = {
+            ImageSelectButton {
+                imageUri = it
+                valid = true
+            }
+
+            Spacer(modifier = Modifier.width(24.dp))
+
+            PostButton(
+                content = content,
+                enabled = valid,
+                feedViewPost = feedViewPost,
+                imageUri = imageUri
+            ) {
+                onClose()
+                Toast.makeText(context, postedMessage, Toast.LENGTH_LONG).show()
+            }
         }
+    ) {
+        NewPostForm(
+            feedViewPost = feedViewPost,
+            content = content,
+            imageUri = imageUri,
+            onContentChange = {
+                content = it
+                valid = content.isNotEmpty() && content.length <= 256 || imageUri != null
+            },
+            onImageRemove = {
+                imageUri = null
+                valid = content.isNotEmpty() && content.length <= 256
+            }
+        )
     }
 }

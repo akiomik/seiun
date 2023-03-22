@@ -32,14 +32,14 @@ private fun CloseButton(onClose: () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FullScreenDialogTopBar(
-    title: String,
+    title: String?,
     onClose: () -> Unit,
     actions: @Composable RowScope.() -> Unit
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     CenterAlignedTopAppBar(
-        title = { Text(title) },
+        title = { title?.let { Text(it) } },
         actions = actions,
         navigationIcon = { CloseButton(onClose = onClose) },
         scrollBehavior = scrollBehavior
@@ -48,7 +48,7 @@ private fun FullScreenDialogTopBar(
 
 @Composable
 fun FullScreenDialog(
-    title: String,
+    title: String? = null,
     onClose: () -> Unit,
     actions: @Composable RowScope.() -> Unit,
     content: @Composable () -> Unit
