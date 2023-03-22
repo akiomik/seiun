@@ -40,7 +40,7 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.R
-import io.github.akiomik.seiun.model.app.bsky.actor.Profile
+import io.github.akiomik.seiun.model.app.bsky.actor.ProfileDetail
 import io.github.akiomik.seiun.ui.theme.Indigo800
 import io.github.akiomik.seiun.viewmodels.AppViewModel
 import io.github.akiomik.seiun.viewmodels.UserFeedViewModel
@@ -49,7 +49,7 @@ import me.onebone.toolbar.ScrollStrategy
 import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 
 @Composable
-private fun UserBanner(profile: Profile, height: Dp = 128.dp) {
+private fun UserBanner(profile: ProfileDetail, height: Dp = 128.dp) {
     Box {
         // fallback
         Box(
@@ -69,7 +69,7 @@ private fun UserBanner(profile: Profile, height: Dp = 128.dp) {
 }
 
 @Composable
-private fun Avatar(profile: Profile, modifier: Modifier = Modifier, size: Dp = 64.dp) {
+private fun Avatar(profile: ProfileDetail, modifier: Modifier = Modifier, size: Dp = 64.dp) {
     AsyncImage(
         model = profile.avatar,
         contentDescription = null,
@@ -80,7 +80,7 @@ private fun Avatar(profile: Profile, modifier: Modifier = Modifier, size: Dp = 6
 }
 
 @Composable
-private fun NameAndHandle(profile: Profile) {
+private fun NameAndHandle(profile: ProfileDetail) {
     val handle = "@${profile.handle}"
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -97,7 +97,7 @@ private fun NameAndHandle(profile: Profile) {
 }
 
 @Composable
-private fun StatRow(profile: Profile) {
+private fun StatRow(profile: ProfileDetail) {
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
@@ -133,7 +133,7 @@ private fun StatRow(profile: Profile) {
 }
 
 @Composable
-private fun FollowOrUnfollowButton(profile: Profile) {
+private fun FollowOrUnfollowButton(profile: ProfileDetail) {
     val context = LocalContext.current
     val viewModel: UserFeedViewModel = viewModel()
 
@@ -159,7 +159,7 @@ private fun FollowOrUnfollowButton(profile: Profile) {
 }
 
 @Composable
-private fun Profile(profile: Profile) {
+private fun Profile(profile: ProfileDetail) {
     val viewModel: AppViewModel = viewModel()
     val viewer by viewModel.profile.collectAsState()
 
@@ -188,7 +188,7 @@ private fun Profile(profile: Profile) {
 }
 
 @Composable
-private fun UserModalContent(profile: Profile, onProfileClick: (String) -> Unit) {
+private fun UserModalContent(profile: ProfileDetail, onProfileClick: (String) -> Unit) {
     val bannerHeight = 128.dp
     val avatarSize = 96.dp
 

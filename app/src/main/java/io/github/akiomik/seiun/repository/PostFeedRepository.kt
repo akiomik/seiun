@@ -4,7 +4,7 @@ import android.util.Log
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.api.RequestHelper
 import io.github.akiomik.seiun.datasources.PostFeedCacheDataSource
-import io.github.akiomik.seiun.model.app.bsky.actor.Profile
+import io.github.akiomik.seiun.model.app.bsky.actor.ProfileDetail
 import io.github.akiomik.seiun.model.app.bsky.blob.UploadBlobOutput
 import io.github.akiomik.seiun.model.app.bsky.feed.AuthorFeed
 import io.github.akiomik.seiun.model.app.bsky.feed.FeedViewPost
@@ -43,7 +43,7 @@ class PostFeedRepository(private val authRepository: AuthRepository) : Applicati
         return timeline
     }
 
-    suspend fun getAuthorFeed(author: Profile, before: String? = null): AuthorFeed {
+    suspend fun getAuthorFeed(author: ProfileDetail, before: String? = null): AuthorFeed {
         Log.d(SeiunApplication.TAG, "Get author feed: before = $before")
 
         val feed = RequestHelper.executeWithRetry(authRepository) {

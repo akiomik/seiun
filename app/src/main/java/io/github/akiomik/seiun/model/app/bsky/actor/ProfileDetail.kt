@@ -4,7 +4,7 @@ import com.squareup.moshi.JsonClass
 import io.github.akiomik.seiun.model.app.bsky.system.DeclRef
 
 @JsonClass(generateAdapter = true)
-data class Profile(
+data class ProfileDetail(
     val did: String,
     val declaration: DeclRef,
     val handle: String,
