@@ -15,6 +15,7 @@ jobs:
           distribution: temurin
           java-version: 18
           cache: gradle
+      - uses: gradle/wrapper-validation-action@v1
       - run: ./gradlew assembleDebug
       - uses: actions/upload-artifact@v1
         with:
