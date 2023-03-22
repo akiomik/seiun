@@ -15,7 +15,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.akiomik.seiun.viewmodels.UserFeedViewModel
 
 @Composable
-fun LoadingIndicator() {
+fun FeedLoadingIndicator() {
     val viewModel: UserFeedViewModel = viewModel()
     val context = LocalContext.current
 

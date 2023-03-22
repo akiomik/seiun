@@ -9,6 +9,7 @@ import io.github.akiomik.seiun.model.app.bsky.actor.Ref
 import io.github.akiomik.seiun.model.app.bsky.actor.UpdateProfileInput
 import io.github.akiomik.seiun.model.app.bsky.actor.UpdateProfileOutput
 import io.github.akiomik.seiun.model.app.bsky.graph.Follow
+import io.github.akiomik.seiun.model.app.bsky.graph.Follows
 import io.github.akiomik.seiun.model.app.bsky.graph.MuteInput
 import io.github.akiomik.seiun.model.app.bsky.graph.UnmuteInput
 import io.github.akiomik.seiun.model.app.bsky.system.DeclRef
@@ -46,6 +47,18 @@ class UserRepository(private val authRepository: AuthRepository) : ApplicationRe
         )
         return RequestHelper.executeWithRetry(authRepository) {
             getAtpClient().updateProfile("Bearer ${it.accessJwt}", body)
+        }
+    }
+
+    suspend fun getFollows(did: String, before: String? = null): Follows {
+        Log.d(SeiunApplication.TAG, "Get follows: did = $did, before = $before")
+
+        return RequestHelper.executeWithRetry(authRepository) {
+            getAtpClient().getFollows(
+                authorization = "Bearer ${it.accessJwt}",
+                user = did,
+                before = before
+            )
         }
     }
 

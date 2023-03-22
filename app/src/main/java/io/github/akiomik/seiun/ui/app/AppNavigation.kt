@@ -26,6 +26,7 @@ import io.github.akiomik.seiun.ui.registration.RegistrationScreen
 import io.github.akiomik.seiun.ui.timeline.TimelineScreen
 import io.github.akiomik.seiun.ui.user.UserScreen
 import io.github.akiomik.seiun.viewmodels.AppViewModel
+import io.github.akiomik.seiun.viewmodels.FollowsViewModel
 
 @Composable
 fun AppNavigation(
@@ -109,9 +110,11 @@ fun AppNavigation(
             "user/{did}",
             arguments = listOf(navArgument("did") { type = NavType.StringType })
         ) {
+            val did = it.arguments?.getString("did")!!
             UserScreen(
-                it.arguments?.getString("did")!!,
-                onProfileClick = { did -> navController.navigate("user/$did") }
+                did,
+                followsViewModel = FollowsViewModel(did),
+                onProfileClick = { navController.navigate("user/$it") }
             )
         }
         composable("login") {

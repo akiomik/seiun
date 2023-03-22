@@ -18,6 +18,7 @@ import io.github.akiomik.seiun.model.app.bsky.feed.SetVoteInput
 import io.github.akiomik.seiun.model.app.bsky.feed.SetVoteOutput
 import io.github.akiomik.seiun.model.app.bsky.feed.Timeline
 import io.github.akiomik.seiun.model.app.bsky.graph.Follow
+import io.github.akiomik.seiun.model.app.bsky.graph.Follows
 import io.github.akiomik.seiun.model.app.bsky.graph.MuteInput
 import io.github.akiomik.seiun.model.app.bsky.graph.UnmuteInput
 import io.github.akiomik.seiun.model.app.bsky.notification.UpdateNotificationSeenInput
@@ -172,6 +173,15 @@ interface AtpService {
         @Header("Authorization") authorization: String,
         @Body body: ReportCreateInput
     ): ApiResult<ReportCreateOutput, AtpError>
+
+    @DecodeErrorBody
+    @GET("app.bsky.graph.getFollows")
+    suspend fun getFollows(
+        @Header("Authorization") authorization: String,
+        @Query("user") user: String,
+        @Query("limit") limit: Int? = null,
+        @Query("before") before: String? = null
+    ): ApiResult<Follows, AtpError>
 
     @DecodeErrorBody
     @POST("com.atproto.repo.createRecord")
