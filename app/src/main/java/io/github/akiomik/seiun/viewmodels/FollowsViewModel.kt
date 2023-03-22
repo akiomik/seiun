@@ -47,9 +47,9 @@ class FollowsViewModel(val did: String) : ApplicationViewModel() {
                 if (data.follows.isNotEmpty()) {
                     _follows.value = _follows.value + data.follows
                     _cursor = data.cursor
-                    Log.d(SeiunApplication.TAG, "Feed posts are updated")
+                    Log.d(SeiunApplication.TAG, "Followers are updated")
                 } else {
-                    Log.d(SeiunApplication.TAG, "No new feed posts")
+                    Log.d(SeiunApplication.TAG, "No new followers")
                     _seenAllFollows.value = true
                 }
             }

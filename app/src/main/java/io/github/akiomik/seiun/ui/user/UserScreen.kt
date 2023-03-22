@@ -43,6 +43,7 @@ import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.model.app.bsky.actor.ProfileDetail
 import io.github.akiomik.seiun.ui.theme.Indigo800
 import io.github.akiomik.seiun.viewmodels.AppViewModel
+import io.github.akiomik.seiun.viewmodels.FollowersViewModel
 import io.github.akiomik.seiun.viewmodels.FollowsViewModel
 import io.github.akiomik.seiun.viewmodels.UserFeedViewModel
 import me.onebone.toolbar.CollapsingToolbarScaffold
@@ -101,9 +102,11 @@ private fun NameAndHandle(profile: ProfileDetail) {
 private fun StatRow(
     profile: ProfileDetail,
     followsViewModel: FollowsViewModel,
+    followersViewModel: FollowersViewModel,
     onProfileClick: (String) -> Unit
 ) {
     var showFollowsList by remember { mutableStateOf(false) }
+    var showFollowersList by remember { mutableStateOf(false) }
 
     if (showFollowsList) {
         FollowsListModal(
@@ -111,21 +114,32 @@ private fun StatRow(
             onProfileClick = onProfileClick,
             onClose = { showFollowsList = false }
         )
+    } else if (showFollowersList) {
+        FollowersListModal(
+            viewModel = followersViewModel,
+            onProfileClick = onProfileClick,
+            onClose = { showFollowersList = false }
+        )
     }
 
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.clickable { showFollowsList = true }
+        ) {
             Text(
                 text = profile.followsCount.toString(),
                 fontWeight = FontWeight.Bold
             )
             Text(
                 text = stringResource(R.string.follows),
-                style = MaterialTheme.typography.labelMedium,
-                modifier = Modifier.clickable { showFollowsList = true }
+                style = MaterialTheme.typography.labelMedium
             )
         }
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.clickable { showFollowersList = true }
+        ) {
             Text(
                 text = profile.followersCount.toString(),
                 fontWeight = FontWeight.Bold
@@ -178,6 +192,7 @@ private fun FollowOrUnfollowButton(profile: ProfileDetail) {
 private fun Profile(
     profile: ProfileDetail,
     followsViewModel: FollowsViewModel,
+    followersViewModel: FollowersViewModel,
     onProfileClick: (String) -> Unit
 ) {
     val viewModel: AppViewModel = viewModel()
@@ -213,6 +228,7 @@ private fun Profile(
         StatRow(
             profile = profile,
             followsViewModel = followsViewModel,
+            followersViewModel = followersViewModel,
             onProfileClick = onProfileClick
         )
     }
@@ -222,6 +238,7 @@ private fun Profile(
 private fun UserModalContent(
     profile: ProfileDetail,
     followsViewModel: FollowsViewModel,
+    followersViewModel: FollowersViewModel,
     onProfileClick: (String) -> Unit
 ) {
     val bannerHeight = 128.dp
@@ -245,7 +262,7 @@ private fun UserModalContent(
                         .background(color = MaterialTheme.colorScheme.surfaceVariant)
                         .fillMaxWidth()
                 ) {
-                    Profile(profile, followsViewModel, onProfileClick)
+                    Profile(profile, followsViewModel, followersViewModel, onProfileClick)
                 }
                 Divider()
             }
@@ -259,7 +276,12 @@ private fun UserModalContent(
 }
 
 @Composable
-fun UserScreen(did: String, followsViewModel: FollowsViewModel, onProfileClick: (String) -> Unit) {
+fun UserScreen(
+    did: String,
+    followsViewModel: FollowsViewModel,
+    followersViewModel: FollowersViewModel,
+    onProfileClick: (String) -> Unit
+) {
     val userFeedViewModel: UserFeedViewModel = viewModel()
     var profileRequested by remember { mutableStateOf(false) }
     val profile by userFeedViewModel.profile.collectAsState()
@@ -281,6 +303,7 @@ fun UserScreen(did: String, followsViewModel: FollowsViewModel, onProfileClick: 
             UserModalContent(
                 profile = profile!!,
                 followsViewModel = followsViewModel,
+                followersViewModel = followersViewModel,
                 onProfileClick = onProfileClick
             )
         }

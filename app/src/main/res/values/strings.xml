@@ -72,4 +72,5 @@
     <string name="notification_name">Post and activities</string>
     <string name="notification_title">You\'ve got %1$d recent notifications</string>
     <string name="follows_no_follows_yet">No follows yet</string>
+    <string name="followers_no_followers_yet">No followers yet</string>
 </resources>
