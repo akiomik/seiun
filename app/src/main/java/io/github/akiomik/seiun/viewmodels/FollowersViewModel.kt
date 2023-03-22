@@ -6,7 +6,7 @@ import io.github.akiomik.seiun.model.app.bsky.actor.RefWithInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class FollowsViewModel(val did: String) : ApplicationViewModel() {
+class FollowersViewModel(val did: String) : ApplicationViewModel() {
     sealed class State {
         object Loading : State()
         object Loaded : State()
@@ -18,17 +18,17 @@ class FollowsViewModel(val did: String) : ApplicationViewModel() {
 
     private val _seenAllFollows = MutableStateFlow(false)
     private val _state = MutableStateFlow<State>(State.Loading)
-    private val _follows = MutableStateFlow<List<RefWithInfo>>(emptyList())
-    val seenAllFollows = _seenAllFollows.asStateFlow()
+    private val _followers = MutableStateFlow<List<RefWithInfo>>(emptyList())
+    val seenAllFollowers = _seenAllFollows.asStateFlow()
     val state = _state.asStateFlow()
-    val follows = _follows.asStateFlow()
+    val followers = _followers.asStateFlow()
 
     init {
         wrapError(
-            run = { userRepository.getFollows(did) },
+            run = { userRepository.getFollowers(did) },
             onSuccess = {
                 Log.d(SeiunApplication.TAG, it.toString())
-                _follows.value = it.follows
+                _followers.value = it.followers
                 _cursor = it.cursor
                 _state.value = State.Loaded
             },
@@ -39,17 +39,17 @@ class FollowsViewModel(val did: String) : ApplicationViewModel() {
         )
     }
 
-    fun loadMoreFollows(onError: (Throwable) -> Unit = {}) {
+    fun loadMoreFollowers(onError: (Throwable) -> Unit = {}) {
         wrapError(run = {
-            val data = userRepository.getFollows(did = did, before = _cursor)
+            val data = userRepository.getFollowers(did = did, before = _cursor)
 
             if (data.cursor != _cursor) {
-                if (data.follows.isNotEmpty()) {
-                    _follows.value = _follows.value + data.follows
+                if (data.followers.isNotEmpty()) {
+                    _followers.value = _followers.value + data.followers
                     _cursor = data.cursor
                     Log.d(SeiunApplication.TAG, "Followers are updated")
                 } else {
-                    Log.d(SeiunApplication.TAG, "No new followers")
+                    Log.d(SeiunApplication.TAG, "No followers")
                     _seenAllFollows.value = true
                 }
             }

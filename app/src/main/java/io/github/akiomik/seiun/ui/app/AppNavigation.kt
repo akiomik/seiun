@@ -26,6 +26,7 @@ import io.github.akiomik.seiun.ui.registration.RegistrationScreen
 import io.github.akiomik.seiun.ui.timeline.TimelineScreen
 import io.github.akiomik.seiun.ui.user.UserScreen
 import io.github.akiomik.seiun.viewmodels.AppViewModel
+import io.github.akiomik.seiun.viewmodels.FollowersViewModel
 import io.github.akiomik.seiun.viewmodels.FollowsViewModel
 
 @Composable
@@ -114,6 +115,7 @@ fun AppNavigation(
             UserScreen(
                 did,
                 followsViewModel = FollowsViewModel(did),
+                followersViewModel = FollowersViewModel(did),
                 onProfileClick = { navController.navigate("user/$it") }
             )
         }
