@@ -16,5 +16,6 @@ jobs:
           distribution: temurin
           java-version: 18
           cache: gradle
+      - uses: gradle/wrapper-validation-action@v1
       - run: ./gradlew ktlintCheck
       - run: ./gradlew test
