@@ -4,18 +4,14 @@ import android.text.format.DateFormat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -33,8 +29,8 @@ private fun Avatar(notification: Notification, onClicked: (String) -> Unit) {
         model = notification.author.avatar,
         contentDescription = null,
         modifier = Modifier
-            .width(50.dp)
-            .height(50.dp)
+            .width(56.dp)
+            .height(56.dp)
             .clip(CircleShape)
             .clickable { onClicked(notification.author.did) }
     )
@@ -47,22 +43,24 @@ private fun VoteItem(notification: Notification, onProfileClick: (String) -> Uni
         notification.record.createdAt.toInstant().toEpochMilli()
     )
 
-    Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
-        Avatar(notification = notification, onClicked = onProfileClick)
-        Column(modifier = Modifier.padding(start = 8.dp)) {
+    ListItem(
+        leadingContent = { Avatar(notification = notification, onClicked = onProfileClick) },
+        headlineContent = {
             Text(
                 stringResource(
                     R.string.notification_liked,
                     notification.author.displayName ?: notification.author.handle
                 )
             )
+        },
+        supportingContent = {
             Text(
                 text = createdAt.toString(),
                 color = Color.Gray,
                 style = MaterialTheme.typography.labelMedium
             )
         }
-    }
+    )
 }
 
 @Composable
@@ -72,22 +70,24 @@ private fun RepostItem(notification: Notification, onProfileClick: (String) -> U
         notification.record.createdAt.toInstant().toEpochMilli()
     )
 
-    Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
-        Avatar(notification = notification, onClicked = onProfileClick)
-        Column(modifier = Modifier.padding(start = 8.dp)) {
+    ListItem(
+        leadingContent = { Avatar(notification = notification, onClicked = onProfileClick) },
+        headlineContent = {
             Text(
                 stringResource(
                     R.string.notification_reposted,
                     notification.author.displayName ?: notification.author.handle
                 )
             )
+        },
+        supportingContent = {
             Text(
                 text = createdAt.toString(),
                 color = Color.Gray,
                 style = MaterialTheme.typography.labelMedium
             )
         }
-    }
+    )
 }
 
 @Composable
@@ -97,22 +97,24 @@ private fun FollowItem(notification: Notification, onProfileClick: (String) -> U
         notification.record.createdAt.toInstant().toEpochMilli()
     )
 
-    Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
-        Avatar(notification = notification, onClicked = onProfileClick)
-        Column(modifier = Modifier.padding(start = 8.dp)) {
+    ListItem(
+        leadingContent = { Avatar(notification = notification, onClicked = onProfileClick) },
+        headlineContent = {
             Text(
                 stringResource(
                     R.string.notification_followed,
                     notification.author.displayName ?: notification.author.handle
                 )
             )
+        },
+        supportingContent = {
             Text(
                 text = createdAt.toString(),
                 color = Color.Gray,
                 style = MaterialTheme.typography.labelMedium
             )
         }
-    }
+    )
 }
 
 @Composable
@@ -122,22 +124,24 @@ private fun InviteItem(notification: Notification, onProfileClick: (String) -> U
         notification.record.createdAt.toInstant().toEpochMilli()
     )
 
-    Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
-        Avatar(notification = notification, onClicked = onProfileClick)
-        Column(modifier = Modifier.padding(start = 8.dp)) {
+    ListItem(
+        leadingContent = { Avatar(notification = notification, onClicked = onProfileClick) },
+        headlineContent = {
             Text(
                 stringResource(
                     R.string.notification_invited,
                     notification.author.displayName ?: notification.author.handle
                 )
             )
+        },
+        supportingContent = {
             Text(
                 text = createdAt.toString(),
                 color = Color.Gray,
                 style = MaterialTheme.typography.labelMedium
             )
         }
-    }
+    )
 }
 
 @Composable
@@ -147,22 +151,24 @@ private fun MentionItem(notification: Notification, onProfileClick: (String) -> 
         notification.record.createdAt.toInstant().toEpochMilli()
     )
 
-    Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
-        Avatar(notification = notification, onClicked = onProfileClick)
-        Column(modifier = Modifier.padding(start = 8.dp)) {
+    ListItem(
+        leadingContent = { Avatar(notification = notification, onClicked = onProfileClick) },
+        headlineContent = {
             Text(
                 stringResource(
                     R.string.notification_mentioned,
                     notification.author.displayName ?: notification.author.handle
                 )
             )
+        },
+        supportingContent = {
             Text(
                 text = createdAt.toString(),
                 color = Color.Gray,
                 style = MaterialTheme.typography.labelMedium
             )
         }
-    }
+    )
 }
 
 @Composable
@@ -172,22 +178,24 @@ private fun ReplyItem(notification: Notification, onProfileClick: (String) -> Un
         notification.record.createdAt.toInstant().toEpochMilli()
     )
 
-    Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
-        Avatar(notification = notification, onClicked = onProfileClick)
-        Column(modifier = Modifier.padding(start = 8.dp)) {
+    ListItem(
+        leadingContent = { Avatar(notification = notification, onClicked = onProfileClick) },
+        headlineContent = {
             Text(
                 stringResource(
                     R.string.notification_replied,
                     notification.author.displayName ?: notification.author.handle
                 )
             )
+        },
+        supportingContent = {
             Text(
                 text = createdAt.toString(),
                 color = Color.Gray,
                 style = MaterialTheme.typography.labelMedium
             )
         }
-    }
+    )
 }
 
 @Composable
