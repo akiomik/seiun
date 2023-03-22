@@ -63,7 +63,7 @@ fun UserFeedContent(onProfileClick: (String) -> Unit) {
             } else if (seenAllFeed) {
                 item { NoMorePostsMessage() }
             } else {
-                item { LoadingIndicator() }
+                item { FeedLoadingIndicator() }
             }
         }
 

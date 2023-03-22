@@ -72,4 +72,5 @@
     <string name="dialog_updated">更新しました</string>
     <string name="notification_name">投稿とアクティビティ</string>
     <string name="notification_title">新しい通知が %1$d 件あります</string>
+    <string name="follows_no_follows_yet">まだフォローがいません</string>
 </resources>
