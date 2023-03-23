@@ -18,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -74,7 +75,7 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
             },
             label = { Text(stringResource(id = R.string.service_provider)) },
             placeholder = { Text("bsky.social") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Next),
             modifier = Modifier.padding(20.dp).fillMaxWidth()
         )
 
@@ -86,7 +87,7 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
             },
             label = { Text(stringResource(id = R.string.registration_email)) },
             placeholder = { Text(text = stringResource(id = R.string.registration_email_placeholder)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
             modifier = Modifier.padding(20.dp).fillMaxWidth()
         )
 
@@ -98,7 +99,7 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
             },
             label = { Text(stringResource(id = R.string.registration_handle)) },
             placeholder = { Text(text = stringResource(id = R.string.registration_handle_placeholder)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii, imeAction = ImeAction.Next),
             prefix = { Text(text = "@") },
             suffix = { Text(text = ".$serviceProvider") },
             modifier = Modifier.padding(20.dp).fillMaxWidth()
@@ -112,7 +113,7 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
             },
             label = { Text(stringResource(id = R.string.registration_password)) },
             visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
             modifier = Modifier.padding(20.dp).fillMaxWidth()
         )
 
@@ -124,7 +125,7 @@ fun RegistrationForm(onRegistrationSuccess: () -> Unit) {
             },
             label = { Text(stringResource(id = R.string.registration_invite_code)) },
             placeholder = { Text(text = "bsky.social-XXXXXX") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii, imeAction = ImeAction.Done),
             modifier = Modifier.padding(20.dp).fillMaxWidth()
         )
 
