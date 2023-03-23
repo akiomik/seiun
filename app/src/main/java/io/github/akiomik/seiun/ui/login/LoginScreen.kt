@@ -23,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -87,7 +88,7 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
             },
             label = { Text(stringResource(id = R.string.service_provider)) },
             placeholder = { Text("bsky.social") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Next),
             modifier = Modifier
                 .padding(20.dp)
                 .fillMaxWidth()
@@ -101,7 +102,7 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
             },
             label = { Text(stringResource(id = R.string.login_handle_or_email)) },
             placeholder = { Text(text = stringResource(id = R.string.login_handle_or_email_placeholder)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii, imeAction = ImeAction.Next),
             modifier = Modifier
                 .padding(20.dp)
                 .fillMaxWidth()
@@ -115,7 +116,7 @@ private fun LoginForm(onLoginSuccess: () -> Unit) {
             },
             label = { Text(stringResource(id = R.string.login_password)) },
             visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
             modifier = Modifier
                 .padding(20.dp)
                 .fillMaxWidth()
