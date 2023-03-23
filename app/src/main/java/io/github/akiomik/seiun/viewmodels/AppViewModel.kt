@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewModelScope
 import io.github.akiomik.seiun.SeiunApplication
-import io.github.akiomik.seiun.model.app.bsky.actor.ProfileDetail
+import io.github.akiomik.seiun.model.app.bsky.actor.ProfileView
 import io.github.akiomik.seiun.ui.timeline.NewPostFab
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.stateIn
 object AppViewModel : ApplicationViewModel() {
     private val innerAtpService = SeiunApplication.instance!!.atpService
 
-    private var innerProfile = MutableStateFlow<ProfileDetail?>(null)
+    private var innerProfile = MutableStateFlow<ProfileView?>(null)
     private var innerShowDrawer = MutableStateFlow(false)
     private var innerShowTopBar = MutableStateFlow(false)
     private var innerShowBottomBar = MutableStateFlow(false)

@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.akiomik.seiun.SeiunApplication
-import io.github.akiomik.seiun.model.app.bsky.actor.ProfileDetail
+import io.github.akiomik.seiun.model.app.bsky.actor.ProfileView
 import io.github.akiomik.seiun.ui.feed.FeedPost
 import io.github.akiomik.seiun.ui.feed.LoadingErrorMessage
 import io.github.akiomik.seiun.ui.feed.NoMorePostsMessage
@@ -50,7 +50,7 @@ fun UserFeedContent(onProfileClick: (String) -> Unit) {
     Box(modifier = Modifier.pullRefresh(state = refreshState)) {
         LazyColumn(state = listState) {
             items(feedViewPosts) { feedViewPost ->
-                if (feedViewPost.post.viewer.muted != true) {
+                if (feedViewPost.post.author.viewer?.muted != true) {
                     FeedPost(viewPost = feedViewPost, onProfileClick = onProfileClick)
                     Divider(color = Color.Gray)
                 }
@@ -76,7 +76,7 @@ fun UserFeedContent(onProfileClick: (String) -> Unit) {
 }
 
 @Composable
-fun UserFeed(profile: ProfileDetail, onProfileClick: (String) -> Unit) {
+fun UserFeed(profile: ProfileView, onProfileClick: (String) -> Unit) {
     val viewModel: UserFeedViewModel = viewModel()
     val state by viewModel.state.collectAsState()
 

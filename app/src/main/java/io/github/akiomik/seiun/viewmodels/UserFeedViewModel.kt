@@ -3,8 +3,7 @@ package io.github.akiomik.seiun.viewmodels
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import io.github.akiomik.seiun.SeiunApplication
-import io.github.akiomik.seiun.model.app.bsky.actor.Profile
-import io.github.akiomik.seiun.model.app.bsky.actor.ProfileDetail
+import io.github.akiomik.seiun.model.app.bsky.actor.ProfileView
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,7 +25,7 @@ class UserFeedViewModel : ApplicationViewModel() {
     private var _cursor: String? = null
 
     private val _feedPostIds: MutableStateFlow<Set<String>> = MutableStateFlow(emptySet())
-    private val _profile = MutableStateFlow<ProfileDetail?>(null)
+    private val _profile = MutableStateFlow<ProfileView?>(null)
     private val _isRefreshing = MutableStateFlow(false)
     private val _seenAllFeed = MutableStateFlow(false)
     private val _state = MutableStateFlow<State>(State.Init)
@@ -37,11 +36,6 @@ class UserFeedViewModel : ApplicationViewModel() {
     val feedViewPosts = postFeedRepository.feedPosts.combine(_feedPostIds) { feedPosts, feedPostIds ->
         feedPosts.filter { post -> feedPostIds.contains(post.id()) }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-
-    fun setProfile(profile: ProfileDetail) {
-        _profile.value = profile
-        _state.value = State.ProfileLoaded
-    }
 
     fun setProfileOf(did: String, onSuccess: () -> Unit, onError: (Throwable) -> Unit) {
         resetState()
@@ -61,7 +55,7 @@ class UserFeedViewModel : ApplicationViewModel() {
         )
     }
 
-    fun setFeed(profile: ProfileDetail, onSuccess: () -> Unit, onError: (Throwable) -> Unit) {
+    fun setFeed(profile: ProfileView, onSuccess: () -> Unit, onError: (Throwable) -> Unit) {
         _state.value = State.FeedLoading
 
         wrapError(
@@ -106,7 +100,7 @@ class UserFeedViewModel : ApplicationViewModel() {
 
         _profile.value?.let { profile ->
             wrapError(run = {
-                val data = postFeedRepository.getAuthorFeed(author = profile, before = _cursor)
+                val data = postFeedRepository.getAuthorFeed(author = profile, cursor = _cursor)
 
                 if (data.cursor != _cursor) {
                     if (data.feed.isNotEmpty()) {
@@ -126,9 +120,9 @@ class UserFeedViewModel : ApplicationViewModel() {
     fun follow(onSuccess: () -> Unit, onError: (Throwable) -> Unit) {
         _profile.value?.let { profile ->
             wrapError(
-                run = { userRepository.follow(profile.did, profile.declaration) },
+                run = { userRepository.follow(profile.did) },
                 onSuccess = {
-                    _profile.value = profile.copy(myState = profile.myState?.copy(follow = it.uri))
+                    _profile.value = profile.copy(viewer = profile.viewer?.copy(following = it.uri))
                     onSuccess()
                 },
                 onError = onError
@@ -138,14 +132,14 @@ class UserFeedViewModel : ApplicationViewModel() {
 
     fun unfollow(onSuccess: () -> Unit, onError: (Throwable) -> Unit) {
         _profile.value?.let { profile ->
-            if (profile.myState?.follow == null) {
+            if (profile.viewer?.following == null) {
                 return
             }
 
             wrapError(
-                run = { userRepository.unfollow(profile.myState.follow) },
+                run = { userRepository.unfollow(profile.viewer.following) },
                 onSuccess = {
-                    _profile.value = profile.copy(myState = profile.myState.copy(follow = null))
+                    _profile.value = profile.copy(viewer = profile.viewer.copy(following = null))
                     onSuccess()
                 },
                 onError = onError
@@ -153,21 +147,21 @@ class UserFeedViewModel : ApplicationViewModel() {
         }
     }
 
-    fun updateProfile(profile: Profile, onSuccess: () -> Unit, onError: (Throwable) -> Unit) {
-        wrapError(
-            run = { userRepository.updateProfile(profile) },
-            onSuccess = {
-                _profile.value = _profile.value?.copy(
-                    displayName = it.record.displayName,
-                    description = it.record.description,
-                    avatar = it.record.avatar?.cid,
-                    banner = it.record.banner?.cid
-                )
-                onSuccess()
-            },
-            onError = onError
-        )
-    }
+//    fun updateProfile(profile: Profile, onSuccess: () -> Unit, onError: (Throwable) -> Unit) {
+//        wrapError(
+//            run = { userRepository.updateProfile(profile) },
+//            onSuccess = {
+//                _profile.value = _profile.value?.copy(
+//                    displayName = it.record.displayName,
+//                    description = it.record.description,
+//                    avatar = it.record.avatar?.cid,
+//                    banner = it.record.banner?.cid
+//                )
+//                onSuccess()
+//            },
+//            onError = onError
+//        )
+//    }
 
     private fun resetState() {
         _profile.value = null

@@ -66,7 +66,7 @@ private fun Timeline(listState: LazyListState, onProfileClick: (String) -> Unit)
     Box(modifier = Modifier.pullRefresh(state = refreshState)) {
         LazyColumn(state = listState) {
             items(feedViewPosts) { feedViewPost ->
-                if (feedViewPost.post.viewer.muted != true) {
+                if (feedViewPost.post.author.viewer?.muted != true) {
                     FeedPost(viewPost = feedViewPost, onProfileClick = onProfileClick)
                     Divider(color = Color.Gray)
                 }

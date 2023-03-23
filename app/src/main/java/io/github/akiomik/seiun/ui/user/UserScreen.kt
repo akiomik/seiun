@@ -40,7 +40,7 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.R
-import io.github.akiomik.seiun.model.app.bsky.actor.ProfileDetail
+import io.github.akiomik.seiun.model.app.bsky.actor.ProfileView
 import io.github.akiomik.seiun.ui.theme.Indigo800
 import io.github.akiomik.seiun.viewmodels.AppViewModel
 import io.github.akiomik.seiun.viewmodels.FollowersViewModel
@@ -51,7 +51,7 @@ import me.onebone.toolbar.ScrollStrategy
 import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 
 @Composable
-private fun UserBanner(profile: ProfileDetail, height: Dp = 128.dp) {
+private fun UserBanner(profile: ProfileView, height: Dp = 128.dp) {
     Box {
         // fallback
         Box(
@@ -71,7 +71,7 @@ private fun UserBanner(profile: ProfileDetail, height: Dp = 128.dp) {
 }
 
 @Composable
-private fun Avatar(profile: ProfileDetail, modifier: Modifier = Modifier, size: Dp = 64.dp) {
+private fun Avatar(profile: ProfileView, modifier: Modifier = Modifier, size: Dp = 64.dp) {
     AsyncImage(
         model = profile.avatar,
         contentDescription = null,
@@ -82,7 +82,7 @@ private fun Avatar(profile: ProfileDetail, modifier: Modifier = Modifier, size: 
 }
 
 @Composable
-private fun NameAndHandle(profile: ProfileDetail) {
+private fun NameAndHandle(profile: ProfileView) {
     val handle = "@${profile.handle}"
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -100,7 +100,7 @@ private fun NameAndHandle(profile: ProfileDetail) {
 
 @Composable
 private fun StatRow(
-    profile: ProfileDetail,
+    profile: ProfileView,
     followsViewModel: FollowsViewModel,
     followersViewModel: FollowersViewModel,
     onProfileClick: (String) -> Unit
@@ -163,11 +163,11 @@ private fun StatRow(
 }
 
 @Composable
-private fun FollowOrUnfollowButton(profile: ProfileDetail) {
+private fun FollowOrUnfollowButton(profile: ProfileView) {
     val context = LocalContext.current
     val viewModel: UserFeedViewModel = viewModel()
 
-    if (profile.myState?.follow == null) {
+    if (profile.viewer?.following == null) {
         Button(onClick = {
             viewModel.follow(
                 onSuccess = {},
@@ -190,7 +190,7 @@ private fun FollowOrUnfollowButton(profile: ProfileDetail) {
 
 @Composable
 private fun Profile(
-    profile: ProfileDetail,
+    profile: ProfileView,
     followsViewModel: FollowsViewModel,
     followersViewModel: FollowersViewModel,
     onProfileClick: (String) -> Unit
@@ -236,7 +236,7 @@ private fun Profile(
 
 @Composable
 private fun UserModalContent(
-    profile: ProfileDetail,
+    profile: ProfileView,
     followsViewModel: FollowsViewModel,
     followersViewModel: FollowersViewModel,
     onProfileClick: (String) -> Unit

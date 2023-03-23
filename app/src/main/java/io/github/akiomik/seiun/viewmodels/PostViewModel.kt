@@ -17,7 +17,7 @@ class PostViewModel : ApplicationViewModel() {
         onError: (Throwable) -> Unit = {}
     ) {
         wrapError(
-            run = { postFeedRepository.upvote(feedPost) },
+            run = { postFeedRepository.like(feedPost) },
             onSuccess = { onSuccess() },
             onError = onError
         )
@@ -29,7 +29,7 @@ class PostViewModel : ApplicationViewModel() {
         onError: (Throwable) -> Unit = {}
     ) {
         wrapError(
-            run = { postFeedRepository.cancelVote(feedPost) },
+            run = { postFeedRepository.cancelLike(feedPost) },
             onSuccess = { onSuccess() },
             onError = onError
         )
@@ -72,7 +72,7 @@ class PostViewModel : ApplicationViewModel() {
             } else {
                 null
             }
-            postFeedRepository.createPost(content, output?.cid, mimeType)
+            postFeedRepository.createPost(content, output?.blob?.cid, mimeType)
             // TODO: Add id to _feedPostIds
         }, onSuccess = { onSuccess() }, onError = onError)
     }
@@ -100,7 +100,7 @@ class PostViewModel : ApplicationViewModel() {
             } else {
                 null
             }
-            postFeedRepository.createReply(content, to, output?.cid, mimeType)
+            postFeedRepository.createReply(content, to, output?.blob?.cid, mimeType)
             // TODO: Add id to _feedPostIds
         }, onSuccess = { onSuccess() }, onError = onError)
     }

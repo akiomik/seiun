@@ -1,7 +1,5 @@
 package io.github.akiomik.seiun.ui.user
 
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,15 +18,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.akiomik.seiun.R
-import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.model.app.bsky.actor.Profile
-import io.github.akiomik.seiun.model.app.bsky.actor.ProfileDetail
+import io.github.akiomik.seiun.model.app.bsky.actor.ProfileView
 import io.github.akiomik.seiun.ui.components.SingleLineTextField
 import io.github.akiomik.seiun.ui.dialog.FullScreenDialog
 import io.github.akiomik.seiun.viewmodels.UserFeedViewModel
 
 @Composable
-fun ProfileEditModal(currentProfile: ProfileDetail, onDismissRequest: () -> Unit) {
+fun ProfileEditModal(currentProfile: ProfileView, onDismissRequest: () -> Unit) {
     val viewModel: UserFeedViewModel = viewModel()
     val context = LocalContext.current
     val updatedMessage = stringResource(id = R.string.dialog_updated)
@@ -79,18 +76,18 @@ fun ProfileEditModal(currentProfile: ProfileDetail, onDismissRequest: () -> Unit
                     banner = banner
                 )
 
-                viewModel.updateProfile(
-                    profile,
-                    onSuccess = {
-                        onDismissRequest()
-                        Toast.makeText(context, updatedMessage, Toast.LENGTH_LONG).show()
-                    },
-                    onError = {
-                        Log.d(SeiunApplication.TAG, it.toString())
-                        onDismissRequest()
-                        Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
-                    }
-                )
+//                viewModel.updateProfile(
+//                    profile,
+//                    onSuccess = {
+//                        onDismissRequest()
+//                        Toast.makeText(context, updatedMessage, Toast.LENGTH_LONG).show()
+//                    },
+//                    onError = {
+//                        Log.d(SeiunApplication.TAG, it.toString())
+//                        onDismissRequest()
+//                        Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
+//                    }
+//                )
             }) {
                 Text(stringResource(R.string.update))
             }

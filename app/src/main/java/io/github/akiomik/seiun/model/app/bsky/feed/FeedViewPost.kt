@@ -5,8 +5,8 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class FeedViewPost(
     val post: PostView,
-    val reply: FeedViewPostReplyRef? = null,
-    val reason: ReasonTrendOrReasonRepost? = null
+    val reply: ReplyRef? = null,
+    val reason: ReasonRepost? = null // TODO: union type
 ) {
     fun id(): String = reason?.id()?.let { "${post.cid}-$it" } ?: post.cid
 }

@@ -4,5 +4,5 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class External(
-    val external: ExternalExternal?
+    val external: ExternalExternal
 )

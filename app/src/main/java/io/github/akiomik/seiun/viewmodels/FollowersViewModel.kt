@@ -2,7 +2,7 @@ package io.github.akiomik.seiun.viewmodels
 
 import android.util.Log
 import io.github.akiomik.seiun.SeiunApplication
-import io.github.akiomik.seiun.model.app.bsky.actor.RefWithInfo
+import io.github.akiomik.seiun.model.app.bsky.actor.WithInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
@@ -18,7 +18,7 @@ class FollowersViewModel(val did: String) : ApplicationViewModel() {
 
     private val _seenAllFollows = MutableStateFlow(false)
     private val _state = MutableStateFlow<State>(State.Loading)
-    private val _followers = MutableStateFlow<List<RefWithInfo>>(emptyList())
+    private val _followers = MutableStateFlow<List<WithInfo>>(emptyList())
     val seenAllFollowers = _seenAllFollows.asStateFlow()
     val state = _state.asStateFlow()
     val followers = _followers.asStateFlow()
@@ -41,7 +41,7 @@ class FollowersViewModel(val did: String) : ApplicationViewModel() {
 
     fun loadMoreFollowers(onError: (Throwable) -> Unit = {}) {
         wrapError(run = {
-            val data = userRepository.getFollowers(did = did, before = _cursor)
+            val data = userRepository.getFollowers(did = did, cursor = _cursor)
 
             if (data.cursor != _cursor) {
                 if (data.followers.isNotEmpty()) {

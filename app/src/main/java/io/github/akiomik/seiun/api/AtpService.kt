@@ -7,32 +7,29 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import io.github.akiomik.seiun.model.AtpError
-import io.github.akiomik.seiun.model.app.bsky.actor.ProfileDetail
-import io.github.akiomik.seiun.model.app.bsky.actor.UpdateProfileInput
-import io.github.akiomik.seiun.model.app.bsky.actor.UpdateProfileOutput
-import io.github.akiomik.seiun.model.app.bsky.blob.UploadBlobOutput
+import io.github.akiomik.seiun.model.app.bsky.actor.ProfileView
 import io.github.akiomik.seiun.model.app.bsky.feed.AuthorFeed
+import io.github.akiomik.seiun.model.app.bsky.feed.Like
 import io.github.akiomik.seiun.model.app.bsky.feed.Post
 import io.github.akiomik.seiun.model.app.bsky.feed.Repost
-import io.github.akiomik.seiun.model.app.bsky.feed.SetVoteInput
-import io.github.akiomik.seiun.model.app.bsky.feed.SetVoteOutput
 import io.github.akiomik.seiun.model.app.bsky.feed.Timeline
 import io.github.akiomik.seiun.model.app.bsky.graph.Follow
 import io.github.akiomik.seiun.model.app.bsky.graph.Followers
 import io.github.akiomik.seiun.model.app.bsky.graph.Follows
-import io.github.akiomik.seiun.model.app.bsky.graph.MuteInput
-import io.github.akiomik.seiun.model.app.bsky.graph.UnmuteInput
+import io.github.akiomik.seiun.model.app.bsky.graph.MuteActorInput
+import io.github.akiomik.seiun.model.app.bsky.graph.UnmuteActorInput
 import io.github.akiomik.seiun.model.app.bsky.notification.UpdateNotificationSeenInput
-import io.github.akiomik.seiun.model.app.bsky.report.ReportCreateInput
-import io.github.akiomik.seiun.model.app.bsky.report.ReportCreateOutput
-import io.github.akiomik.seiun.model.com.atproto.account.AccountCreateInput
-import io.github.akiomik.seiun.model.com.atproto.account.AccountCreateOutput
+import io.github.akiomik.seiun.model.com.atproto.moderation.CreateReportInput
+import io.github.akiomik.seiun.model.com.atproto.moderation.CreateReportOutput
 import io.github.akiomik.seiun.model.com.atproto.repo.CreateRecordInput
 import io.github.akiomik.seiun.model.com.atproto.repo.CreateRecordOutput
 import io.github.akiomik.seiun.model.com.atproto.repo.DeleteRecordInput
-import io.github.akiomik.seiun.model.com.atproto.session.SessionCreateInput
-import io.github.akiomik.seiun.model.com.atproto.session.SessionCreateOutput
-import io.github.akiomik.seiun.model.com.atproto.session.SessionRefreshOutput
+import io.github.akiomik.seiun.model.com.atproto.repo.UploadBlobOutput
+import io.github.akiomik.seiun.model.com.atproto.server.CreateAccountInput
+import io.github.akiomik.seiun.model.com.atproto.server.CreateAccountOutput
+import io.github.akiomik.seiun.model.com.atproto.server.CreateSessionInput
+import io.github.akiomik.seiun.model.com.atproto.server.CreateSessionOutput
+import io.github.akiomik.seiun.model.com.atproto.server.RefreshSessionOutput
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
 import okhttp3.logging.HttpLoggingInterceptor
@@ -68,36 +65,36 @@ interface AtpService {
     }
 
     @DecodeErrorBody
-    @POST("com.atproto.account.create")
+    @POST("com.atproto.server.createAccount")
     suspend fun createAccount(
-        @Body body: AccountCreateInput
-    ): ApiResult<AccountCreateOutput, AtpError>
+        @Body body: CreateAccountInput
+    ): ApiResult<CreateAccountOutput, AtpError>
 
     @DecodeErrorBody
-    @POST("com.atproto.session.create")
+    @POST("com.atproto.server.createSession")
     suspend fun createSession(
-        @Body body: SessionCreateInput
-    ): ApiResult<SessionCreateOutput, AtpError>
+        @Body body: CreateSessionInput
+    ): ApiResult<CreateSessionOutput, AtpError>
 
     @DecodeErrorBody
-    @POST("com.atproto.session.refresh")
+    @POST("com.atproto.server.refreshSession")
     suspend fun refreshSession(
         @Header("Authorization") authorization: String
-    ): ApiResult<SessionRefreshOutput, AtpError>
+    ): ApiResult<RefreshSessionOutput, AtpError>
 
     @DecodeErrorBody
     @GET("app.bsky.actor.getProfile")
     suspend fun getProfile(
         @Header("Authorization") authorization: String,
         @Query("actor") actor: String
-    ): ApiResult<ProfileDetail, AtpError>
+    ): ApiResult<ProfileView, AtpError>
 
-    @DecodeErrorBody
-    @POST("app.bsky.actor.updateProfile")
-    suspend fun updateProfile(
-        @Header("Authorization") authorization: String,
-        @Body body: UpdateProfileInput
-    ): ApiResult<UpdateProfileOutput, AtpError>
+//    @DecodeErrorBody
+//    @POST("com.atproto.repo.putRecord")
+//    suspend fun updateProfile(
+//        @Header("Authorization") authorization: String,
+//        @Body body: UpdateProfileInput
+//    ): ApiResult<UpdateProfileOutput, AtpError>
 
     @DecodeErrorBody
     @GET("app.bsky.feed.getTimeline")
@@ -105,7 +102,7 @@ interface AtpService {
         @Header("Authorization") authorization: String,
         @Query("algorithm") algorithm: String? = null,
         @Query("limit") limit: Int? = null,
-        @Query("before") before: String? = null
+        @Query("cursor") cursor: String? = null
     ): ApiResult<Timeline, AtpError>
 
     @DecodeErrorBody
@@ -114,7 +111,7 @@ interface AtpService {
         @Header("Authorization") authorization: String,
         @Query("author") author: String,
         @Query("limit") limit: Int? = null,
-        @Query("before") before: String? = null
+        @Query("cursor") cursor: String? = null
     ): ApiResult<AuthorFeed, AtpError>
 
     @DecodeErrorBody
@@ -139,19 +136,19 @@ interface AtpService {
     ): ApiResult<Unit, AtpError>
 
     @DecodeErrorBody
-    @POST("app.bsky.feed.setVote")
-    suspend fun setVote(
+    @POST("com.atproto.repo.createRecord")
+    suspend fun like(
         @Header("Authorization") authorization: String,
-        @Body body: SetVoteInput
-    ): ApiResult<SetVoteOutput, AtpError>
+        @Body body: CreateRecordInput<Like>
+    ): ApiResult<CreateRecordOutput, AtpError>
 
     @DecodeErrorBody
-    @GET("app.bsky.notification.list")
+    @GET("app.bsky.notification.listNotifications")
     suspend fun listNotifications(
         @Header("Authorization") authorization: String,
         @Query("limit") limit: Int? = null,
-        @Query("before") before: String? = null
-    ): ApiResult<io.github.akiomik.seiun.model.app.bsky.notification.NotificationList, AtpError>
+        @Query("cursor") cursor: String? = null
+    ): ApiResult<io.github.akiomik.seiun.model.app.bsky.notification.Notifications, AtpError>
 
     @DecodeErrorBody
     @POST("app.bsky.notification.updateSeen")
@@ -161,7 +158,7 @@ interface AtpService {
     ): ApiResult<Unit, AtpError>
 
     @DecodeErrorBody
-    @POST("com.atproto.blob.upload")
+    @POST("com.atproto.repo.uploadBlob")
     suspend fun uploadBlob(
         @Header("Authorization") authorization: String,
         @Header("Content-Type") contentType: String,
@@ -169,11 +166,11 @@ interface AtpService {
     ): ApiResult<UploadBlobOutput, AtpError>
 
     @DecodeErrorBody
-    @POST("com.atproto.report.create")
+    @POST("com.atproto.moderation.createReport")
     suspend fun createReport(
         @Header("Authorization") authorization: String,
-        @Body body: ReportCreateInput
-    ): ApiResult<ReportCreateOutput, AtpError>
+        @Body body: CreateReportInput
+    ): ApiResult<CreateReportOutput, AtpError>
 
     @DecodeErrorBody
     @GET("app.bsky.graph.getFollows")
@@ -181,7 +178,7 @@ interface AtpService {
         @Header("Authorization") authorization: String,
         @Query("user") user: String,
         @Query("limit") limit: Int? = null,
-        @Query("before") before: String? = null
+        @Query("cursor") cursor: String? = null
     ): ApiResult<Follows, AtpError>
 
     @DecodeErrorBody
@@ -190,7 +187,7 @@ interface AtpService {
         @Header("Authorization") authorization: String,
         @Query("user") user: String,
         @Query("limit") limit: Int? = null,
-        @Query("before") before: String? = null
+        @Query("cursor") cursor: String? = null
     ): ApiResult<Followers, AtpError>
 
     @DecodeErrorBody
@@ -208,16 +205,16 @@ interface AtpService {
     ): ApiResult<Unit, AtpError>
 
     @DecodeErrorBody
-    @POST("app.bsky.graph.mute")
-    suspend fun mute(
+    @POST("app.bsky.graph.muteActor")
+    suspend fun muteActor(
         @Header("Authorization") authorization: String,
-        @Body body: MuteInput
+        @Body body: MuteActorInput
     ): ApiResult<Unit, AtpError>
 
     @DecodeErrorBody
-    @POST("app.bsky.graph.unmute")
-    suspend fun unmute(
+    @POST("app.bsky.graph.unmuteActor")
+    suspend fun unmuteActor(
         @Header("Authorization") authorization: String,
-        @Body body: UnmuteInput
+        @Body body: UnmuteActorInput
     ): ApiResult<Unit, AtpError>
 }

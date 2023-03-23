@@ -7,5 +7,7 @@ data class CreateRecordInput<A>(
     val did: String,
     val record: A,
     val collection: String,
-    val validate: Boolean? = null
+    val rkey: String? = null,
+    val validate: Boolean? = null,
+    val swapCommit: String? = null
 )
