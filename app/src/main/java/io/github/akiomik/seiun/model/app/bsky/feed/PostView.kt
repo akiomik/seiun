@@ -1,7 +1,7 @@
 package io.github.akiomik.seiun.model.app.bsky.feed
 
 import com.squareup.moshi.JsonClass
-import io.github.akiomik.seiun.model.app.bsky.actor.RefWithInfo
+import io.github.akiomik.seiun.model.app.bsky.actor.WithInfo
 import io.github.akiomik.seiun.model.com.atproto.repo.StrongRef
 import java.util.*
 
@@ -9,41 +9,40 @@ import java.util.*
 data class PostView(
     val uri: String,
     val cid: String,
-    val author: RefWithInfo,
+    val author: WithInfo,
     val record: Post, // TODO: unknown
-    val replyCount: Int,
-    val repostCount: Int,
-    val upvoteCount: Int,
-    val downvoteCount: Int,
     val indexedAt: Date,
-    val viewer: PostViewViewerState,
-    val embed: ImagesPresentedOrExternalPresented? = null
+    val replyCount: Int? = null,
+    val repostCount: Int? = null,
+    val likeCount: Int? = null,
+    val viewer: ViewerState? = null,
+    val embed: ImagesViewOrExternalViewOrRecordView? = null // TODO: union type
 ) {
     fun reposted(uri: String): PostView {
         return copy(
-            repostCount = repostCount + 1,
-            viewer = viewer.copy(repost = uri)
+            repostCount = (repostCount ?: 0) + 1,
+            viewer = viewer?.copy(repost = uri)
         )
     }
 
     fun repostCanceled(): PostView {
         return copy(
-            repostCount = repostCount - 1,
-            viewer = viewer.copy(repost = null)
+            repostCount = (repostCount ?: 0) - 1,
+            viewer = viewer?.copy(repost = null)
         )
     }
 
-    fun upvoted(uri: String): PostView {
+    fun liked(uri: String): PostView {
         return copy(
-            upvoteCount = upvoteCount + 1,
-            viewer = viewer.copy(upvote = uri)
+            likeCount = (likeCount ?: 0) + 1,
+            viewer = viewer?.copy(like = uri)
         )
     }
 
-    fun upvoteCanceled(): PostView {
+    fun likeCanceled(): PostView {
         return copy(
-            upvoteCount = upvoteCount - 1,
-            viewer = viewer.copy(upvote = null)
+            likeCount = (likeCount ?: 0) - 1,
+            viewer = viewer?.copy(like = null)
         )
     }
 

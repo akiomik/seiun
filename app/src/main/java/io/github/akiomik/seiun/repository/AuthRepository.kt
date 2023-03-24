@@ -7,11 +7,11 @@ import io.github.akiomik.seiun.datastores.Credential
 import io.github.akiomik.seiun.datastores.CredentialDataStore
 import io.github.akiomik.seiun.datastores.Session
 import io.github.akiomik.seiun.datastores.SessionDataStore
-import io.github.akiomik.seiun.model.com.atproto.account.AccountCreateInput
-import io.github.akiomik.seiun.model.com.atproto.account.AccountCreateOutput
-import io.github.akiomik.seiun.model.com.atproto.session.SessionCreateInput
-import io.github.akiomik.seiun.model.com.atproto.session.SessionCreateOutput
-import io.github.akiomik.seiun.model.com.atproto.session.SessionRefreshOutput
+import io.github.akiomik.seiun.model.com.atproto.server.CreateAccountInput
+import io.github.akiomik.seiun.model.com.atproto.server.CreateAccountOutput
+import io.github.akiomik.seiun.model.com.atproto.server.CreateSessionInput
+import io.github.akiomik.seiun.model.com.atproto.server.CreateSessionOutput
+import io.github.akiomik.seiun.model.com.atproto.server.RefreshSessionOutput
 
 class AuthRepository(
     private val credentialDataStore: CredentialDataStore,
@@ -22,9 +22,9 @@ class AuthRepository(
         handle: String,
         password: String,
         inviteCode: String
-    ): AccountCreateOutput {
+    ): CreateAccountOutput {
         Log.d(SeiunApplication.TAG, "Create account: $handle")
-        val param = AccountCreateInput(
+        val param = CreateAccountInput(
             email = email,
             handle = handle,
             password = password,
@@ -34,15 +34,20 @@ class AuthRepository(
         return RequestHelper.execute { getAtpClient().createAccount(param) }
     }
 
-    suspend fun login(handleOrEmail: String, password: String): SessionCreateOutput {
+    suspend fun login(handleOrEmail: String, password: String): CreateSessionOutput {
         Log.d(SeiunApplication.TAG, "Create session")
 
         return RequestHelper.execute {
-            getAtpClient().createSession(SessionCreateInput(handleOrEmail, password))
+            getAtpClient().createSession(
+                CreateSessionInput(
+                    identifier = handleOrEmail,
+                    password = password
+                )
+            )
         }
     }
 
-    suspend fun refresh(): SessionRefreshOutput {
+    suspend fun refresh(): RefreshSessionOutput {
         Log.d(SeiunApplication.TAG, "Refresh session")
         val oldSession = sessionDataStore.get()
 

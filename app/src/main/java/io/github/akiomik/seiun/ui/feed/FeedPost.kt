@@ -58,7 +58,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.R
-import io.github.akiomik.seiun.model.app.bsky.embed.PresentedImage
+import io.github.akiomik.seiun.model.app.bsky.embed.ImagesViewImage
 import io.github.akiomik.seiun.model.app.bsky.feed.FeedViewPost
 import io.github.akiomik.seiun.ui.dialog.DeleteDialog
 import io.github.akiomik.seiun.ui.dialog.MuteDialog
@@ -163,7 +163,7 @@ private fun ReplyIndicator(viewPost: FeedViewPost) {
                 tint = Color.Gray
             )
             Text(
-                text = NumberFormatter.compact(viewPost.post.replyCount),
+                text = viewPost.post.replyCount?.let { NumberFormatter.compact(it) }.orEmpty(),
                 color = Color.Gray,
                 style = MaterialTheme.typography.labelLarge
             )
@@ -174,7 +174,7 @@ private fun ReplyIndicator(viewPost: FeedViewPost) {
 @Composable
 private fun RepostIndicator(viewPost: FeedViewPost) {
     val viewModel: PostViewModel = viewModel()
-    val reposted = viewPost.post.viewer.repost != null
+    val reposted = viewPost.post.viewer?.repost != null
     val color: Color = if (reposted) {
         Green700
     } else {
@@ -206,7 +206,7 @@ private fun RepostIndicator(viewPost: FeedViewPost) {
                 tint = color
             )
             Text(
-                text = NumberFormatter.compact(viewPost.post.repostCount),
+                text = viewPost.post.repostCount?.let { NumberFormatter.compact(it) }.orEmpty(),
                 style = MaterialTheme.typography.labelLarge,
                 color = color
             )
@@ -217,7 +217,7 @@ private fun RepostIndicator(viewPost: FeedViewPost) {
 @Composable
 private fun UpvoteIndicator(viewPost: FeedViewPost) {
     val viewModel: PostViewModel = viewModel()
-    val upvoted = viewPost.post.viewer.upvote != null
+    val upvoted = viewPost.post.viewer?.like != null
     val color = if (upvoted) {
         Red700
     } else {
@@ -254,7 +254,7 @@ private fun UpvoteIndicator(viewPost: FeedViewPost) {
                 tint = color
             )
             Text(
-                text = NumberFormatter.compact(viewPost.post.upvoteCount),
+                text = viewPost.post.likeCount?.let { NumberFormatter.compact(it) }.orEmpty(),
                 style = MaterialTheme.typography.labelLarge,
                 color = color
             )
@@ -448,7 +448,7 @@ fun ImageTile(viewPost: FeedViewPost) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ImagePager(images: List<PresentedImage>, initialIndex: Int, onDismissRequest: () -> Unit) {
+fun ImagePager(images: List<ImagesViewImage>, initialIndex: Int, onDismissRequest: () -> Unit) {
     val pagerState = rememberPagerState(initialIndex)
 
     Dialog(

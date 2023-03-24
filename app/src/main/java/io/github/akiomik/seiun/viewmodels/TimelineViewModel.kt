@@ -78,7 +78,7 @@ class TimelineViewModel : ApplicationViewModel() {
         Log.d(SeiunApplication.TAG, "Load more posts")
 
         wrapError(run = {
-            val data = postFeedRepository.getTimeline(before = _cursor)
+            val data = postFeedRepository.getTimeline(cursor = _cursor)
 
             if (data.cursor != _cursor) {
                 if (data.feed.isNotEmpty()) {

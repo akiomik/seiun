@@ -4,25 +4,23 @@ import android.util.Log
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.api.RequestHelper
 import io.github.akiomik.seiun.datasources.PostFeedCacheDataSource
-import io.github.akiomik.seiun.model.app.bsky.actor.ProfileDetail
-import io.github.akiomik.seiun.model.app.bsky.blob.UploadBlobOutput
+import io.github.akiomik.seiun.model.app.bsky.actor.ProfileView
 import io.github.akiomik.seiun.model.app.bsky.feed.AuthorFeed
 import io.github.akiomik.seiun.model.app.bsky.feed.FeedViewPost
-import io.github.akiomik.seiun.model.app.bsky.feed.ImagesOrExternal
+import io.github.akiomik.seiun.model.app.bsky.feed.ImagesOrExternalOrRecord
+import io.github.akiomik.seiun.model.app.bsky.feed.Like
 import io.github.akiomik.seiun.model.app.bsky.feed.Post
 import io.github.akiomik.seiun.model.app.bsky.feed.PostReplyRef
 import io.github.akiomik.seiun.model.app.bsky.feed.Repost
-import io.github.akiomik.seiun.model.app.bsky.feed.SetVoteInput
-import io.github.akiomik.seiun.model.app.bsky.feed.SetVoteOutput
 import io.github.akiomik.seiun.model.app.bsky.feed.Timeline
-import io.github.akiomik.seiun.model.app.bsky.feed.VoteDirection
-import io.github.akiomik.seiun.model.app.bsky.report.RepoRefOrRecordRef
-import io.github.akiomik.seiun.model.app.bsky.report.ReportCreateInput
-import io.github.akiomik.seiun.model.app.bsky.report.ReportCreateOutput
+import io.github.akiomik.seiun.model.com.atproto.moderation.CreateReportInput
+import io.github.akiomik.seiun.model.com.atproto.moderation.CreateReportOutput
+import io.github.akiomik.seiun.model.com.atproto.moderation.RepoRefOrStrongRef
 import io.github.akiomik.seiun.model.com.atproto.repo.CreateRecordInput
 import io.github.akiomik.seiun.model.com.atproto.repo.CreateRecordOutput
 import io.github.akiomik.seiun.model.com.atproto.repo.DeleteRecordInput
-import io.github.akiomik.seiun.model.type.Image
+import io.github.akiomik.seiun.model.com.atproto.repo.UploadBlobOutput
+import io.github.akiomik.seiun.model.type.Blob
 import io.github.akiomik.seiun.utilities.UriConverter
 import kotlinx.coroutines.flow.Flow
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -31,11 +29,11 @@ import java.util.*
 class PostFeedRepository(private val authRepository: AuthRepository) : ApplicationRepository() {
     val feedPosts: Flow<List<FeedViewPost>> = PostFeedCacheDataSource.feed
 
-    suspend fun getTimeline(before: String? = null): Timeline {
-        Log.d(SeiunApplication.TAG, "Get timeline: before = $before")
+    suspend fun getTimeline(cursor: String? = null): Timeline {
+        Log.d(SeiunApplication.TAG, "Get timeline: cursor = $cursor")
 
         val timeline = RequestHelper.executeWithRetry(authRepository) {
-            getAtpClient().getTimeline("Bearer ${it.accessJwt}", before = before)
+            getAtpClient().getTimeline("Bearer ${it.accessJwt}", cursor = cursor)
         }
 
         timeline.feed.forEach { PostFeedCacheDataSource.putFeedPost(it) }
@@ -43,14 +41,14 @@ class PostFeedRepository(private val authRepository: AuthRepository) : Applicati
         return timeline
     }
 
-    suspend fun getAuthorFeed(author: ProfileDetail, before: String? = null): AuthorFeed {
-        Log.d(SeiunApplication.TAG, "Get author feed: before = $before")
+    suspend fun getAuthorFeed(author: ProfileView, cursor: String? = null): AuthorFeed {
+        Log.d(SeiunApplication.TAG, "Get author feed: cursor = $cursor")
 
         val feed = RequestHelper.executeWithRetry(authRepository) {
             getAtpClient().getAuthorFeed(
                 "Bearer ${it.accessJwt}",
-                author = author.handle,
-                before = before
+                actor = author.handle,
+                cursor = cursor
             )
         }
 
@@ -59,32 +57,39 @@ class PostFeedRepository(private val authRepository: AuthRepository) : Applicati
         return feed
     }
 
-    suspend fun upvote(feedPost: FeedViewPost): SetVoteOutput {
+    suspend fun like(feedPost: FeedViewPost): CreateRecordOutput {
         val subject = feedPost.post.toStrongRef()
-        Log.d(SeiunApplication.TAG, "Upvote post: uri = ${subject.uri}, cid = ${subject.cid}")
+        Log.d(SeiunApplication.TAG, "Like: uri = ${subject.uri}, cid = ${subject.cid}")
 
-        val body = SetVoteInput(subject = subject, direction = VoteDirection.up)
         val res = RequestHelper.executeWithRetry(authRepository) {
-            getAtpClient().setVote(authorization = "Bearer ${it.accessJwt}", body = body)
+            val body = CreateRecordInput(
+                did = it.did,
+                record = Like(subject = subject, createdAt = Date()),
+                collection = "app.bsky.feed.like"
+            )
+            getAtpClient().like(authorization = "Bearer ${it.accessJwt}", body = body)
         }
 
-        PostFeedCacheDataSource.putFeedPost(feedPost.copy(post = feedPost.post.upvoted(res.upvote!!)))
+        PostFeedCacheDataSource.putFeedPost(feedPost.copy(post = feedPost.post.liked(res.uri)))
 
         return res
     }
 
-    suspend fun cancelVote(feedPost: FeedViewPost): SetVoteOutput {
-        val subject = feedPost.post.toStrongRef()
-        Log.d(SeiunApplication.TAG, "Cancel vote post: uri = ${subject.uri}, cid = ${subject.cid}")
+    suspend fun cancelLike(feedPost: FeedViewPost) {
+        val uri = feedPost.post.viewer?.like ?: return
+        Log.d(SeiunApplication.TAG, "Cancel like: uri = $uri")
 
-        val body = SetVoteInput(subject = subject, direction = VoteDirection.none)
-        val res = RequestHelper.executeWithRetry(authRepository) {
-            getAtpClient().setVote(authorization = "Bearer ${it.accessJwt}", body = body)
+        val rkey = UriConverter.toRkey(uri)
+        RequestHelper.executeWithRetry(authRepository) {
+            val body = DeleteRecordInput(
+                did = it.did,
+                collection = "app.bsky.feed.like",
+                rkey = rkey
+            )
+            getAtpClient().deleteRecord(authorization = "Bearer ${it.accessJwt}", body = body)
         }
 
-        PostFeedCacheDataSource.putFeedPost(feedPost.copy(post = feedPost.post.upvoteCanceled()))
-
-        return res
+        PostFeedCacheDataSource.putFeedPost(feedPost.copy(post = feedPost.post.likeCanceled()))
     }
 
     suspend fun repost(feedPost: FeedViewPost): CreateRecordOutput {
@@ -107,7 +112,7 @@ class PostFeedRepository(private val authRepository: AuthRepository) : Applicati
     }
 
     suspend fun cancelRepost(feedPost: FeedViewPost) {
-        val uri = feedPost.post.viewer.repost ?: return
+        val uri = feedPost.post.viewer?.repost ?: return
 
         Log.d(SeiunApplication.TAG, "Cancel repost: $uri")
 
@@ -121,22 +126,15 @@ class PostFeedRepository(private val authRepository: AuthRepository) : Applicati
         PostFeedCacheDataSource.putFeedPost(feedPost.copy(post = feedPost.post.repostCanceled()))
     }
 
-    suspend fun createPost(
-        content: String,
-        imageCid: String?,
-        imageMimeType: String?
-    ): CreateRecordOutput {
+    suspend fun createPost(content: String, imageBlob: Blob? = null): CreateRecordOutput {
         Log.d(SeiunApplication.TAG, "Create a post: content = $content")
 
-        val embed = if (imageCid != null && imageMimeType != null) {
-            val image = io.github.akiomik.seiun.model.app.bsky.embed.Image(
-                image = Image(
-                    imageCid,
-                    imageMimeType
-                ),
+        val embed = if (imageBlob != null) {
+            val image = io.github.akiomik.seiun.model.app.bsky.embed.ImagesImage(
+                image = imageBlob,
                 alt = ""
             )
-            ImagesOrExternal(images = listOf(image), type = "app.bsky.embed.images")
+            ImagesOrExternalOrRecord(images = listOf(image), type = "app.bsky.embed.images")
         } else {
             null
         }
@@ -157,21 +155,17 @@ class PostFeedRepository(private val authRepository: AuthRepository) : Applicati
     suspend fun createReply(
         content: String,
         to: PostReplyRef,
-        imageCid: String?,
-        imageMimeType: String?
+        imageBlob: Blob? = null
     ): CreateRecordOutput {
         Log.d(SeiunApplication.TAG, "Create a reply: content = $content, to = $to")
 
-        val embed = if (imageCid != null && imageMimeType != null) {
+        val embed = if (imageBlob != null) {
             val image =
-                io.github.akiomik.seiun.model.app.bsky.embed.Image(
-                    image = Image(
-                        imageCid,
-                        imageMimeType
-                    ),
+                io.github.akiomik.seiun.model.app.bsky.embed.ImagesImage(
+                    image = imageBlob,
                     alt = "app.bsky.feed.post"
                 )
-            ImagesOrExternal(images = listOf(image), type = "app.bsky.embed.images")
+            ImagesOrExternalOrRecord(images = listOf(image), type = "app.bsky.embed.images")
         } else {
             null
         }
@@ -201,14 +195,14 @@ class PostFeedRepository(private val authRepository: AuthRepository) : Applicati
         PostFeedCacheDataSource.removeFeedPost(feedViewPost.id())
     }
 
-    suspend fun uploadImage(image: ByteArray, mimeType: String): UploadBlobOutput {
-        Log.d(SeiunApplication.TAG, "Upload image: mimeType = $mimeType")
+    suspend fun uploadBlob(blob: ByteArray, mimeType: String): UploadBlobOutput {
+        Log.d(SeiunApplication.TAG, "Upload blob: mimeType = $mimeType")
 
         return RequestHelper.executeWithRetry(authRepository) {
             getAtpClient().uploadBlob(
                 authorization = "Bearer ${it.accessJwt}",
                 contentType = mimeType,
-                body = image.toRequestBody()
+                body = blob.toRequestBody()
             )
         }
     }
@@ -217,14 +211,14 @@ class PostFeedRepository(private val authRepository: AuthRepository) : Applicati
         feedViewPost: FeedViewPost,
         reasonType: String,
         reason: String? = null
-    ): ReportCreateOutput {
+    ): CreateReportOutput {
         Log.d(
             SeiunApplication.TAG,
             "Report post: cid = ${feedViewPost.post.cid}, reasonType = $reasonType"
         )
 
-        val body = ReportCreateInput(
-            subject = RepoRefOrRecordRef(
+        val body = CreateReportInput(
+            subject = RepoRefOrStrongRef(
                 type = "com.atproto.repo.recordRef",
                 uri = feedViewPost.post.uri,
                 cid = feedViewPost.post.cid

@@ -81,7 +81,7 @@ class NotificationViewModel : ApplicationViewModel() {
         Log.d(SeiunApplication.TAG, "Load more notifications")
 
         wrapError(run = {
-            val res = notificationRepository.listNotifications(before = _cursor.value)
+            val res = notificationRepository.listNotifications(cursor = _cursor.value)
 
             if (res.cursor != _cursor.value) {
                 if (res.notifications.isNotEmpty()) {
