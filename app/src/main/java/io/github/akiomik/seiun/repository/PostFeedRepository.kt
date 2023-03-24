@@ -47,7 +47,7 @@ class PostFeedRepository(private val authRepository: AuthRepository) : Applicati
         val feed = RequestHelper.executeWithRetry(authRepository) {
             getAtpClient().getAuthorFeed(
                 "Bearer ${it.accessJwt}",
-                author = author.handle,
+                actor = author.handle,
                 cursor = cursor
             )
         }
@@ -126,19 +126,12 @@ class PostFeedRepository(private val authRepository: AuthRepository) : Applicati
         PostFeedCacheDataSource.putFeedPost(feedPost.copy(post = feedPost.post.repostCanceled()))
     }
 
-    suspend fun createPost(
-        content: String,
-        imageCid: String?,
-        imageMimeType: String?
-    ): CreateRecordOutput {
+    suspend fun createPost(content: String, imageBlob: Blob? = null): CreateRecordOutput {
         Log.d(SeiunApplication.TAG, "Create a post: content = $content")
 
-        val embed = if (imageCid != null && imageMimeType != null) {
+        val embed = if (imageBlob != null) {
             val image = io.github.akiomik.seiun.model.app.bsky.embed.ImagesImage(
-                image = Blob(
-                    imageCid,
-                    imageMimeType
-                ),
+                image = imageBlob,
                 alt = ""
             )
             ImagesOrExternalOrRecord(images = listOf(image), type = "app.bsky.embed.images")
@@ -162,18 +155,14 @@ class PostFeedRepository(private val authRepository: AuthRepository) : Applicati
     suspend fun createReply(
         content: String,
         to: PostReplyRef,
-        imageCid: String?,
-        imageMimeType: String?
+        imageBlob: Blob? = null
     ): CreateRecordOutput {
         Log.d(SeiunApplication.TAG, "Create a reply: content = $content, to = $to")
 
-        val embed = if (imageCid != null && imageMimeType != null) {
+        val embed = if (imageBlob != null) {
             val image =
                 io.github.akiomik.seiun.model.app.bsky.embed.ImagesImage(
-                    image = Blob(
-                        imageCid,
-                        imageMimeType
-                    ),
+                    image = imageBlob,
                     alt = "app.bsky.feed.post"
                 )
             ImagesOrExternalOrRecord(images = listOf(image), type = "app.bsky.embed.images")
@@ -206,14 +195,14 @@ class PostFeedRepository(private val authRepository: AuthRepository) : Applicati
         PostFeedCacheDataSource.removeFeedPost(feedViewPost.id())
     }
 
-    suspend fun uploadImage(image: ByteArray, mimeType: String): UploadBlobOutput {
-        Log.d(SeiunApplication.TAG, "Upload image: mimeType = $mimeType")
+    suspend fun uploadBlob(blob: ByteArray, mimeType: String): UploadBlobOutput {
+        Log.d(SeiunApplication.TAG, "Upload blob: mimeType = $mimeType")
 
         return RequestHelper.executeWithRetry(authRepository) {
             getAtpClient().uploadBlob(
                 authorization = "Bearer ${it.accessJwt}",
                 contentType = mimeType,
-                body = image.toRequestBody()
+                body = blob.toRequestBody()
             )
         }
     }

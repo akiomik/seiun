@@ -68,11 +68,11 @@ class PostViewModel : ApplicationViewModel() {
     ) {
         wrapError(run = {
             val output = if (image != null && mimeType != null) {
-                postFeedRepository.uploadImage(image, mimeType)
+                postFeedRepository.uploadBlob(image, mimeType)
             } else {
                 null
             }
-            postFeedRepository.createPost(content, output?.blob?.cid, mimeType)
+            postFeedRepository.createPost(content, output?.blob)
             // TODO: Add id to _feedPostIds
         }, onSuccess = { onSuccess() }, onError = onError)
     }
@@ -96,11 +96,11 @@ class PostViewModel : ApplicationViewModel() {
             }
 
             val output = if (image != null && mimeType != null) {
-                postFeedRepository.uploadImage(image, mimeType)
+                postFeedRepository.uploadBlob(image, mimeType)
             } else {
                 null
             }
-            postFeedRepository.createReply(content, to, output?.blob?.cid, mimeType)
+            postFeedRepository.createReply(content, to, output?.blob)
             // TODO: Add id to _feedPostIds
         }, onSuccess = { onSuccess() }, onError = onError)
     }

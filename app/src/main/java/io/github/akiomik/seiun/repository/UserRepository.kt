@@ -52,7 +52,7 @@ class UserRepository(private val authRepository: AuthRepository) : ApplicationRe
         return RequestHelper.executeWithRetry(authRepository) {
             getAtpClient().getFollows(
                 authorization = "Bearer ${it.accessJwt}",
-                user = did,
+                actor = did,
                 cursor = cursor
             )
         }
@@ -64,7 +64,7 @@ class UserRepository(private val authRepository: AuthRepository) : ApplicationRe
         return RequestHelper.executeWithRetry(authRepository) {
             getAtpClient().getFollowers(
                 authorization = "Bearer ${it.accessJwt}",
-                user = did,
+                actor = did,
                 cursor = cursor
             )
         }

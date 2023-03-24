@@ -38,7 +38,12 @@ class AuthRepository(
         Log.d(SeiunApplication.TAG, "Create session")
 
         return RequestHelper.execute {
-            getAtpClient().createSession(CreateSessionInput(handleOrEmail, password))
+            getAtpClient().createSession(
+                CreateSessionInput(
+                    identifier = handleOrEmail,
+                    password = password
+                )
+            )
         }
     }
 

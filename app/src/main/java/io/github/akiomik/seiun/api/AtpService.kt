@@ -109,7 +109,7 @@ interface AtpService {
     @GET("app.bsky.feed.getAuthorFeed")
     suspend fun getAuthorFeed(
         @Header("Authorization") authorization: String,
-        @Query("author") author: String,
+        @Query("actor") actor: String,
         @Query("limit") limit: Int? = null,
         @Query("cursor") cursor: String? = null
     ): ApiResult<AuthorFeed, AtpError>
@@ -176,7 +176,7 @@ interface AtpService {
     @GET("app.bsky.graph.getFollows")
     suspend fun getFollows(
         @Header("Authorization") authorization: String,
-        @Query("user") user: String,
+        @Query("actor") actor: String,
         @Query("limit") limit: Int? = null,
         @Query("cursor") cursor: String? = null
     ): ApiResult<Follows, AtpError>
@@ -185,7 +185,7 @@ interface AtpService {
     @GET("app.bsky.graph.getFollowers")
     suspend fun getFollowers(
         @Header("Authorization") authorization: String,
-        @Query("user") user: String,
+        @Query("actor") actor: String,
         @Query("limit") limit: Int? = null,
         @Query("cursor") cursor: String? = null
     ): ApiResult<Followers, AtpError>
