@@ -41,6 +41,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.model.app.bsky.actor.ProfileViewDetailed
+import io.github.akiomik.seiun.ui.components.LinkableText
 import io.github.akiomik.seiun.ui.feed.LoadingErrorMessage
 import io.github.akiomik.seiun.ui.theme.Indigo800
 import io.github.akiomik.seiun.viewmodels.AppViewModel
@@ -224,7 +225,7 @@ private fun Profile(
 
         NameAndHandle(profile = profile)
 
-        Text(profile.description.orEmpty())
+        LinkableText(profile.description.orEmpty())
 
         StatRow(
             profile = profile,

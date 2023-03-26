@@ -60,6 +60,7 @@ import coil.compose.AsyncImage
 import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.model.app.bsky.embed.ImagesViewImage
 import io.github.akiomik.seiun.model.app.bsky.feed.FeedViewPost
+import io.github.akiomik.seiun.ui.components.LinkableText
 import io.github.akiomik.seiun.ui.dialog.DeleteDialog
 import io.github.akiomik.seiun.ui.dialog.MuteDialog
 import io.github.akiomik.seiun.ui.dialog.ReportDialog
@@ -356,14 +357,19 @@ private fun FeedPostContent(viewPost: FeedViewPost) {
 
         if (viewPost.post.record.text.isNotEmpty()) {
             SelectionContainer {
-                Text(text = viewPost.post.record.text, modifier = Modifier.padding(top = 8.dp))
+                LinkableText(
+                    text = viewPost.post.record.text,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
             }
         }
 
         ImageTile(viewPost)
 
         Row(
-            modifier = Modifier.padding(top = 8.dp, bottom = 4.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(top = 8.dp, bottom = 4.dp)
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
