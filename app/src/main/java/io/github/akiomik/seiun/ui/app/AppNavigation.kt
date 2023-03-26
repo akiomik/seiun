@@ -28,6 +28,7 @@ import io.github.akiomik.seiun.ui.user.UserScreen
 import io.github.akiomik.seiun.viewmodels.AppViewModel
 import io.github.akiomik.seiun.viewmodels.FollowersViewModel
 import io.github.akiomik.seiun.viewmodels.FollowsViewModel
+import io.github.akiomik.seiun.viewmodels.UserFeedViewModel
 
 @Composable
 fun AppNavigation(
@@ -113,7 +114,7 @@ fun AppNavigation(
         ) {
             val did = it.arguments?.getString("did")!!
             UserScreen(
-                did,
+                userFeedViewModel = UserFeedViewModel(did),
                 followsViewModel = FollowsViewModel(did),
                 followersViewModel = FollowersViewModel(did),
                 onProfileClick = { navController.navigate("user/$it") }
