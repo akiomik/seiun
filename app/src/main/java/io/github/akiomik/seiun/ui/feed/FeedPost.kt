@@ -215,15 +215,15 @@ private fun RepostIndicator(viewPost: FeedViewPost) {
 }
 
 @Composable
-private fun UpvoteIndicator(viewPost: FeedViewPost) {
+private fun LikeIndicator(viewPost: FeedViewPost) {
     val viewModel: PostViewModel = viewModel()
-    val upvoted = viewPost.post.viewer?.like != null
-    val color = if (upvoted) {
+    val liked = viewPost.post.viewer?.like != null
+    val color = if (liked) {
         Red700
     } else {
         Color.Gray
     }
-    val icon = if (upvoted) {
+    val icon = if (liked) {
         Icons.Sharp.Favorite
     } else {
         Icons.Sharp.FavoriteBorder
@@ -232,12 +232,12 @@ private fun UpvoteIndicator(viewPost: FeedViewPost) {
 
     TextButton(
         onClick = {
-            if (upvoted) {
-                viewModel.cancelVote(feedPost = viewPost, onError = {
+            if (liked) {
+                viewModel.cancelLike(feedPost = viewPost, onError = {
                     Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
                 })
             } else {
-                viewModel.upvote(feedPost = viewPost, onError = {
+                viewModel.like(feedPost = viewPost, onError = {
                     Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
                 })
             }
@@ -369,7 +369,7 @@ private fun FeedPostContent(viewPost: FeedViewPost) {
         ) {
             ReplyIndicator(viewPost = viewPost)
             RepostIndicator(viewPost = viewPost)
-            UpvoteIndicator(viewPost = viewPost)
+            LikeIndicator(viewPost = viewPost)
             MenuButton(viewPost = viewPost)
         }
         Text(

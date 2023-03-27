@@ -11,7 +11,7 @@ class PostViewModel : ApplicationViewModel() {
     private val userRepository = SeiunApplication.instance!!.userRepository
     private val postFeedRepository = SeiunApplication.instance!!.postFeedRepository
 
-    fun upvote(
+    fun like(
         feedPost: FeedViewPost,
         onSuccess: () -> Unit = {},
         onError: (Throwable) -> Unit = {}
@@ -23,7 +23,7 @@ class PostViewModel : ApplicationViewModel() {
         )
     }
 
-    fun cancelVote(
+    fun cancelLike(
         feedPost: FeedViewPost,
         onSuccess: () -> Unit = {},
         onError: (Throwable) -> Unit = {}

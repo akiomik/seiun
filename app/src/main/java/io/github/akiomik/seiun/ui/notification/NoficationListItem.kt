@@ -37,7 +37,7 @@ private fun Avatar(notification: Notification, onClicked: (String) -> Unit) {
 }
 
 @Composable
-private fun VoteItem(notification: Notification, onProfileClick: (String) -> Unit) {
+private fun LikeItem(notification: Notification, onProfileClick: (String) -> Unit) {
     val createdAt = DateFormat.format(
         DATETIME_FORMAT,
         notification.record.createdAt.toInstant().toEpochMilli()
@@ -210,7 +210,7 @@ fun NotificationListItem(notification: Notification, onProfileClick: (String) ->
             .fillMaxWidth()
     ) {
         when (notification.reason) {
-            "vote" -> VoteItem(notification = notification, onProfileClick = onProfileClick)
+            "like" -> LikeItem(notification = notification, onProfileClick = onProfileClick)
             "repost" -> RepostItem(notification = notification, onProfileClick = onProfileClick)
             "follow" -> FollowItem(notification = notification, onProfileClick = onProfileClick)
             "invite" -> InviteItem(notification = notification, onProfileClick = onProfileClick)
