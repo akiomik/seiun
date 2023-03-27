@@ -45,7 +45,7 @@
     <string name="notification_liked">%1$s があなたの投稿にいいねしました</string>
     <string name="notification_reposted">%1$s があなたの投稿をリポストしました</string>
     <string name="notification_followed">%1$s があなたをフォローしました</string>
-    <string name="notification_invited">%1$s があなたを招待しました</string>
+    <string name="notification_quoted">%1$s があなたを投稿を引用しました</string>
     <string name="notification_mentioned">%1$s があなたにメンションしました</string>
     <string name="notification_replied">%1$s があなたに返信しました</string>
     <string name="feed_posted">投稿しました</string>

@@ -118,33 +118,6 @@ private fun FollowItem(notification: Notification, onProfileClick: (String) -> U
 }
 
 @Composable
-private fun InviteItem(notification: Notification, onProfileClick: (String) -> Unit) {
-    val createdAt = DateFormat.format(
-        DATETIME_FORMAT,
-        notification.record.createdAt.toInstant().toEpochMilli()
-    )
-
-    ListItem(
-        leadingContent = { Avatar(notification = notification, onClicked = onProfileClick) },
-        headlineContent = {
-            Text(
-                stringResource(
-                    R.string.notification_invited,
-                    notification.author.displayName ?: notification.author.handle
-                )
-            )
-        },
-        supportingContent = {
-            Text(
-                text = createdAt.toString(),
-                color = Color.Gray,
-                style = MaterialTheme.typography.labelMedium
-            )
-        }
-    )
-}
-
-@Composable
 private fun MentionItem(notification: Notification, onProfileClick: (String) -> Unit) {
     val createdAt = DateFormat.format(
         DATETIME_FORMAT,
@@ -199,6 +172,33 @@ private fun ReplyItem(notification: Notification, onProfileClick: (String) -> Un
 }
 
 @Composable
+private fun QuoteItem(notification: Notification, onProfileClick: (String) -> Unit) {
+    val createdAt = DateFormat.format(
+        DATETIME_FORMAT,
+        notification.record.createdAt.toInstant().toEpochMilli()
+    )
+
+    ListItem(
+        leadingContent = { Avatar(notification = notification, onClicked = onProfileClick) },
+        headlineContent = {
+            Text(
+                stringResource(
+                    R.string.notification_quoted,
+                    notification.author.displayName ?: notification.author.handle
+                )
+            )
+        },
+        supportingContent = {
+            Text(
+                text = createdAt.toString(),
+                color = Color.Gray,
+                style = MaterialTheme.typography.labelMedium
+            )
+        }
+    )
+}
+
+@Composable
 fun NotificationListItem(notification: Notification, onProfileClick: (String) -> Unit) {
     val readColor = MaterialTheme.colorScheme.surface
     val unreadColor = MaterialTheme.colorScheme.primaryContainer
@@ -213,10 +213,10 @@ fun NotificationListItem(notification: Notification, onProfileClick: (String) ->
             "like" -> LikeItem(notification = notification, onProfileClick = onProfileClick)
             "repost" -> RepostItem(notification = notification, onProfileClick = onProfileClick)
             "follow" -> FollowItem(notification = notification, onProfileClick = onProfileClick)
-            "invite" -> InviteItem(notification = notification, onProfileClick = onProfileClick)
             "mention" ->
                 MentionItem(notification = notification, onProfileClick = onProfileClick)
             "reply" -> ReplyItem(notification = notification, onProfileClick = onProfileClick)
+            "quote" -> QuoteItem(notification = notification, onProfileClick = onProfileClick)
             else -> {}
         }
     }
