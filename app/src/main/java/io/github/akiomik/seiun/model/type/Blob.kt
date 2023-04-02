@@ -5,9 +5,9 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class Blob(
-    val ref: Ref,
+    val ref: Ref?,
     val mimeType: String,
-    val size: Int,
+    val size: Int?,
     @Json(name = "\$type")
     val type: String? = "blob"
 )

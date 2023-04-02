@@ -68,7 +68,7 @@ class NotificationViewModel : ApplicationViewModel() {
 
             // NOTE: Update always for updating isRead
             val newNotifications =
-                mergeNotifications(_notifications.value.orEmpty(), notifications.notifications)
+                mergeNotifications(_notifications.value, notifications.notifications)
             _notifications.value = newNotifications
             Log.d(SeiunApplication.TAG, "Notifications are merged")
         }, onComplete = {
@@ -85,7 +85,7 @@ class NotificationViewModel : ApplicationViewModel() {
 
             if (res.cursor != _cursor.value) {
                 if (res.notifications.isNotEmpty()) {
-                    val newNotifications = notifications.value.orEmpty() + res.notifications
+                    val newNotifications = notifications.value + res.notifications
                     _notifications.value = newNotifications
                     _cursor.value = res.cursor
                     _state.value = State.Loaded
