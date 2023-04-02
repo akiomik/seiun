@@ -49,7 +49,7 @@ interface AtpService {
             .add(KotlinJsonAdapterFactory())
             .add(Date::class.java, Rfc3339DateJsonAdapter())
             .build()
-        private val logging = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+        private val logging = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC)
         private val client = OkHttpClient.Builder().addInterceptor(logging).build()
 
         fun create(serviceProvider: String): AtpService {
