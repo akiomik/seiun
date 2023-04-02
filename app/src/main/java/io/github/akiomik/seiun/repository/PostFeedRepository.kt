@@ -63,7 +63,7 @@ class PostFeedRepository(private val authRepository: AuthRepository) : Applicati
 
         val res = RequestHelper.executeWithRetry(authRepository) {
             val body = CreateRecordInput(
-                did = it.did,
+                repo = it.did,
                 record = Like(subject = subject, createdAt = Date()),
                 collection = "app.bsky.feed.like"
             )
@@ -82,7 +82,7 @@ class PostFeedRepository(private val authRepository: AuthRepository) : Applicati
         val rkey = UriConverter.toRkey(uri)
         RequestHelper.executeWithRetry(authRepository) {
             val body = DeleteRecordInput(
-                did = it.did,
+                repo = it.did,
                 collection = "app.bsky.feed.like",
                 rkey = rkey
             )
@@ -99,7 +99,7 @@ class PostFeedRepository(private val authRepository: AuthRepository) : Applicati
         val res = RequestHelper.executeWithRetry(authRepository) {
             val record = Repost(subject = subject, Date())
             val body = CreateRecordInput(
-                did = it.did,
+                repo = it.did,
                 record = record,
                 collection = "app.bsky.feed.repost"
             )
@@ -119,7 +119,7 @@ class PostFeedRepository(private val authRepository: AuthRepository) : Applicati
         val rkey = UriConverter.toRkey(uri)
         RequestHelper.executeWithRetry(authRepository) {
             val body =
-                DeleteRecordInput(did = it.did, rkey = rkey, collection = "app.bsky.feed.repost")
+                DeleteRecordInput(repo = it.did, rkey = rkey, collection = "app.bsky.feed.repost")
             getAtpClient().deleteRecord("Bearer ${it.accessJwt}", body = body)
         }
 
@@ -143,7 +143,7 @@ class PostFeedRepository(private val authRepository: AuthRepository) : Applicati
 
         val res = RequestHelper.executeWithRetry(authRepository) {
             val body =
-                CreateRecordInput(did = it.did, record = record, collection = "app.bsky.feed.post")
+                CreateRecordInput(repo = it.did, record = record, collection = "app.bsky.feed.post")
             getAtpClient().createPost(authorization = "Bearer ${it.accessJwt}", body = body)
         }
 
@@ -173,7 +173,7 @@ class PostFeedRepository(private val authRepository: AuthRepository) : Applicati
 
         val res = RequestHelper.executeWithRetry(authRepository) {
             val body =
-                CreateRecordInput(did = it.did, record = record, collection = "app.bsky.feed.post")
+                CreateRecordInput(repo = it.did, record = record, collection = "app.bsky.feed.post")
             getAtpClient().createPost(authorization = "Bearer ${it.accessJwt}", body = body)
         }
 
@@ -188,7 +188,7 @@ class PostFeedRepository(private val authRepository: AuthRepository) : Applicati
         val rkey = UriConverter.toRkey(feedViewPost.post.uri)
         RequestHelper.executeWithRetry(authRepository) {
             val body =
-                DeleteRecordInput(did = it.did, collection = "app.bsky.feed.post", rkey = rkey)
+                DeleteRecordInput(repo = it.did, collection = "app.bsky.feed.post", rkey = rkey)
             getAtpClient().deleteRecord("Bearer ${it.accessJwt}", body)
         }
 

@@ -75,7 +75,7 @@ class UserRepository(private val authRepository: AuthRepository) : ApplicationRe
 
         return RequestHelper.executeWithRetry(authRepository) {
             val body = CreateRecordInput(
-                did = it.did,
+                repo = it.did,
                 record = Follow(subject = did, Date()),
                 collection = "app.bsky.graph.follow"
             )
@@ -88,7 +88,7 @@ class UserRepository(private val authRepository: AuthRepository) : ApplicationRe
 
         return RequestHelper.executeWithRetry(authRepository) {
             val body = DeleteRecordInput(
-                did = it.did,
+                repo = it.did,
                 collection = "app.bsky.graph.follow",
                 rkey = UriConverter.toRkey(uri)
             )

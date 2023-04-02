@@ -4,7 +4,7 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class CreateRecordInput<A>(
-    val did: String,
+    val repo: String,
     val record: A,
     val collection: String,
     val rkey: String? = null,

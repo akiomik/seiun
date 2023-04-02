@@ -4,7 +4,7 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class DeleteRecordInput(
-    val did: String,
+    val repo: String,
     val collection: String,
     val rkey: String,
     val swapRecord: String? = null,
