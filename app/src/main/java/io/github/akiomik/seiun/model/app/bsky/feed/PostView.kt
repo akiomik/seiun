@@ -16,7 +16,7 @@ data class PostView(
     val repostCount: Int? = null,
     val likeCount: Int? = null,
     val viewer: ViewerState? = null,
-    val embed: ImagesViewOrExternalViewOrRecordView? = null // TODO: union type
+    val embed: ImagesViewOrExternalViewOrRecordViewOrRecordWithMediaView? = null // TODO: union type
 ) {
     fun reposted(uri: String): PostView {
         return copy(

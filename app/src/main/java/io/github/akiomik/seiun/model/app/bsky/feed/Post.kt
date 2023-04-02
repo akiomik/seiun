@@ -11,5 +11,5 @@ data class Post(
     val entities: List<PostEntity>? = null,
     val facets: List<Facet>? = null,
     val reply: PostReplyRef? = null,
-    val embed: ImagesOrExternalOrRecord? = null // TODO: union type
+    val embed: ImagesOrExternalOrRecordOrRecordOrRecordWithMedia? = null // TODO: union type
 )

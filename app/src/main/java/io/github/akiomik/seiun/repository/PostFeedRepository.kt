@@ -7,7 +7,7 @@ import io.github.akiomik.seiun.datasources.PostFeedCacheDataSource
 import io.github.akiomik.seiun.model.app.bsky.actor.ProfileView
 import io.github.akiomik.seiun.model.app.bsky.feed.AuthorFeed
 import io.github.akiomik.seiun.model.app.bsky.feed.FeedViewPost
-import io.github.akiomik.seiun.model.app.bsky.feed.ImagesOrExternalOrRecord
+import io.github.akiomik.seiun.model.app.bsky.feed.ImagesOrExternalOrRecordOrRecordOrRecordWithMedia
 import io.github.akiomik.seiun.model.app.bsky.feed.Like
 import io.github.akiomik.seiun.model.app.bsky.feed.Post
 import io.github.akiomik.seiun.model.app.bsky.feed.PostReplyRef
@@ -134,7 +134,7 @@ class PostFeedRepository(private val authRepository: AuthRepository) : Applicati
                 image = imageBlob,
                 alt = ""
             )
-            ImagesOrExternalOrRecord(images = listOf(image), type = "app.bsky.embed.images")
+            ImagesOrExternalOrRecordOrRecordOrRecordWithMedia(images = listOf(image), type = "app.bsky.embed.images")
         } else {
             null
         }
@@ -165,7 +165,7 @@ class PostFeedRepository(private val authRepository: AuthRepository) : Applicati
                     image = imageBlob,
                     alt = "app.bsky.feed.post"
                 )
-            ImagesOrExternalOrRecord(images = listOf(image), type = "app.bsky.embed.images")
+            ImagesOrExternalOrRecordOrRecordOrRecordWithMedia(images = listOf(image), type = "app.bsky.embed.images")
         } else {
             null
         }
