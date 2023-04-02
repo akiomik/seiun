@@ -1,9 +1,11 @@
 package io.github.akiomik.seiun.model.app.bsky.feed
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 import io.github.akiomik.seiun.model.app.bsky.embed.ExternalViewExternal
 import io.github.akiomik.seiun.model.app.bsky.embed.ImagesViewImage
 
+@JsonClass(generateAdapter = true)
 data class ImagesViewOrExternalView(
     @Json(name = "\$type")
     val type: String,

@@ -1,8 +1,10 @@
 package io.github.akiomik.seiun.model.app.bsky.feed
 
+import com.squareup.moshi.JsonClass
 import io.github.akiomik.seiun.model.app.bsky.actor.WithInfo
 import java.util.*
 
+@JsonClass(generateAdapter = true)
 data class RecordViewRecordOrRecordViewNotFound(
 //    @Json(name = "\$type")
 //    val type: String,
