@@ -13,13 +13,20 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 
 object AppViewModel : ApplicationViewModel() {
+    sealed interface ProfileState {
+        object Init : ProfileState
+        object Loading : ProfileState
+        object Loaded : ProfileState
+    }
+
     private val innerAtpService = SeiunApplication.instance!!.atpService
 
+    private var innerProfileState = MutableStateFlow<ProfileState>(ProfileState.Init)
     private var innerProfile = MutableStateFlow<ProfileViewDetailed?>(null)
     private var innerShowDrawer = MutableStateFlow(false)
     private var innerShowTopBar = MutableStateFlow(false)
     private var innerShowBottomBar = MutableStateFlow(false)
-    private var innerFab = MutableStateFlow<@Composable () -> Unit>({})
+    private var innerFab = MutableStateFlow<@Composable () -> Unit> {}
 
     private val isDrawerAvailable = innerAtpService.combine(innerProfile) { atpService, profile ->
         atpService != null && profile != null
@@ -36,9 +43,18 @@ object AppViewModel : ApplicationViewModel() {
     private val userRepository = SeiunApplication.instance!!.userRepository
 
     fun updateProfile() {
+        if (innerProfileState.value != ProfileState.Init) {
+            return
+        }
+
+        innerProfileState.value = ProfileState.Loading
+
         wrapError(
             run = { userRepository.getProfile() },
-            onSuccess = { innerProfile.value = it },
+            onSuccess = {
+                innerProfile.value = it
+                innerProfileState.value = ProfileState.Loaded
+            },
             onError = { Log.d(SeiunApplication.TAG, "Failed to init ProfileViewModel: $it") }
         )
     }
