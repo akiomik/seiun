@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.MutableCreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -28,6 +29,7 @@ import io.github.akiomik.seiun.ui.user.UserScreen
 import io.github.akiomik.seiun.viewmodels.AppViewModel
 import io.github.akiomik.seiun.viewmodels.FollowersViewModel
 import io.github.akiomik.seiun.viewmodels.FollowsViewModel
+import io.github.akiomik.seiun.viewmodels.UserFeedViewModel
 
 @Composable
 fun AppNavigation(
@@ -112,11 +114,25 @@ fun AppNavigation(
             arguments = listOf(navArgument("did") { type = NavType.StringType })
         ) {
             val did = it.arguments?.getString("did")!!
+
+            val userFeedViewModel: UserFeedViewModel = viewModel(
+                extras = MutableCreationExtras().apply { set(UserFeedViewModel.didKey, did) },
+                factory = UserFeedViewModel.Factory
+            )
+            val followsViewModel: FollowsViewModel = viewModel(
+                extras = MutableCreationExtras().apply { set(FollowsViewModel.didKey, did) },
+                factory = FollowsViewModel.Factory
+            )
+            val followersViewModel: FollowersViewModel = viewModel(
+                extras = MutableCreationExtras().apply { set(FollowersViewModel.didKey, did) },
+                factory = FollowersViewModel.Factory
+            )
+
             UserScreen(
-                did,
-                followsViewModel = FollowsViewModel(did),
-                followersViewModel = FollowersViewModel(did),
-                onProfileClick = { navController.navigate("user/$it") }
+                userFeedViewModel = userFeedViewModel,
+                followsViewModel = followsViewModel,
+                followersViewModel = followersViewModel,
+                onProfileClick = { otherDid -> navController.navigate("user/$otherDid") }
             )
         }
         composable("login") {

@@ -41,6 +41,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.model.app.bsky.actor.ProfileViewDetailed
+import io.github.akiomik.seiun.ui.feed.LoadingErrorMessage
 import io.github.akiomik.seiun.ui.theme.Indigo800
 import io.github.akiomik.seiun.viewmodels.AppViewModel
 import io.github.akiomik.seiun.viewmodels.FollowersViewModel
@@ -236,13 +237,14 @@ private fun Profile(
 
 @Composable
 private fun UserModalContent(
-    profile: ProfileViewDetailed,
+    userFeedViewModel: UserFeedViewModel,
     followsViewModel: FollowsViewModel,
     followersViewModel: FollowersViewModel,
     onProfileClick: (String) -> Unit
 ) {
     val bannerHeight = 128.dp
     val avatarSize = 96.dp
+    val profile by userFeedViewModel.profile.collectAsState()
 
     // TODO: Use ExitUntilCollapsed
     CollapsingToolbarScaffold(
@@ -271,41 +273,33 @@ private fun UserModalContent(
         enabled = true,
         modifier = Modifier.fillMaxSize()
     ) {
-        UserFeed(profile, onProfileClick)
+        UserFeed(userFeedViewModel, onProfileClick)
     }
 }
 
 @Composable
 fun UserScreen(
-    did: String,
+    userFeedViewModel: UserFeedViewModel,
     followsViewModel: FollowsViewModel,
     followersViewModel: FollowersViewModel,
     onProfileClick: (String) -> Unit
 ) {
-    val userFeedViewModel: UserFeedViewModel = viewModel()
-    var profileRequested by remember { mutableStateOf(false) }
-    val profile by userFeedViewModel.profile.collectAsState()
-
-    if (!profileRequested) {
-        userFeedViewModel.setProfileOf(
-            did = did,
-            onSuccess = { profileRequested = true },
-            onError = { profileRequested = true }
-        )
-    }
+    val state by userFeedViewModel.state.collectAsState()
 
     Surface(modifier = Modifier.fillMaxSize()) {
-        if (profile == null) {
-            Box(contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
-        } else {
-            UserModalContent(
-                profile = profile!!,
-                followsViewModel = followsViewModel,
-                followersViewModel = followersViewModel,
-                onProfileClick = onProfileClick
-            )
+        when (state) {
+            is UserFeedViewModel.State.Loading ->
+                Box(contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            is UserFeedViewModel.State.Loaded ->
+                UserModalContent(
+                    userFeedViewModel = userFeedViewModel,
+                    followsViewModel = followsViewModel,
+                    followersViewModel = followersViewModel,
+                    onProfileClick = onProfileClick
+                )
+            is UserFeedViewModel.State.Error -> LoadingErrorMessage()
         }
     }
 }

@@ -1,6 +1,10 @@
 package io.github.akiomik.seiun.viewmodels
 
 import android.util.Log
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.CreationExtras
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.model.app.bsky.actor.ProfileViewBasic
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +31,6 @@ class FollowsViewModel(val did: String) : ApplicationViewModel() {
         wrapError(
             run = { userRepository.getFollows(did) },
             onSuccess = {
-                Log.d(SeiunApplication.TAG, it.toString())
                 _follows.value = it.follows
                 _cursor = it.cursor
                 _state.value = State.Loaded
@@ -54,5 +57,16 @@ class FollowsViewModel(val did: String) : ApplicationViewModel() {
                 }
             }
         }, onError = onError)
+    }
+
+    companion object {
+        val didKey = object : CreationExtras.Key<String> {}
+
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val did = this[didKey]
+                FollowsViewModel(did!!)
+            }
+        }
     }
 }
