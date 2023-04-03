@@ -3,7 +3,7 @@ package io.github.akiomik.seiun.model.app.bsky.actor
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-data class WithInfo(
+data class ProfileViewBasic(
     val did: String,
     val handle: String,
     val displayName: String? = null,

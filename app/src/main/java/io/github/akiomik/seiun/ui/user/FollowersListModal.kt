@@ -21,12 +21,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.R
-import io.github.akiomik.seiun.model.app.bsky.actor.WithInfo
+import io.github.akiomik.seiun.model.app.bsky.actor.ProfileViewBasic
 import io.github.akiomik.seiun.ui.dialog.FullScreenDialog
 import io.github.akiomik.seiun.viewmodels.FollowersViewModel
 
 @Composable
-private fun Avatar(user: WithInfo, onClicked: (String) -> Unit) {
+private fun Avatar(user: ProfileViewBasic, onClicked: (String) -> Unit) {
     AsyncImage(
         model = user.avatar,
         contentDescription = null,
@@ -39,7 +39,7 @@ private fun Avatar(user: WithInfo, onClicked: (String) -> Unit) {
 }
 
 @Composable
-private fun FollowersListItem(user: WithInfo, onProfileClick: (String) -> Unit) {
+private fun FollowersListItem(user: ProfileViewBasic, onProfileClick: (String) -> Unit) {
     ListItem(
         leadingContent = { Avatar(user = user, onClicked = onProfileClick) },
         headlineContent = { Text(text = user.displayName ?: "@${user.handle}") },
@@ -67,7 +67,7 @@ private fun FollowersListItem(user: WithInfo, onProfileClick: (String) -> Unit) 
 
 @Composable
 private fun FollowersListContent(
-    followers: List<WithInfo>,
+    followers: List<ProfileViewBasic>,
     viewModel: FollowersViewModel,
     onProfileClick: (String) -> Unit
 ) {

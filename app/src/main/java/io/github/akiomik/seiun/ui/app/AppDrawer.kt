@@ -33,12 +33,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import io.github.akiomik.seiun.R
-import io.github.akiomik.seiun.model.app.bsky.actor.ProfileView
+import io.github.akiomik.seiun.model.app.bsky.actor.ProfileViewDetailed
 import io.github.akiomik.seiun.viewmodels.AppViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-private fun Profile(onClicked: (ProfileView) -> Unit) {
+private fun Profile(onClicked: (ProfileViewDetailed) -> Unit) {
     val viewModel: AppViewModel = viewModel()
     val profile by viewModel.profile.collectAsState()
 
@@ -55,7 +55,7 @@ private fun Profile(onClicked: (ProfileView) -> Unit) {
 }
 
 @Composable
-private fun Avatar(profile: ProfileView?) {
+private fun Avatar(profile: ProfileViewDetailed?) {
     AsyncImage(
         model = profile?.avatar,
         contentDescription = null,
@@ -67,7 +67,7 @@ private fun Avatar(profile: ProfileView?) {
 }
 
 @Composable
-private fun NameAndHandle(profile: ProfileView?) {
+private fun NameAndHandle(profile: ProfileViewDetailed?) {
     Column {
         Text(
             text = profile?.displayName.orEmpty(),
@@ -85,7 +85,7 @@ private fun NameAndHandle(profile: ProfileView?) {
 fun AppDrawer(
     state: DrawerState,
     enabled: Boolean,
-    onProfileClick: (ProfileView) -> Unit,
+    onProfileClick: (ProfileViewDetailed) -> Unit,
     content: @Composable () -> Unit
 ) {
 //    var selected by remember { mutableStateOf("") }

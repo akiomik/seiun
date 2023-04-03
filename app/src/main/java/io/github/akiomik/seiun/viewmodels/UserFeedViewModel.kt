@@ -3,7 +3,7 @@ package io.github.akiomik.seiun.viewmodels
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import io.github.akiomik.seiun.SeiunApplication
-import io.github.akiomik.seiun.model.app.bsky.actor.ProfileView
+import io.github.akiomik.seiun.model.app.bsky.actor.ProfileViewDetailed
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,7 +25,7 @@ class UserFeedViewModel : ApplicationViewModel() {
     private var _cursor: String? = null
 
     private val _feedPostIds: MutableStateFlow<Set<String>> = MutableStateFlow(emptySet())
-    private val _profile = MutableStateFlow<ProfileView?>(null)
+    private val _profile = MutableStateFlow<ProfileViewDetailed?>(null)
     private val _isRefreshing = MutableStateFlow(false)
     private val _seenAllFeed = MutableStateFlow(false)
     private val _state = MutableStateFlow<State>(State.Init)
@@ -55,7 +55,7 @@ class UserFeedViewModel : ApplicationViewModel() {
         )
     }
 
-    fun setFeed(profile: ProfileView, onSuccess: () -> Unit, onError: (Throwable) -> Unit) {
+    fun setFeed(profile: ProfileViewDetailed, onSuccess: () -> Unit, onError: (Throwable) -> Unit) {
         _state.value = State.FeedLoading
 
         wrapError(
