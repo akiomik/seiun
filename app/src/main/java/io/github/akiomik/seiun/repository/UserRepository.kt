@@ -3,7 +3,7 @@ package io.github.akiomik.seiun.repository
 import android.util.Log
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.api.RequestHelper
-import io.github.akiomik.seiun.model.app.bsky.actor.ProfileView
+import io.github.akiomik.seiun.model.app.bsky.actor.ProfileViewDetailed
 import io.github.akiomik.seiun.model.app.bsky.graph.Follow
 import io.github.akiomik.seiun.model.app.bsky.graph.Followers
 import io.github.akiomik.seiun.model.app.bsky.graph.Follows
@@ -16,7 +16,7 @@ import io.github.akiomik.seiun.utilities.UriConverter
 import java.util.*
 
 class UserRepository(private val authRepository: AuthRepository) : ApplicationRepository() {
-    suspend fun getProfile(): ProfileView {
+    suspend fun getProfile(): ProfileViewDetailed {
         Log.d(SeiunApplication.TAG, "Get profile")
 
         return RequestHelper.executeWithRetry(authRepository) {
@@ -24,7 +24,7 @@ class UserRepository(private val authRepository: AuthRepository) : ApplicationRe
         }
     }
 
-    suspend fun getProfileOf(did: String): ProfileView {
+    suspend fun getProfileOf(did: String): ProfileViewDetailed {
         Log.d(SeiunApplication.TAG, "Get profile of $did")
 
         return RequestHelper.executeWithRetry(authRepository) {

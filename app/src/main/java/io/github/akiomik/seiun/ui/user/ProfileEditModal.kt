@@ -19,13 +19,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.model.app.bsky.actor.Profile
-import io.github.akiomik.seiun.model.app.bsky.actor.ProfileView
+import io.github.akiomik.seiun.model.app.bsky.actor.ProfileViewDetailed
 import io.github.akiomik.seiun.ui.components.SingleLineTextField
 import io.github.akiomik.seiun.ui.dialog.FullScreenDialog
 import io.github.akiomik.seiun.viewmodels.UserFeedViewModel
 
 @Composable
-fun ProfileEditModal(currentProfile: ProfileView, onDismissRequest: () -> Unit) {
+fun ProfileEditModal(currentProfile: ProfileViewDetailed, onDismissRequest: () -> Unit) {
     val viewModel: UserFeedViewModel = viewModel()
     val context = LocalContext.current
     val updatedMessage = stringResource(id = R.string.dialog_updated)

@@ -1,7 +1,7 @@
 package io.github.akiomik.seiun.model.app.bsky.feed
 
 import com.squareup.moshi.JsonClass
-import io.github.akiomik.seiun.model.app.bsky.actor.WithInfo
+import io.github.akiomik.seiun.model.app.bsky.actor.ProfileViewBasic
 import io.github.akiomik.seiun.model.com.atproto.repo.StrongRef
 import java.util.*
 
@@ -9,7 +9,7 @@ import java.util.*
 data class PostView(
     val uri: String,
     val cid: String,
-    val author: WithInfo,
+    val author: ProfileViewBasic,
     val record: Post, // TODO: unknown
     val indexedAt: Date,
     val replyCount: Int? = null,

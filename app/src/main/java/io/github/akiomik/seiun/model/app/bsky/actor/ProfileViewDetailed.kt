@@ -4,7 +4,7 @@ import com.squareup.moshi.JsonClass
 import java.util.*
 
 @JsonClass(generateAdapter = true)
-data class ProfileView(
+data class ProfileViewDetailed(
     val did: String,
     val handle: String,
     val displayName: String? = null,

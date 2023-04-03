@@ -2,7 +2,7 @@ package io.github.akiomik.seiun.viewmodels
 
 import android.util.Log
 import io.github.akiomik.seiun.SeiunApplication
-import io.github.akiomik.seiun.model.app.bsky.actor.WithInfo
+import io.github.akiomik.seiun.model.app.bsky.actor.ProfileViewBasic
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
@@ -18,7 +18,7 @@ class FollowsViewModel(val did: String) : ApplicationViewModel() {
 
     private val _seenAllFollows = MutableStateFlow(false)
     private val _state = MutableStateFlow<State>(State.Loading)
-    private val _follows = MutableStateFlow<List<WithInfo>>(emptyList())
+    private val _follows = MutableStateFlow<List<ProfileViewBasic>>(emptyList())
     val seenAllFollows = _seenAllFollows.asStateFlow()
     val state = _state.asStateFlow()
     val follows = _follows.asStateFlow()
