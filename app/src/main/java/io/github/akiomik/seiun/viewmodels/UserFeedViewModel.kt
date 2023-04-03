@@ -1,7 +1,11 @@
 package io.github.akiomik.seiun.viewmodels
 
 import android.util.Log
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.model.app.bsky.actor.ProfileViewDetailed
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -143,4 +147,15 @@ class UserFeedViewModel(val did: String) : ApplicationViewModel() {
 //            onError = onError
 //        )
 //    }
+
+    companion object {
+        val didKey = object : CreationExtras.Key<String> {}
+
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val did = this[didKey]
+                UserFeedViewModel(did!!)
+            }
+        }
+    }
 }
