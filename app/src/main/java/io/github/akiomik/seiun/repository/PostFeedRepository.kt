@@ -5,9 +5,12 @@ import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.api.RequestHelper
 import io.github.akiomik.seiun.datasources.PostFeedCacheDataSource
 import io.github.akiomik.seiun.model.app.bsky.actor.ProfileViewDetailed
+import io.github.akiomik.seiun.model.app.bsky.embed.External
+import io.github.akiomik.seiun.model.app.bsky.embed.Images
+import io.github.akiomik.seiun.model.app.bsky.embed.Record
+import io.github.akiomik.seiun.model.app.bsky.embed.RecordWithMedia
 import io.github.akiomik.seiun.model.app.bsky.feed.AuthorFeed
 import io.github.akiomik.seiun.model.app.bsky.feed.FeedViewPost
-import io.github.akiomik.seiun.model.app.bsky.feed.ImagesOrExternalOrRecordOrRecordOrRecordWithMedia
 import io.github.akiomik.seiun.model.app.bsky.feed.Like
 import io.github.akiomik.seiun.model.app.bsky.feed.Post
 import io.github.akiomik.seiun.model.app.bsky.feed.PostReplyRef
@@ -15,12 +18,14 @@ import io.github.akiomik.seiun.model.app.bsky.feed.Repost
 import io.github.akiomik.seiun.model.app.bsky.feed.Timeline
 import io.github.akiomik.seiun.model.com.atproto.moderation.CreateReportInput
 import io.github.akiomik.seiun.model.com.atproto.moderation.CreateReportOutput
-import io.github.akiomik.seiun.model.com.atproto.moderation.RepoRefOrStrongRef
 import io.github.akiomik.seiun.model.com.atproto.repo.CreateRecordInput
 import io.github.akiomik.seiun.model.com.atproto.repo.CreateRecordOutput
 import io.github.akiomik.seiun.model.com.atproto.repo.DeleteRecordInput
+import io.github.akiomik.seiun.model.com.atproto.repo.StrongRef
 import io.github.akiomik.seiun.model.com.atproto.repo.UploadBlobOutput
 import io.github.akiomik.seiun.model.type.Blob
+import io.github.akiomik.seiun.model.type.Union2
+import io.github.akiomik.seiun.model.type.Union4
 import io.github.akiomik.seiun.utilities.UriConverter
 import kotlinx.coroutines.flow.Flow
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -134,7 +139,7 @@ class PostFeedRepository(private val authRepository: AuthRepository) : Applicati
                 image = imageBlob,
                 alt = ""
             )
-            ImagesOrExternalOrRecordOrRecordOrRecordWithMedia(images = listOf(image), type = "app.bsky.embed.images")
+            Union4.Element1<Images, External, Record, RecordWithMedia>(Images(images = listOf(image)))
         } else {
             null
         }
@@ -165,7 +170,7 @@ class PostFeedRepository(private val authRepository: AuthRepository) : Applicati
                     image = imageBlob,
                     alt = "app.bsky.feed.post"
                 )
-            ImagesOrExternalOrRecordOrRecordOrRecordWithMedia(images = listOf(image), type = "app.bsky.embed.images")
+            Union4.Element1<Images, External, Record, RecordWithMedia>(Images(images = listOf(image)))
         } else {
             null
         }
@@ -218,10 +223,11 @@ class PostFeedRepository(private val authRepository: AuthRepository) : Applicati
         )
 
         val body = CreateReportInput(
-            subject = RepoRefOrStrongRef(
-                type = "com.atproto.repo.recordRef",
-                uri = feedViewPost.post.uri,
-                cid = feedViewPost.post.cid
+            subject = Union2.Element2(
+                StrongRef(
+                    uri = feedViewPost.post.uri,
+                    cid = feedViewPost.post.cid
+                )
             ),
             reasonType = reasonType,
             reason = reason

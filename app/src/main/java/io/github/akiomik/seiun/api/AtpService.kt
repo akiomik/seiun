@@ -6,6 +6,8 @@ import com.slack.eithernet.DecodeErrorBody
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import io.github.akiomik.seiun.api.adapters.Union2JsonAdapter
+import io.github.akiomik.seiun.api.adapters.Union4JsonAdapter
 import io.github.akiomik.seiun.model.AtpError
 import io.github.akiomik.seiun.model.app.bsky.actor.ProfileViewDetailed
 import io.github.akiomik.seiun.model.app.bsky.feed.AuthorFeed
@@ -46,8 +48,10 @@ import java.util.*
 interface AtpService {
     companion object {
         private val moshi = Moshi.Builder()
-            .add(KotlinJsonAdapterFactory())
             .add(Date::class.java, Rfc3339DateJsonAdapter())
+            .add(Union2JsonAdapter.Factory)
+            .add(Union4JsonAdapter.Factory)
+            .add(KotlinJsonAdapterFactory())
             .build()
         private val logging = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC)
         private val client = OkHttpClient.Builder().addInterceptor(logging).build()
@@ -154,7 +158,7 @@ interface AtpService {
     @POST("app.bsky.notification.updateSeen")
     suspend fun updateNotificationSeen(
         @Header("Authorization") authorization: String,
-        @Body() body: UpdateNotificationSeenInput
+        @Body body: UpdateNotificationSeenInput
     ): ApiResult<Unit, AtpError>
 
     @DecodeErrorBody

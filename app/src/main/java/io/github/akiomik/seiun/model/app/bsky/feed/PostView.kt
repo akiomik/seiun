@@ -2,7 +2,12 @@ package io.github.akiomik.seiun.model.app.bsky.feed
 
 import com.squareup.moshi.JsonClass
 import io.github.akiomik.seiun.model.app.bsky.actor.ProfileViewBasic
+import io.github.akiomik.seiun.model.app.bsky.embed.ExternalView
+import io.github.akiomik.seiun.model.app.bsky.embed.ImagesView
+import io.github.akiomik.seiun.model.app.bsky.embed.RecordView
+import io.github.akiomik.seiun.model.app.bsky.embed.RecordWithMediaView
 import io.github.akiomik.seiun.model.com.atproto.repo.StrongRef
+import io.github.akiomik.seiun.model.type.Union4
 import java.util.*
 
 @JsonClass(generateAdapter = true)
@@ -16,7 +21,7 @@ data class PostView(
     val repostCount: Int? = null,
     val likeCount: Int? = null,
     val viewer: ViewerState? = null,
-    val embed: ImagesViewOrExternalViewOrRecordViewOrRecordWithMediaView? = null // TODO: union type
+    val embed: Union4<ImagesView, ExternalView, RecordView, RecordWithMediaView>? = null
 ) {
     fun reposted(uri: String): PostView {
         return copy(

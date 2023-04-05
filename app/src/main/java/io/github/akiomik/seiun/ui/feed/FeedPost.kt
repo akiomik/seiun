@@ -60,6 +60,7 @@ import coil.compose.AsyncImage
 import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.model.app.bsky.embed.ImagesViewImage
 import io.github.akiomik.seiun.model.app.bsky.feed.FeedViewPost
+import io.github.akiomik.seiun.model.type.Union4
 import io.github.akiomik.seiun.ui.components.LinkableText
 import io.github.akiomik.seiun.ui.dialog.DeleteDialog
 import io.github.akiomik.seiun.ui.dialog.MuteDialog
@@ -395,13 +396,10 @@ fun ImageTile(viewPost: FeedViewPost) {
     val paddingTop = 16.dp
     val maxHeight = 240.dp
 
-    viewPost.post.embed?.images?.let { images ->
+    if (viewPost.post.embed is Union4.Element1) {
+        val images = viewPost.post.embed.value.images
         if (images.size == 1) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = paddingTop)
-            ) {
+            Box(modifier = Modifier.fillMaxWidth().padding(top = paddingTop)) {
                 AsyncImage(
                     model = images[0].thumb,
                     contentDescription = images[0].alt,
