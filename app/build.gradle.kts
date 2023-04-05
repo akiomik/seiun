@@ -16,8 +16,8 @@ android {
         applicationId = "io.github.akiomik.seiun"
         minSdk = 28
         targetSdk = 33
-        versionCode = 17
-        versionName = "0.2.5"
+        versionCode = 18
+        versionName = "0.2.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
