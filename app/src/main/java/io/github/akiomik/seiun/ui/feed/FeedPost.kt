@@ -1,5 +1,7 @@
 package io.github.akiomik.seiun.ui.feed
 
+import android.content.Intent
+import android.net.Uri
 import android.text.format.DateFormat
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -33,8 +35,10 @@ import androidx.compose.material.icons.sharp.VolumeMute
 import androidx.compose.material.icons.sharp.Warning
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -53,8 +57,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.R
@@ -366,6 +372,7 @@ private fun FeedPostContent(viewPost: FeedViewPost) {
         }
 
         ImageTile(viewPost)
+        ExternalCard(viewPost)
 
         Row(
             modifier = Modifier
@@ -388,6 +395,58 @@ private fun FeedPostContent(viewPost: FeedViewPost) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ExternalCard(viewPost: FeedViewPost) {
+    if (viewPost.post.embed is Union4.Element2) {
+        val external = viewPost.post.embed.value.external
+        val context = LocalContext.current
+
+        OutlinedCard(
+            modifier = Modifier.padding(top = 16.dp),
+            onClick = {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(external.uri))
+                context.startActivity(intent)
+            }
+        ) {
+            external.thumb?.let { uri ->
+                AsyncImage(
+                    model = uri,
+                    contentDescription = external.title,
+                    modifier = Modifier.fillMaxWidth().height(160.dp),
+                    contentScale = ContentScale.Crop
+                )
+            }
+            Column(
+                modifier = Modifier.padding(12.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = external.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = external.uri,
+                    style = MaterialTheme.typography.labelMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = Color.Gray
+                )
+                if (external.description.isNotEmpty()) {
+                    Text(
+                        text = external.description,
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+        }
+    }
+}
+
 @Composable
 fun ImageTile(viewPost: FeedViewPost) {
     var showImagePager by remember { mutableStateOf(false) }
@@ -399,7 +458,11 @@ fun ImageTile(viewPost: FeedViewPost) {
     if (viewPost.post.embed is Union4.Element1) {
         val images = viewPost.post.embed.value.images
         if (images.size == 1) {
-            Box(modifier = Modifier.fillMaxWidth().padding(top = paddingTop)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = paddingTop)
+            ) {
                 AsyncImage(
                     model = images[0].thumb,
                     contentDescription = images[0].alt,
