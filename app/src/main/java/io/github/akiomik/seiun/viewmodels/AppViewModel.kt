@@ -20,6 +20,7 @@ object AppViewModel : ApplicationViewModel() {
     }
 
     private val innerAtpService = SeiunApplication.instance!!.atpService
+    private val preferencesRepository = SeiunApplication.instance!!.preferencesRepository
 
     private var innerProfileState = MutableStateFlow<ProfileState>(ProfileState.Init)
     private var innerProfile = MutableStateFlow<ProfileViewDetailed?>(null)
@@ -57,6 +58,14 @@ object AppViewModel : ApplicationViewModel() {
             },
             onError = { Log.d(SeiunApplication.TAG, "Failed to init ProfileViewModel: $it") }
         )
+    }
+
+    fun updateIsAutoTranslationEnabled(enabled: Boolean) {
+        preferencesRepository.updateIsAutoTranslationEnabled(enabled)
+    }
+
+    fun isAutoTranslationEnabled(): Boolean {
+        return preferencesRepository.load().isAutoTranslationEnabled
     }
 
     fun onTimeline() {

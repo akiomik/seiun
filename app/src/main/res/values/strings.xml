@@ -22,6 +22,7 @@
     <string name="update">Update</string>
     <string name="display_name">Display Name</string>
     <string name="description">About me</string>
+    <string name="auto_translation">Auto translation</string>
     <string name="login_title">Login</string>
     <string name="login_handle_or_email">Handle or Email</string>
     <string name="login_handle_or_email_placeholder">jack.bsky.social or jack@example.com</string>
@@ -50,6 +51,7 @@
     <string name="feed_posted">Your post has been published</string>
     <string name="feed_reposted">Reposted by %1$s</string>
     <string name="feed_replying">Replying to %1$s</string>
+    <string name="feed_translated_from">Translated from %1$s:</string>
     <string name="feed_no_more_posts">No more posts</string>
     <string name="feed_loading_error">Failed to get timeline. Please try later</string>
     <string name="feed_no_posts_yet">No posts yet</string>

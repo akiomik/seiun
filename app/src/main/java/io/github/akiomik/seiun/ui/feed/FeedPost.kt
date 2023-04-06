@@ -3,7 +3,6 @@ package io.github.akiomik.seiun.ui.feed
 import android.content.Intent
 import android.net.Uri
 import android.text.format.DateFormat
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
@@ -44,7 +43,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -57,6 +56,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -67,9 +67,9 @@ import coil.compose.AsyncImage
 import com.google.mlkit.common.model.DownloadConditions
 import com.google.mlkit.nl.languageid.LanguageIdentification
 import com.google.mlkit.nl.translate.Translation
+import com.google.mlkit.nl.translate.Translator
 import com.google.mlkit.nl.translate.TranslatorOptions
 import io.github.akiomik.seiun.R
-import io.github.akiomik.seiun.SeiunApplication
 import io.github.akiomik.seiun.model.app.bsky.embed.ImagesViewImage
 import io.github.akiomik.seiun.model.app.bsky.feed.FeedViewPost
 import io.github.akiomik.seiun.model.app.bsky.feed.Post
@@ -362,44 +362,54 @@ fun MenuButton(viewPost: FeedViewPost) {
 
 @Composable
 private fun TextTranslation(text: String) {
-    if (text.isEmpty()) {
+    val viewModel: AppViewModel = viewModel()
+    val isAutoTranslationEnabled by remember { mutableStateOf(viewModel.isAutoTranslationEnabled()) }
+
+    if (text.isEmpty() || !isAutoTranslationEnabled) {
         return
     }
 
     val languageIdentifier = LanguageIdentification.getClient()
-    val preferedLocale = Locale.getDefault()
+    val preferredLocale = Locale.getDefault()
     val conditions = DownloadConditions.Builder().requireWifi().build()
     var translatedText by remember { mutableStateOf<String?>(null) }
     var identifiedLanguageCode by remember { mutableStateOf<String?>(null) }
+    var isTranslating by remember { mutableStateOf(false) }
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-    SideEffect {
-        if (translatedText == null) {
-            Log.d(SeiunApplication.TAG, "Start translation")
+    DisposableEffect(lifecycleOwner) {
+        var translator: Translator? = null
+
+        if (translatedText == null && !isTranslating) {
             languageIdentifier.identifyLanguage(text).addOnSuccessListener { languageCode ->
                 identifiedLanguageCode = languageCode
 
-                Log.d(SeiunApplication.TAG, "Language code is $languageCode")
-                if (languageCode != preferedLocale.language) {
+                if (languageCode != preferredLocale.language) {
                     val options = TranslatorOptions.Builder().setSourceLanguage(languageCode)
-                        .setTargetLanguage(preferedLocale.language).build()
-                    val translator = Translation.getClient(options)
+                        .setTargetLanguage(preferredLocale.language).build()
+                    translator = Translation.getClient(options)
+                    lifecycleOwner.lifecycle.addObserver(translator!!)
 
-                    translator.downloadModelIfNeeded(conditions).addOnSuccessListener {
-                        Log.d(SeiunApplication.TAG, "Model is downloaded")
-                        translator.translate(text).addOnSuccessListener {
-                            Log.d(SeiunApplication.TAG, "translated! $it")
+                    translator?.downloadModelIfNeeded(conditions)?.addOnSuccessListener {
+                        isTranslating = true
+                        translator?.translate(text)?.addOnSuccessListener {
                             translatedText = it
+                            isTranslating = false
                         }
                     }
                 }
             }
+        }
+
+        onDispose {
+            translator?.let { lifecycleOwner.lifecycle.removeObserver(it) }
         }
     }
 
     if (identifiedLanguageCode != null && translatedText != null) {
         Column(modifier = Modifier.padding(top = 12.dp)) {
             val locale = Locale(identifiedLanguageCode.toString())
-            Text(text = "Translated from ${locale.displayLanguage}:")
+            Text(text = stringResource(R.string.feed_translated_from, locale.displayLanguage))
             Text(text = translatedText.toString())
         }
     }
