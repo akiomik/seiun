@@ -1,10 +1,11 @@
 package io.github.akiomik.seiun.model.app.bsky.graph
 
 import com.squareup.moshi.JsonClass
+import io.github.akiomik.seiun.model.type.Record
 import java.util.*
 
 @JsonClass(generateAdapter = true)
 data class Follow(
     val subject: String,
-    val createdAt: Date
-)
+    override val createdAt: Date
+) : Record

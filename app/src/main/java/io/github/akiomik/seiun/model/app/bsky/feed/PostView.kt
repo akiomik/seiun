@@ -7,6 +7,7 @@ import io.github.akiomik.seiun.model.app.bsky.embed.ImagesView
 import io.github.akiomik.seiun.model.app.bsky.embed.RecordView
 import io.github.akiomik.seiun.model.app.bsky.embed.RecordWithMediaView
 import io.github.akiomik.seiun.model.com.atproto.repo.StrongRef
+import io.github.akiomik.seiun.model.type.Record
 import io.github.akiomik.seiun.model.type.Union4
 import java.util.*
 
@@ -15,7 +16,7 @@ data class PostView(
     val uri: String,
     val cid: String,
     val author: ProfileViewBasic,
-    val record: Post, // TODO: unknown
+    val record: Record,
     val indexedAt: Date,
     val replyCount: Int? = null,
     val repostCount: Int? = null,

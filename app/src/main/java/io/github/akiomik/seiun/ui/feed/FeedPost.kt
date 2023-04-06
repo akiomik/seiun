@@ -66,6 +66,7 @@ import coil.compose.AsyncImage
 import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.model.app.bsky.embed.ImagesViewImage
 import io.github.akiomik.seiun.model.app.bsky.feed.FeedViewPost
+import io.github.akiomik.seiun.model.app.bsky.feed.Post
 import io.github.akiomik.seiun.model.type.Union4
 import io.github.akiomik.seiun.ui.components.LinkableText
 import io.github.akiomik.seiun.ui.dialog.DeleteDialog
@@ -354,44 +355,46 @@ fun MenuButton(viewPost: FeedViewPost) {
 
 @Composable
 private fun FeedPostContent(viewPost: FeedViewPost) {
-    val createdAt = DateFormat.format(
-        "yyyy/MM/dd HH:mm",
-        viewPost.post.record.createdAt.toInstant().toEpochMilli()
-    )
-
-    Column {
-        NameRow(viewPost = viewPost)
-
-        if (viewPost.post.record.text.isNotEmpty()) {
-            SelectionContainer {
-                LinkableText(
-                    text = viewPost.post.record.text,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-            }
-        }
-
-        ImageTile(viewPost)
-        ExternalCard(viewPost)
-
-        Row(
-            modifier = Modifier
-                .padding(top = 8.dp, bottom = 4.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            ReplyIndicator(viewPost = viewPost)
-            RepostIndicator(viewPost = viewPost)
-            LikeIndicator(viewPost = viewPost)
-            MenuButton(viewPost = viewPost)
-        }
-        Text(
-            modifier = Modifier.padding(bottom = 4.dp),
-            text = createdAt.toString(),
-            color = Color.Gray,
-            style = MaterialTheme.typography.labelMedium
+    if (viewPost.post.record is Post) {
+        val createdAt = DateFormat.format(
+            "yyyy/MM/dd HH:mm",
+            viewPost.post.record.createdAt.toInstant().toEpochMilli()
         )
+
+        Column {
+            NameRow(viewPost = viewPost)
+
+            if (viewPost.post.record.text.isNotEmpty()) {
+                SelectionContainer {
+                    LinkableText(
+                        text = viewPost.post.record.text,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
+            }
+
+            ImageTile(viewPost)
+            ExternalCard(viewPost)
+
+            Row(
+                modifier = Modifier
+                    .padding(top = 8.dp, bottom = 4.dp)
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                ReplyIndicator(viewPost = viewPost)
+                RepostIndicator(viewPost = viewPost)
+                LikeIndicator(viewPost = viewPost)
+                MenuButton(viewPost = viewPost)
+            }
+            Text(
+                modifier = Modifier.padding(bottom = 4.dp),
+                text = createdAt.toString(),
+                color = Color.Gray,
+                style = MaterialTheme.typography.labelMedium
+            )
+        }
     }
 }
 
