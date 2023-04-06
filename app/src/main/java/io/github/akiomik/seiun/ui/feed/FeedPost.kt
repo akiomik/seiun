@@ -43,6 +43,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,14 +56,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.google.mlkit.common.model.DownloadConditions
+import com.google.mlkit.nl.languageid.LanguageIdentification
+import com.google.mlkit.nl.translate.Translation
+import com.google.mlkit.nl.translate.Translator
+import com.google.mlkit.nl.translate.TranslatorOptions
 import io.github.akiomik.seiun.R
 import io.github.akiomik.seiun.model.app.bsky.embed.ImagesViewImage
 import io.github.akiomik.seiun.model.app.bsky.feed.FeedViewPost
@@ -77,6 +83,7 @@ import io.github.akiomik.seiun.ui.theme.Red700
 import io.github.akiomik.seiun.utilities.NumberFormatter
 import io.github.akiomik.seiun.viewmodels.AppViewModel
 import io.github.akiomik.seiun.viewmodels.PostViewModel
+import java.util.*
 
 @Composable
 private fun RepostText(viewPost: FeedViewPost) {
@@ -354,6 +361,61 @@ fun MenuButton(viewPost: FeedViewPost) {
 }
 
 @Composable
+private fun TextTranslation(text: String) {
+    val viewModel: AppViewModel = viewModel()
+    val isAutoTranslationEnabled by remember { mutableStateOf(viewModel.isAutoTranslationEnabled()) }
+
+    if (text.isEmpty() || !isAutoTranslationEnabled) {
+        return
+    }
+
+    val languageIdentifier = LanguageIdentification.getClient()
+    val preferredLocale = Locale.getDefault()
+    val conditions = DownloadConditions.Builder().requireWifi().build()
+    var translatedText by remember { mutableStateOf<String?>(null) }
+    var identifiedLanguageCode by remember { mutableStateOf<String?>(null) }
+    var isTranslating by remember { mutableStateOf(false) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner) {
+        var translator: Translator? = null
+
+        if (translatedText == null && !isTranslating) {
+            languageIdentifier.identifyLanguage(text).addOnSuccessListener { languageCode ->
+                identifiedLanguageCode = languageCode
+
+                if (languageCode != preferredLocale.language) {
+                    val options = TranslatorOptions.Builder().setSourceLanguage(languageCode)
+                        .setTargetLanguage(preferredLocale.language).build()
+                    translator = Translation.getClient(options)
+                    lifecycleOwner.lifecycle.addObserver(translator!!)
+
+                    translator?.downloadModelIfNeeded(conditions)?.addOnSuccessListener {
+                        isTranslating = true
+                        translator?.translate(text)?.addOnSuccessListener {
+                            translatedText = it
+                            isTranslating = false
+                        }
+                    }
+                }
+            }
+        }
+
+        onDispose {
+            translator?.let { lifecycleOwner.lifecycle.removeObserver(it) }
+        }
+    }
+
+    if (identifiedLanguageCode != null && translatedText != null) {
+        Column(modifier = Modifier.padding(top = 12.dp)) {
+            val locale = Locale(identifiedLanguageCode.toString())
+            Text(text = stringResource(R.string.feed_translated_from, locale.displayLanguage))
+            Text(text = translatedText.toString())
+        }
+    }
+}
+
+@Composable
 private fun FeedPostContent(viewPost: FeedViewPost) {
     if (viewPost.post.record is Post) {
         val createdAt = DateFormat.format(
@@ -371,6 +433,10 @@ private fun FeedPostContent(viewPost: FeedViewPost) {
                         modifier = Modifier.padding(top = 8.dp)
                     )
                 }
+            }
+
+            if (viewPost.post.record.text.isNotEmpty()) {
+                TextTranslation(text = viewPost.post.record.text)
             }
 
             ImageTile(viewPost)
@@ -416,7 +482,9 @@ fun ExternalCard(viewPost: FeedViewPost) {
                 AsyncImage(
                     model = uri,
                     contentDescription = external.title,
-                    modifier = Modifier.fillMaxWidth().height(160.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(160.dp),
                     contentScale = ContentScale.Crop
                 )
             }

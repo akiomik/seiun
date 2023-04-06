@@ -24,6 +24,7 @@
     <string name="update">更新</string>
     <string name="display_name">名前</string>
     <string name="description">自己紹介</string>
+    <string name="auto_translation">自動翻訳🎋</string>
     <string name="login_handle_or_email">ハンドルネーム または メールアドレス</string>
     <string name="login_handle_or_email_placeholder">jack.bsky.social または jack@example.com</string>
     <string name="login_password">パスワード</string>
@@ -51,6 +52,7 @@
     <string name="feed_posted">投稿しました</string>
     <string name="feed_reposted">%1$s がリポスト</string>
     <string name="feed_replying">%1$s への返信</string>
+    <string name="feed_translated_from">%1$s から翻訳:</string>
     <string name="feed_no_more_posts">これ以上投稿はありません</string>
     <string name="feed_loading_error">タイムラインの取得に失敗しました。後ほどお試しください</string>
     <string name="feed_no_posts_yet">まだ投稿がありません</string>

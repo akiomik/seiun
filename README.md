@@ -29,3 +29,4 @@ Google Play and the Google Play logo are trademarks of Google LLC.
 - Push notification (experimental)
 - Custom service provider
 - i18n support (en-US / ja-JP)
+- Auto translation (experimental)

@@ -16,11 +16,15 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -88,9 +92,10 @@ fun AppDrawer(
     onProfileClick: (ProfileViewDetailed) -> Unit,
     content: @Composable () -> Unit
 ) {
-//    var selected by remember { mutableStateOf("") }
+    val viewModel: AppViewModel = viewModel()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    var isAutoTranslationEnabled by remember { mutableStateOf(viewModel.isAutoTranslationEnabled()) }
 
     ModalNavigationDrawer(
         drawerState = state,
@@ -106,7 +111,6 @@ fun AppDrawer(
                 }
 
                 NavigationDrawerItem(
-//                    selected = selected == "license",
                     selected = false,
                     onClick = {
                         scope.launch { state.close() }
@@ -117,6 +121,30 @@ fun AppDrawer(
                         // NOTE: Do NOT update selected for license
                     },
                     label = { Text(stringResource(R.string.license)) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+
+                NavigationDrawerItem(
+                    selected = false,
+                    onClick = {
+                        isAutoTranslationEnabled = !isAutoTranslationEnabled
+                        viewModel.updateIsAutoTranslationEnabled(isAutoTranslationEnabled)
+                    },
+                    label = {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Switch(
+                                checked = isAutoTranslationEnabled,
+                                onCheckedChange = {
+                                    isAutoTranslationEnabled = it
+                                    viewModel.updateIsAutoTranslationEnabled(it)
+                                }
+                            )
+                            Text(stringResource(R.string.auto_translation))
+                        }
+                    },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
             }
