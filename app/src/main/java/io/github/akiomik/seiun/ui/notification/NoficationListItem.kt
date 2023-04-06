@@ -4,8 +4,10 @@ import android.text.format.DateFormat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ListItem
@@ -19,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.R
+import io.github.akiomik.seiun.model.app.bsky.feed.Post
 import io.github.akiomik.seiun.model.app.bsky.notification.Notification
 
 const val DATETIME_FORMAT = "yyyy/MM/dd HH:mm"
@@ -54,6 +57,7 @@ private fun LikeItem(notification: Notification, onProfileClick: (String) -> Uni
             )
         },
         supportingContent = {
+            Spacer(modifier = Modifier.size(8.dp))
             Text(
                 text = createdAt.toString(),
                 color = Color.Gray,
@@ -81,6 +85,7 @@ private fun RepostItem(notification: Notification, onProfileClick: (String) -> U
             )
         },
         supportingContent = {
+            Spacer(modifier = Modifier.size(8.dp))
             Text(
                 text = createdAt.toString(),
                 color = Color.Gray,
@@ -108,6 +113,7 @@ private fun FollowItem(notification: Notification, onProfileClick: (String) -> U
             )
         },
         supportingContent = {
+            Spacer(modifier = Modifier.size(8.dp))
             Text(
                 text = createdAt.toString(),
                 color = Color.Gray,
@@ -119,6 +125,10 @@ private fun FollowItem(notification: Notification, onProfileClick: (String) -> U
 
 @Composable
 private fun MentionItem(notification: Notification, onProfileClick: (String) -> Unit) {
+    if (notification.record !is Post) {
+        return
+    }
+
     val createdAt = DateFormat.format(
         DATETIME_FORMAT,
         notification.record.createdAt.toInstant().toEpochMilli()
@@ -135,6 +145,9 @@ private fun MentionItem(notification: Notification, onProfileClick: (String) -> 
             )
         },
         supportingContent = {
+            Spacer(modifier = Modifier.size(8.dp))
+            Text(notification.record.text)
+            Spacer(modifier = Modifier.size(8.dp))
             Text(
                 text = createdAt.toString(),
                 color = Color.Gray,
@@ -146,6 +159,10 @@ private fun MentionItem(notification: Notification, onProfileClick: (String) -> 
 
 @Composable
 private fun ReplyItem(notification: Notification, onProfileClick: (String) -> Unit) {
+    if (notification.record !is Post) {
+        return
+    }
+
     val createdAt = DateFormat.format(
         DATETIME_FORMAT,
         notification.record.createdAt.toInstant().toEpochMilli()
@@ -162,6 +179,9 @@ private fun ReplyItem(notification: Notification, onProfileClick: (String) -> Un
             )
         },
         supportingContent = {
+            Spacer(modifier = Modifier.size(8.dp))
+            Text(notification.record.text)
+            Spacer(modifier = Modifier.size(8.dp))
             Text(
                 text = createdAt.toString(),
                 color = Color.Gray,
@@ -173,6 +193,10 @@ private fun ReplyItem(notification: Notification, onProfileClick: (String) -> Un
 
 @Composable
 private fun QuoteItem(notification: Notification, onProfileClick: (String) -> Unit) {
+    if (notification.record !is Post) {
+        return
+    }
+
     val createdAt = DateFormat.format(
         DATETIME_FORMAT,
         notification.record.createdAt.toInstant().toEpochMilli()
@@ -189,6 +213,9 @@ private fun QuoteItem(notification: Notification, onProfileClick: (String) -> Un
             )
         },
         supportingContent = {
+            Spacer(modifier = Modifier.size(8.dp))
+            Text(notification.record.text)
+            Spacer(modifier = Modifier.size(8.dp))
             Text(
                 text = createdAt.toString(),
                 color = Color.Gray,
