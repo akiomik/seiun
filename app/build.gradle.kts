@@ -90,6 +90,8 @@ dependencies {
     implementation(libs.bundles.coil)
     implementation(libs.play.services.oss.licenses)
     implementation(libs.toolbar.compose)
+    implementation(libs.mlkit.translate)
+    implementation(libs.mlkit.language.id)
 
     testImplementation(libs.bundles.test)
     androidTestImplementation(libs.bundles.android.test)

@@ -60,6 +60,10 @@ play-services-oss-licenses = "com.google.android.gms:play-services-oss-licenses:
 # collapsing toolbar for user page
 toolbar-compose = "me.onebone:toolbar-compose:2.3.5"
 
+# translation
+mlkit-translate = "com.google.mlkit:translate:17.0.1"
+mlkit-language-id = "com.google.mlkit:language-id:17.0.4"
+
 [bundles]
 androidx = [
     "activity-compose",
