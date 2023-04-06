@@ -8,13 +8,14 @@ import io.github.akiomik.seiun.model.app.bsky.embed.RecordWithMedia
 import io.github.akiomik.seiun.model.app.bsky.richtext.Facet
 import io.github.akiomik.seiun.model.type.Union4
 import java.util.*
+import io.github.akiomik.seiun.model.type.Record as IRecord
 
 @JsonClass(generateAdapter = true)
 data class Post(
     val text: String,
-    val createdAt: Date,
+    override val createdAt: Date,
     val entities: List<PostEntity>? = null,
     val facets: List<Facet>? = null,
     val reply: PostReplyRef? = null,
     val embed: Union4<Images, External, Record, RecordWithMedia>? = null
-)
+) : IRecord

@@ -6,6 +6,7 @@ import com.slack.eithernet.DecodeErrorBody
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import io.github.akiomik.seiun.api.adapters.RecordJsonAdapterFactory
 import io.github.akiomik.seiun.api.adapters.Union2JsonAdapter
 import io.github.akiomik.seiun.api.adapters.Union4JsonAdapter
 import io.github.akiomik.seiun.model.AtpError
@@ -51,6 +52,7 @@ interface AtpService {
             .add(Date::class.java, Rfc3339DateJsonAdapter())
             .add(Union2JsonAdapter.Factory)
             .add(Union4JsonAdapter.Factory)
+            .add(RecordJsonAdapterFactory)
             .add(KotlinJsonAdapterFactory())
             .build()
         private val logging = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC)

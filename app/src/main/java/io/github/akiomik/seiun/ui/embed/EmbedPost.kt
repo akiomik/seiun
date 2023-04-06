@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import io.github.akiomik.seiun.model.app.bsky.feed.FeedViewPost
+import io.github.akiomik.seiun.model.app.bsky.feed.Post
 
 @Composable
 private fun Avatar(viewPost: FeedViewPost) {
@@ -68,20 +69,25 @@ private fun NameRow(viewPost: FeedViewPost) {
 
 @Composable
 private fun PostContent(viewPost: FeedViewPost) {
-    val createdAt = DateFormat.format(
-        "yyyy/MM/dd HH:mm",
-        viewPost.post.record.createdAt.toInstant().toEpochMilli()
-    )
-
-    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        NameRow(viewPost = viewPost)
-        Text(text = viewPost.post.record.text)
-        Text(
-            modifier = Modifier.padding(bottom = 4.dp),
-            text = createdAt.toString(),
-            color = Color.Gray,
-            style = MaterialTheme.typography.labelMedium
+    if (viewPost.post.record is Post) {
+        val createdAt = DateFormat.format(
+            "yyyy/MM/dd HH:mm",
+            viewPost.post.record.createdAt.toInstant().toEpochMilli()
         )
+
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            NameRow(viewPost = viewPost)
+            Text(text = viewPost.post.record.text)
+            Text(
+                modifier = Modifier.padding(bottom = 4.dp),
+                text = createdAt.toString(),
+                color = Color.Gray,
+                style = MaterialTheme.typography.labelMedium
+            )
+        }
     }
 }
 
